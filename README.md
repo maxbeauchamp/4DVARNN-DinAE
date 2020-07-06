@@ -43,4 +43,8 @@ when interpolating pseudo irregular and noisy wide-swath SWOT observations built
 (top-right panel) from  an idealized groundtruth (top-left panel) with state-of-the-art 
 optimal interpolation (bottom-left panel) and the newly proposed end-to-end learning approach: 
 
-![Farmers Market Finder Demo](figs/animation_grads_OSSE.gif)
+Nadir only                 |  Nadir+SWOT
+:-------------------------:|:-------------------------:
+![Farmers Market Finder Demo](figs/animation_grads_OSSE.gif)  |  ![Farmers Market Finder Demo](figs/animation_grads_OSSE.gif)
+
+
