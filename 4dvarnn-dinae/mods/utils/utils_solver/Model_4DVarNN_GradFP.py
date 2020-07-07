@@ -21,23 +21,23 @@ from .mods.utils.utils_solver.model_GradUpdate3    import model_GradUpdate3
 # fixed-point iterations prior to a gradient-based minimization
 class Model_4DVarNN_GradFP(torch.nn.Module):
     def __init__(self,mod_AE,ShapeData,NiterProjection,NiterGrad,GradType,OptimType,InterpFlag=False,periodicBnd=False):
-    #def __init__(self,mod_AE,GradType,OptimType):
         super(Model_4DVarNN_GradFP, self).__init__()
-
         self.model_AE = mod_AE
-
         with torch.no_grad():
-            print('Opitm type %d'%OptimType)
+            print('Optim type %d'%OptimType)
             self.OptimType = OptimType
             self.NProjFP   = int(NiterProjection)
             self.NGrad     = int(NiterGrad)
             self.InterpFlag  = InterpFlag
             self.periodicBnd = periodicBnd
-
+        # Define Solver type according to OptimType
+        ## Gradient-based minimization using a fixed-step descent
         if OptimType == 0:
           self.model_Grad = model_GradUpdate0(ShapeData,GradType)
+        ## Gradient-based minimization using a CNN using a (sub)gradient as inputs 
         elif OptimType == 1:
           self.model_Grad = model_GradUpdate1(ShapeData,GradType,self.periodicBnd)
+        ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs
         elif OptimType == 2:
           self.model_Grad = model_GradUpdate2(ShapeData,GradType,self.periodicBnd)
         elif OptimType == 3:
@@ -45,15 +45,11 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 
     def forward(self, x_inp,xobs,mask,g1=None,g2=None,normgrad=0.0):
         mask_  = torch.add(1.0,torch.mul(mask,-1.0)) #1. - mask
-        
         x      = torch.mul(x_inp,1.0)
 
         # fixed-point iterations
         if self.NProjFP > 0:
-          for kk in range(0,self.NProjFP):
-        #if NiterProjection > 0:
-        #  x      = torch.mul(x_inp,1.0)
-        #  for kk in range(0,NiterProjection):            
+          for kk in range(0,self.NProjFP):        
             x_proj = self.model_AE(x)
             x_proj = torch.mul(x_proj,mask_)
             x      = torch.mul(x, mask)   
@@ -68,26 +64,25 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             else:
                 _normgrad = normgrad
             for kk in range(0,self.NGrad):
-                # AE pediction
+                # AE prediction
                 xpred = self.model_AE(x)
-             
                 # gradient update
+                ## Gradient-based minimization using a fixed-step descent
                 if self.OptimType == 0:
                     grad  = self.model_Grad( x, xpred, xobs, mask , _normgrad )
-        
+                ## Gradient-based minimization using a CNN using a (sub)gradient as inputs
                 elif self.OptimType == 1:               
                   if kk == 0:
                     grad  = self.model_Grad( x, xpred, xobs, mask, g1 , _normgrad)
                   else:
                     grad  = self.model_Grad( x, xpred, xobs, mask,grad_old , _normgrad)
                   grad_old = torch.mul(1.,grad)
-        
+                ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs
                 elif self.OptimType == 2:               
                   if kk == 0:
                     grad,hidden,cell  = self.model_Grad( x, xpred, xobs, mask, g1, g2 , _normgrad )
                   else:
                     grad,hidden,cell  = self.model_Grad( x, xpred, xobs, mask, hidden, cell , _normgrad )
-        
                 # interpolation constraint
                 if( self.InterpFlag == True ):
                     # optimization update

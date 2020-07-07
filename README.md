@@ -36,6 +36,33 @@ same conditions as regards security.
 The fact that you are presently reading this means that you have had
 knowledge of the CeCILL-C license and that you accept its terms.
 
+## Architecture of the code
+
+### utils/utils_solver
+
+* Model_4DVarNN_GradFP.py: First, it uses a set of FP iterations to define x_proj, the output of the NN. Then, it uses a set of Gradient-based iterations to minimize the targeted 4DVAR cost:
+![formula](https://render.githubusercontent.com/render/math?math=U_\Phi\left ( x , y , \Omega\right ) = \lambda_1 \sum_n \left \|x(t_n)-y(t_n)\right \|^2_{\Omega _{t_i}} + \lambda_2 \sum_n \left \|x(t_n) - \Phi(x)(t_n) \right \|^2)
+According to OptimType, the class is initialized with the appropriate gradient-based solver in model_GradUpdateX.py for the minimization, i.e.:
+  * if OptimType == 0, load model_GradUpdate0.py : Gradient-based minimization using a fixed-step descent
+  * if OptimType == 1, load model_GradUpdate1.py : Gradient-based minimization using a CNN using a (sub)gradient as inputs
+  * if OptimType == 2, load model_GradUpdate2.py : Gradient-based minimization using a LSTM using a (sub)gradient as inputs
+
+* Compute_Grad.py: According to GradType, define the type of loss function to use when using automatic differential tools used for the gradient-based descent in model_GradUpdateX.py for solving the minimisation of the 4DVar cost.
+  * GradType == 0: subgradient for prior ||x-g(x)||^2 
+  * GradType == 1: true gradient using autograd for prior ||x-g(x)||^2
+  * GradType == 2: true gradient using autograd for prior ||x-g(x)||
+  * GradType == 3: true gradient using autograd for prior ||x-g1(x)||^2 + ||x-g2(x)||^2
+  * GradType == 4: true gradient using autograd for prior ||g(x)||^2
+
+* ConvLSTM2d.py: Define a Pytorch version of a 2D convolutional LSTM
+
+### utils/utils_nn
+
+* ConvAE.py: Convolutional auto-encoder for operator Phi
+* GENN.py: Gibbs-Energy-based NN for operator Phi
+* ResNetConv2d.py: Define a ResNet architecture (Conv2d)   
+* ConstrainedConv2d.py: Define a Constrained Conv2D Layer with zero-weight at central point
+
 ## Results
 
 Below is an illustration of the results obtained on the daily velocity SSH field

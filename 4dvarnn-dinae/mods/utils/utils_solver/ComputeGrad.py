@@ -15,11 +15,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class Compute_Grad(torch.nn.Module):
     def __init__(self,ShapeData,GradType):
         super(Compute_Grad, self).__init__()
-
         with torch.no_grad():
             self.GradType  = GradType
-            self.shape     = ShapeData
-        
+            self.shape     = ShapeData        
         self.alphaObs    = torch.nn.Parameter(torch.Tensor([1.]))
         self.alphaAE     = torch.nn.Parameter(torch.Tensor([1.]))
         if( self.GradType == 3 ):
@@ -31,43 +29,29 @@ class Compute_Grad(torch.nn.Module):
             self.alphaL1    = torch.nn.Parameter(torch.Tensor([1.]))
             self.alphaL2     = torch.nn.Parameter(torch.Tensor([1.]))
 
-    def forward(self, x,xpred,xobs,mask):
+    def forward(self,x,xpred,xobs,mask):
 
         # compute gradient
-        if self.GradType == 0: ## subgradient for prior ||x-g(x)||^2 
+        ## subgradient for prior ||x-g(x)||^2 
+        if self.GradType == 0: 
           grad  = torch.add(xpred,-1.,x)
           grad2 = torch.add(x,-1.,xobs)
           grad  = torch.add(grad,1.,grad2)
           grad  = self.alphaAE * grad + self.alphaObs * grad2
-
-        elif self.GradType == 1: ## true gradient using autograd for prior ||x-g(x)||^2 
+        ## true gradient using autograd for prior ||x-g(x)||^2 
+        elif self.GradType == 1: 
           loss1 = torch.mean( (xpred - x)**2 )
           loss2 = torch.sum( (xobs - x)**2 * mask ) / torch.sum( mask )
           loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
-          #=loss  = loss / ( self.alphaAE**2 + self.alphaObs**2)
-
           grad = torch.autograd.grad(loss,x,create_graph=True)[0]
-          #grad = torch.autograd.grad(loss,x)[0]
-          
-        elif self.GradType == 2: ## true gradient using autograd for prior ||x-g(x)||
+        ## true gradient using autograd for prior ||x-g(x)||
+        elif self.GradType == 2: 
           loss1 = self.alphaL2**2 * torch.mean( (xpred - x)**2 ) + self.alphaL1**2 * torch.mean( torch.abs(xpred - x) )
           loss2 = torch.sum( (xobs - x)**2 * mask ) / torch.sum( mask )
           loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
-          #=loss  = loss / ( self.alphaAE**2 + self.alphaObs**2)
-
           grad = torch.autograd.grad(loss,x,create_graph=True)[0]
-          #grad = torch.autograd.grad(loss,x)[0]
-
-        elif self.GradType == 4: ## true gradient using autograd for prior ||g(x)||^2 
-          loss1 = torch.mean( xpred **2 )
-          loss2 = torch.sum( (xobs - x)**2 * mask ) / torch.sum( mask )
-          loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
-          #=loss  = loss / ( self.alphaAE**2 + self.alphaObs**2)
-
-          grad = torch.autograd.grad(loss,x,create_graph=True)[0]
-          #grad = torch.autograd.grad(loss,x)[0]
-        
-        elif self.GradType == 3: ## true gradient using autograd for prior ||x-g1(x)||^2 + ||x-g2(x)||^2 
+        ## true gradient using autograd for prior ||x-g1(x)||^2 + ||x-g2(x)||^2 
+        elif self.GradType == 3: 
           if len(self.shape) == 2 :            
             for ii in range(0,xpred.size(1)):
                if( ii == 0 ):
@@ -82,8 +66,12 @@ class Compute_Grad(torch.nn.Module):
               
           loss2 = torch.sum( (xobs - x)**2 * mask ) / torch.sum( mask )
           loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
-          #=loss  = loss / ( self.alphaAE**2 + self.alphaObs**2)
-
+          grad = torch.autograd.grad(loss,x,create_graph=True)[0]
+        ## true gradient using autograd for prior ||g(x)||^2 
+        elif self.GradType == 4: 
+          loss1 = torch.mean( xpred **2 )
+          loss2 = torch.sum( (xobs - x)**2 * mask ) / torch.sum( mask )
+          loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
           grad = torch.autograd.grad(loss,x,create_graph=True)[0]
 
         # Check is this is needed or not
