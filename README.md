@@ -40,21 +40,22 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 ### utils/utils_solver
 
-* Model_4DVarNN_GradFP.py: First, it uses a set of FP iterations to define x_proj, the output of the NN. Then, it uses a set of Gradient-based iterations to minimize the targeted 4DVAR cost:
-![formula](https://render.githubusercontent.com/render/math?math=U_\Phi\left ( x , y , \Omega\right ) = \lambda_1 \sum_n \left \|x(t_n)-y(t_n)\right \|^2_{\Omega _{t_i}} + \lambda_2 \sum_n \left \|x(t_n) - \Phi(x)(t_n) \right \|^2)
-According to OptimType, the class is initialized with the appropriate gradient-based solver in model_GradUpdateX.py for the minimization, i.e.:
-  * if OptimType == 0, load model_GradUpdate0.py : Gradient-based minimization using a fixed-step descent
-  * if OptimType == 1, load model_GradUpdate1.py : Gradient-based minimization using a CNN using a (sub)gradient as inputs
-  * if OptimType == 2, load model_GradUpdate2.py : Gradient-based minimization using a LSTM using a (sub)gradient as inputs
+* Model_4DVarNN_GradFP.py: First, it uses a set of FP iterations to define x_proj, the output of the NN. Then, it uses a set of Gradient-based iterations to find operator <img src="https://render.githubusercontent.com/render/math?math=\Phi"> minimizing the targeted 4DVAR cost:
+<img src="https://render.githubusercontent.com/render/math?math=U_\Phi\left ( x , y , \Omega\right ) = \lambda_1 \sum_n \left \|x(t_n)-y(t_n)\right \|^2_{\Omega _{t_i}} %2B \lambda_2 \sum_n \left \|x(t_n) - \Phi(x)(t_n) \right \|^2">
 
-* Compute_Grad.py: According to GradType, define the type of loss function to use when using automatic differential tools used for the gradient-based descent in model_GradUpdateX.py for solving the minimisation of the 4DVar cost.
+It will involve a joint learning scheme of operator <img src="https://render.githubusercontent.com/render/math?math=\Phi"> and solver <img src="https://render.githubusercontent.com/render/math?math=\Gamma"> through a bi-level optimization scheme:
+<img src="https://render.githubusercontent.com/render/math?math=\arg \min_{\Phi} \sum_n {\cal{L}} (x_n,\tilde{x}_n) \mbox{  s.t.  } \tilde{x}_n = \arg \min_x  U_\Phi \left ( x,y_n , \Omega_n\right)">
+where <img src="https://render.githubusercontent.com/render/math?math=\cal{L}"> is loss function to use when using automatic differential tools. It is defined according to GradType in Compute_Grad.py:
   * GradType == 0: subgradient for prior ||x-g(x)||^2 
   * GradType == 1: true gradient using autograd for prior ||x-g(x)||^2
   * GradType == 2: true gradient using autograd for prior ||x-g(x)||
   * GradType == 3: true gradient using autograd for prior ||x-g1(x)||^2 + ||x-g2(x)||^2
   * GradType == 4: true gradient using autograd for prior ||g(x)||^2
 
-* ConvLSTM2d.py: Define a Pytorch version of a 2D convolutional LSTM
+According to OptimType, the class is initialized with the appropriate gradient-based solver <img src="https://render.githubusercontent.com/render/math?math=\Gamma"> in model_GradUpdateX.py for the minimization, i.e.:
+  * if OptimType == 0, load model_GradUpdate0.py : Gradient-based minimization using a fixed-step descent
+  * if OptimType == 1, load model_GradUpdate1.py : Gradient-based minimization using a CNN using a (sub)gradient as inputs
+  * if OptimType == 2, load model_GradUpdate2.py : Gradient-based minimization using a 2D convolutional LSTM using a (sub)gradient as inputs defined in ConvLSTM2d.py
 
 ### utils/utils_nn
 
