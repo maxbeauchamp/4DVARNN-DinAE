@@ -15,11 +15,11 @@ def plot_Figs(dirSAVE,genFilename,genSuffixModel,\
     if include_covariates == True:
         index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
         mask_train      = mask_train[:,index,:,:]
-        x_train         = np.moveaxis(x_train[:,index,:,:]
-        x_train_missing = np.moveaxis(x_train_missing[:,index,:,:]
+        x_train         = x_train[:,index,:,:]
+        x_train_missing = x_train_missing[:,index,:,:]
         mask_test       = mask_test[:,index,:,:]
-        x_test         = x_test[:,index,:,:]
-        x_test_missing = x_test_missing[:,index,:,:]
+        x_test          = x_test[:,index,:,:]
+        x_test_missing  = x_test_missing[:,index,:,:]
         meanTr = meanTr[0]
         stdTr  = stdTr[0]
 

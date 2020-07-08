@@ -3,8 +3,9 @@ from .tools import *
 from .graphics import *
 
 def save_Pickle(dirSAVE,\
-                x_train,x_train_missing,x_train_pred,rec_AE_Tr,meanTr,stdTr,\     
-                x_test,x_test_missing,x_test_pred,rec_AE_Tt):     
+                x_train,x_train_missing,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\     
+                x_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,\
+                iter):     
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
@@ -15,10 +16,10 @@ def save_Pickle(dirSAVE,\
     ## keep only the information on the target variable (remove covariates)
     if include_covariates == True:
         index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
-        x_train         = np.moveaxis(x_train[:,index,:,:]
-        x_train_missing = np.moveaxis(x_train_missing[:,index,:,:]
-        x_test         = x_test[:,index,:,:]
-        x_test_missing = x_test_missing[:,index,:,:]
+        x_train         = x_train[:,index,:,:]
+        x_train_missing = x_train_missing[:,index,:,:]
+        x_test          = x_test[:,index,:,:]
+        x_test_missing  = x_test_missing[:,index,:,:]
         meanTr = meanTr[0]
         stdTr  = stdTr[0]
 
@@ -49,8 +50,10 @@ def save_Pickle(dirSAVE,\
                      x_train_missing[:,:,:,idT],\
                      x_train_pred[:,:,:,idT],\
                      rec_AE_Tr[:,:,:,idT],\
+                     x_train_OI[:,:,:,idT],\
                      x_test[:,:,:,idT],\
                      x_test_missing[:,:,:,idT],\
                      x_test_pred[:,:,:,idT],\
                      rec_AE_Tt[:,:,:,idT],\
+                     x_test_OI[:,:,:,idT],\
                     ], handle)

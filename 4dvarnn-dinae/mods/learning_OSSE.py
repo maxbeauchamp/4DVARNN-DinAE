@@ -300,6 +300,6 @@ def learning_OSSE(dict_global_Params,genFilename,\
                   lday_pred,lday_test,iter)
         ## save results in a pickle file
         save_Pickle(dirSAVE,\
-                    gt_train,x_train_missing,x_train_pred,rec_AE_Tr,meanTr,stdTr,\     
-                    gt_test,x_test_missing,x_test_pred,rec_AE_Tt,\
+                    gt_train,x_train_missing,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\     
+                    gt_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,\
                     iter)       
