@@ -38,10 +38,10 @@ knowledge of the CeCILL-C license and that you accept its terms.
 
 ## Architecture of the code
 
-It will involve a joint learning scheme of operator <img src="https://render.githubusercontent.com/render/math?math=\Phi"> and solver <img src="https://render.githubusercontent.com/render/math?math=\Gamma"> through a bi-level optimization scheme:
-<img src="https://render.githubusercontent.com/render/math?math=\arg \min_{\Phi,\Gamma} \sum_n {\cal{L}} (x_n,\tilde{x}_n) \mbox{  s.t.  } \tilde{x}_n = \arg \min_x  U_\Phi \left ( x,y_n , \Omega_n\right)"> 
-where <img src="https://render.githubusercontent.com/render/math?math=U_\PhiU_\Phi"> is the 4DVAR cost function:
-<img src="https://render.githubusercontent.com/render/math?math=U_\Phi\left ( x , y , \Omega\right ) = \lambda_1 \sum_n \left \|x(t_n)-y(t_n)\right \|^2_{\Omega _{t_i}} %2B \lambda_2 \sum_n \left \|x(t_n) - \Phi(x)(t_n) \right \|^2">
+It will involve a joint learning scheme of operator <img src="https://render.githubusercontent.com/render/math?math=\Phi"> and solver <img src="https://render.githubusercontent.com/render/math?math=\Gamma"> through a bi-level optimization scheme:  
+<img src="https://render.githubusercontent.com/render/math?math=\arg \min_{\Phi,\Gamma} \sum_n {\cal{L}} (x_n,\tilde{x}_n) \mbox{  s.t.  } \tilde{x}_n = \arg \min_x  U_\Phi \left ( x,y_n , \Omega_n\right)">  
+where <img src="https://render.githubusercontent.com/render/math?math=U_\Phi"> is the 4DVAR cost function:  
+<img src="https://render.githubusercontent.com/render/math?math=U_\Phi\left ( x , y , \Omega\right ) = \lambda_1 \sum_n \left \|x(t_n)-y(t_n)\right \|^2_{\Omega _{t_i}} %2B \lambda_2 \sum_n \left \|x(t_n) - \Phi(x)(t_n) \right \|^2">  
 and <img src="https://render.githubusercontent.com/render/math?math=\cal{L}"> is the loss function to use when using automatic differential tools in the neural network. This loss is defined according to the GradType flag in utils/utils_solver/Compute_Grad.py:
   * GradType == 0: subgradient for prior <img src="https://render.githubusercontent.com/render/math?math=||x-g(x)||^2"> 
   * GradType == 1: true gradient using autograd for prior <img src="https://render.githubusercontent.com/render/math?math=||x-g(x)||^2">
