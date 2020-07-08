@@ -40,19 +40,21 @@ if __name__ == '__main__':
         fileObs                 = datapath+domain+"/data/gridded_data_swot_wocorr/dataset_swot.nc"           # Obs file (2)
     else:
         fileObs                 = datapath+domain+"/data/gridded_data_swot_wocorr/dataset_nadir_"+lag+"d_swot.nc" # Obs file (3)
-    flagTrWMissingData          = wMis     # Training phase with or without missing data
+    flagTrWMissingData          = wMis  # Training phase with or without missing data
     flagloadOIData 		= 1     # load OI: work on rough variable or anomaly
     include_covariates          = wCov  # use additional covariates in initial layer
     if include_covariates==True:
-        '''lfile_cov                   = [datapath+domain+"/ref/NATL60-CJM165_sst_y2013.1y.nc",\
+        '''lfile_cov            = [datapath+domain+"/ref/NATL60-CJM165_sst_y2013.1y.nc",\
                                        datapath+domain+"/ref/NATL60-CJM165_sss_y2013.1y.nc",\
                                        datapath+domain+"/oi/ssh_NATL60_4nadir.nc"]
-        lname_cov                   = ["sst","sss","ssh_mod"]
-        lid_cov                     = ["SST","SSS","OI"]'''
-        lfile_cov                   = [datapath+domain+"/oi/ssh_NATL60_4nadir.nc"]
-        lname_cov                   = ["ssh_mod"]
-        lid_cov                     = ["OI"]
-        N_cov                        = len(lid_cov)
+        lname_cov               = ["sst","sss","ssh_mod"]
+        lid_cov                 = ["SST","SSS","OI"]'''
+        lfile_cov               = [datapath+domain+"/oi/ssh_NATL60_4nadir.nc"]
+        lname_cov               = ["ssh_mod"]
+        lid_cov                 = ["OI"]
+        N_cov                   = len(lid_cov)
+    else:
+        N_cov                   = 0
     size_tw                     = 11    # Length of the 4th dimension          
     Wsquare     		= 4     # half-width of holes
     Nsquare     		= 3     # number of holes
@@ -109,12 +111,14 @@ if __name__ == '__main__':
     globParams = createGlobParams(list_globParams)   
 
     #1) *** Read the data ***
-    genFilename, x_train, y_train, mask_train, gt_train, x_train_missing, meanTr, stdTr,\
-    x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_train_OI, x_test_OI = import_Data_OSSE(globParams,type_obs)
+    genFilename, \
+    x_train,y_train,mask_train,gt_train,x_train_missing,x_train_OI,lday_pred,meanTr, stdTr,\
+    x_test,y_test,mask_test,gt_test,x_test_missing,x_test_OI,lday_test = import_Data_OSSE(globParams,type_obs)
 
     #2) *** Define AE architecture ***
     genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,x_train,mask_train)
 
     #5) *** Train ConvAE ***      
-    learning_OSSE(globParams,genFilename,x_train,x_train_missing,mask_train,gt_train,meanTr,stdTr,\
-                 x_test,x_test_missing,mask_test,gt_test,lday_test,x_train_OI,x_test_OI,model_AE,DIMCAE)
+    learning_OSSE(globParams,genFilename,\
+                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_pred,meanTr,stdTr,\
+                  x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,model_AE,DIMCAE)

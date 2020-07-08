@@ -26,7 +26,7 @@ def GENN(dict_global_Params,genFilename,shapeData):
             self.resnet1 = ResNetConv2d(NbResUnit,DimAE,5,1,0)
             self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,DimAE,(4,4),stride=(4,4),bias=False)
             self.resnet2 = ResNetConv2d(NbResUnit,DimAE,5,1,0)
-            self.convF   = torch.nn.Conv2d(DimAE,shapeData[0],(1,1),padding=0,bias=False)
+            self.convF   = torch.nn.Conv2d(DimAE,int(shapeData[0]/(N_cov+1)),(1,1),padding=0,bias=False)
                 
         def _make_ResNet(self,Nblocks,dim,K,kernel_size, padding):
             layers = []

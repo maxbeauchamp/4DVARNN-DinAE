@@ -169,5 +169,5 @@ def import_Data_OSE(dict_global_Params):
       
     print("... (after normalization) mean Tt = %f"%(np.nanmean(gt_test)))
       
-    return genFilename, meanTt, stdTt, x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_test_OI, x_test_OI
+    return genFilename, meanTt, stdTt, x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_test_OI
 

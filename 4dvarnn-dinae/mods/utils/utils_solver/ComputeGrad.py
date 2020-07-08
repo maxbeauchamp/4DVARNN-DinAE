@@ -27,7 +27,7 @@ class Compute_Grad(torch.nn.Module):
 
         if( self.GradType == 2 ):
             self.alphaL1    = torch.nn.Parameter(torch.Tensor([1.]))
-            self.alphaL2     = torch.nn.Parameter(torch.Tensor([1.]))
+            self.alphaL2    = torch.nn.Parameter(torch.Tensor([1.]))
 
     def forward(self,x,xpred,xobs,mask):
 

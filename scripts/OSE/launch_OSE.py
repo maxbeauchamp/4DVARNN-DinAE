@@ -90,13 +90,13 @@ if __name__ == '__main__':
 
     #1) *** Read the data ***
     genFilename, meanTt, stdTt,\
-    x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_train_OI, x_test_OI = import_Data_OSE(globParams)
+    x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_test_OI = import_Data_OSE(globParams)
 
     #2) *** Define AE architecture ***
     genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,x_test,mask_test)
 
     #5) *** Train ConvAE ***      
     learning_OSE(globParams,genFilename,meanTt,stdTt,\
-                 x_test,x_test_missing,mask_test,gt_test,lday_test,x_train_OI,x_test_OI,\
+                 x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,\
                  encoder,decoder,model_AE,DIMCAE)
 

@@ -4,7 +4,6 @@ from .utils.graphics import *
 from .utils.eval_Performance      import eval_AEPerformance
 from .utils.eval_Performance      import eval_InterpPerformance
 from .utils.plot_Figs             import plot_Figs
-from .utils.save_Pickle           import save_Pickle
 from .utils.save_Models           import save_Models
 sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/4dvarnn-dinae/mods')
 
@@ -12,27 +11,54 @@ from .utils.utils_solver.Model_4DVarNN_FP      import Model_4DVarNN_FP
 from .utils.utils_solver.Model_4DVarNN_Grad    import Model_4DVarNN_GradFP
 from .utils.utils_solver.Model_4DVarNN_GradFP  import Model_4DVarNN_GradFP
 
-def learning_OSSE(dict_global_Params,genFilename,\
-                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_pred,meanTr,stdTr,\
-                  x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,model_AE,DIMCAE):
+def learning_OSSE(dict_global_Params,genFilename,x_train,x_train_missing,mask_train,gt_train,\
+                        meanTr,stdTr,x_test,x_test_missing,mask_test,gt_test,lday_test,x_train_OI,x_test_OI,model_AE,DimCAE):
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
         exec("globals()['"+key+"']=val")
 
+    # ******************************** #
+    # PCA decomposition for comparison #
+    # *********************************#
+
+    # train PCA
+    pca      = decomposition.PCA(DimCAE)
+    pca.fit(np.reshape(gt_train,(gt_train.shape[0],gt_train.shape[1]*gt_train.shape[2]*gt_train.shape[3])))
+    
+    # apply PCA to test data
+    rec_PCA_Tt       = pca.transform(np.reshape(gt_test,(gt_test.shape[0],gt_test.shape[1]*gt_test.shape[2]*gt_test.shape[3])))
+    rec_PCA_Tt[:,DimCAE:] = 0.
+    rec_PCA_Tt       = pca.inverse_transform(rec_PCA_Tt)
+    mse_PCA_Tt       = np.mean( (rec_PCA_Tt - gt_test.reshape((gt_test.shape[0],gt_test.shape[1]*gt_test.shape[2]*gt_test.shape[3])))**2 )
+    var_Tt           = np.mean( (gt_test-np.mean(gt_train,axis=0))** 2 )
+    exp_var_PCA_Tt   = 1. - mse_PCA_Tt / var_Tt
+    
+    print(".......... PCA Dim = %d"%(DimCAE))
+    print('.... explained variance PCA (Tr) : %.2f%%'%(100.*np.cumsum(pca.explained_variance_ratio_)[DimCAE-1]))
+    print('.... explained variance PCA (Tt) : %.2f%%'%(100.*exp_var_PCA_Tt))
+
+    print("..... Regularization parameters: dropout = %.3f, wl2 = %.2E"%(dropout,wl2))
+    
     # ***************** #
     # model compilation #
     # ***************** #
 
-    ## model parameters
-    NbProjection   = [2,2,5,5,10,15,14]#[0,0,2,2,5,5,10,15,14]
+    # model fit
+    NbProjection   = [0,0,2,2,5,5,10,15,14]
+    NbProjection   = [2,5,5,5]
     NbGradIter     = [0,2,5,5,10,10,15]
-    lrUpdate       = [1e-4,1e-5,1e-6,1e-7]#[1e-3,1e-4,1e-5,1e-5,1e-5,1e-6,1e-6,1e-5,1e-6]
+    lrUpdate       = [1e-3,1e-4,1e-5,1e-5,1e-5,1e-6,1e-6,1e-5,1e-6]
+    lrUpdate       = [1e-4,1e-5,1e-6,1e-7]
+    #lrUpdate       = [1e-3,1e-4,1e-5,1e-6]
     IterUpdate     = [0,3,10,15,20,25,30,35,40]
+    #IterUpdate     = [0,6,15,20]
     val_split      = 0.1
-    iterInit       = 0
-    comptUpdate    = 0  
-    ## modify/check data format
+    
+    iterInit = 0
+    comptUpdate   = 0  
+
+    # Modify/Check data format
     x_train         = np.moveaxis(x_train, -1, 1)
     x_train_missing = np.moveaxis(x_train_missing, -1, 1)
     mask_train      = np.moveaxis(mask_train, -1, 1)
@@ -43,35 +69,57 @@ def learning_OSSE(dict_global_Params,genFilename,\
     gt_test         = np.moveaxis(gt_test, -1, 1)
     print("... Training datashape: "+str(x_train.shape))
     print("... Test datashape    : "+str(x_test.shape))
-    ## define dataloaders with randomised batches (no random shuffling for validation/test data)
-    training_dataset = torch.utils.data.TensorDataset(\
+
+    # mean-squared error loss
+    stdTr    = np.std( x_train )
+    stdTt    = np.std( x_test )
+    print()
+    print('....   stdTr = %.3f'%stdTr)
+    print('....   stdTt = %.3f'%stdTt)
+
+    ## Define dataloaders with randomised batches     
+    ## no random shuffling for validation/test data
+    training_dataset     = torch.utils.data.TensorDataset(\
                             torch.Tensor(x_train_missing),\
                             torch.Tensor(mask_train),\
-                            torch.Tensor(gt_train)) 
-    test_dataset     = torch.utils.data.TensorDataset(\
+                            torch.Tensor(gt_train)) # create your dataset
+    test_dataset         = torch.utils.data.TensorDataset(\
                             torch.Tensor(x_test_missing),\
                             torch.Tensor(mask_test),\
-                            torch.Tensor(gt_test))       
+                            torch.Tensor(gt_test)) # create your datset                    
     dataset_sizes = {'train': len(training_dataset), 'val': len(test_dataset)} 
+
     ## instantiate model for GPU implementation
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(".... Device GPU: "+str(torch.cuda.is_available()))
-    ## initialize or load the model (bug for number of FP iterations = 0) 
-    shapeData       = x_train.shape[1:]  
+
+
     NBProjCurrent = NbProjection[0]
     NBGradCurrent = NbGradIter[0]
     print('..... DinAE learning (initialisation): NBProj = %d -- NGrad = %d'%(NBProjCurrent,NBGradCurrent))
+    #Model visualisation
+    inputs = torch.randn(21,11,200,200)
+    y = model_AE.encoder(torch.autograd.Variable(inputs))
+    print(y.size())            
+    inputs = torch.randn(21,200,4,4)
+    y = model_AE.decoder(torch.autograd.Variable(inputs))
+    print(y.size())
+    # NiterProjection, NiterGrad: global variables
+    # bug for NiterProjection = 0
+    shapeData       = x_train.shape[1:]  
+    flagLoadModelAE = 0
     if flagLoadModelAE == 1:
         model.load_state_dict(torch.load(fileAEModelInit))
     else:
         model = Model_4DVarNN_GradFP(\
               model_AE,shapeData,NBProjCurrent,NBGradCurrent,\
-              flagGradModel,flagOptimMethod,N_cov=N_cov)    
-    ## create an optimizer object (Adam with lr 1e-3)
+              flagGradModel,flagOptimMethod)    
+    # create an optimizer object (Adam with lr 1e-3)
     lrCurrent        = lrUpdate[0]
     optimizer        = optim.Adam(model.parameters(), lr=lrCurrent)
-    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=1.)                  
-    ## model compilation 
+    exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=1.)
+                        
+    # model compilation 
     since = time.time()
     alpha_MaskedLoss = alpha_Losss[0]
     alpha_GTLoss     = 1. - alpha_Losss[0]
@@ -85,8 +133,8 @@ def learning_OSSE(dict_global_Params,genFilename,\
     print("..... Start learning AE model %d FP/Grad %d"%(flagAEType,flagOptimMethod))
     best_loss      = 1e10
     for iter in range(iterInit,Niter):
-        ## update number of FP projections, number of GB iterations, learning rate and the corresponding model
         if iter == IterUpdate[comptUpdate]:
+            # update GradFP parameters
             NBProjCurrent = NbProjection[comptUpdate]
             NBGradCurrent = NbGradIter[comptUpdate]
             lrCurrent     = lrUpdate[comptUpdate]
@@ -95,7 +143,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
             print('..... Update model architecture')
             model = Model_4DVarNN_GradFP(\
                       model_AE,shapeData,NBProjCurrent,NBGradCurrent,\
-                      flagGradModel,flagOptimMethod,N_cov=N_cov)
+                      flagGradModel,flagOptimMethod)
             model = model.to(device)        
             # update optimizer
             optimizer        = optim.Adam(model.parameters(), lr= lrCurrent)
@@ -105,29 +153,34 @@ def learning_OSSE(dict_global_Params,genFilename,\
             # update comptUpdate
             if comptUpdate < len(NbProjection)-1:
                 comptUpdate += 1
-        ## daloader for the training phase                
+
+        # Daloader during training phase                
         dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
-                                 batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True),\
-                        'val':   torch.utils.data.DataLoader(test_dataset,\
-                                 batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True), }
+                                   batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True),\
+                        'val': torch.utils.data.DataLoader(test_dataset,\
+                                   batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True),
+                      }
                 
-        ## run NbEpoc training epochs
+        # Run NbEpoc training epochs
         for epoch in range(NbEpoc):
             print('Epoc %d/%d'%(epoch,NbEpoc))
             # Each epoch has a training and validation phase
             for phase in ['train', 'val']:
+
                 if phase == 'train':
                     model.train()  # Set model to training mode
                     print('..... Training step')
                 else:
                     model.eval()   # Set model to evaluate mode
                     print('..... Test step')
+            
                 running_loss         = 0.0
                 running_loss_All     = 0.
                 running_loss_R       = 0.
                 running_loss_I       = 0.
                 running_loss_AE      = 0.
                 num_loss     = 0
+    
                 # Iterate over data.
                 compt = 0
                 for inputs_missing,masks,inputs_GT in dataloaders[phase]:
@@ -213,8 +266,15 @@ def learning_OSSE(dict_global_Params,genFilename,\
         ## load best model weights
         model.load_state_dict(best_model_wts)
 
-        ## AE performance on training and validation datasets
-        # outputs for training data
+        ## Performance summary for best model
+        # Daloader during training phase                
+        dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
+                                   batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True),\
+                        'val': torch.utils.data.DataLoader(test_dataset,\
+                                   batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True),
+                      }
+
+        ## outputs for training data
         x_train_pred = []
         for inputs_missing,masks,inputs_GT in dataloaders['train']:
             inputs_missing = inputs_missing.to(device)
@@ -227,7 +287,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
             else:
                 x_train_pred  = np.concatenate((x_train_pred,\
                                    torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
-        # outputs for test data
+        ## outputs for test data
         x_test_pred = []
         for inputs_missing,masks,inputs_GT in dataloaders['val']:
             inputs_missing = inputs_missing.to(device)
@@ -268,13 +328,37 @@ def learning_OSSE(dict_global_Params,genFilename,\
             else:
                 rec_AE_Tt  = np.concatenate((rec_AE_Tt,torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
 
+        exp_var_AE_Tr,exp_var_AE_Tt = eval_AEPerformance(x_train,rec_AE_Tr,x_test,rec_AE_Tt)
+        print(".......... Auto-encoder performance when applied to gap-free data")
+        print('.... explained variance AE (Tr)  : %.2f%%'%(100.*exp_var_AE_Tr))
+        print('.... explained variance AE (Tt)  : %.2f%%'%(100.*exp_var_AE_Tt))
+
+        # remove additional covariates from variables
+        if include_covariates == True:
+            mask_train_wc, x_train_wc, x_train_init_wc, x_train_missing_wc,\
+            mask_test_wc, x_test_wc, x_test_init_wc, x_test_missing_wc,\
+            meanTr_wc, stdTr_wc=\
+            mask_train, x_train, x_train_init, x_train_missing,\
+            mask_test, x_test, x_test_init, x_test_missing,\
+            meanTr, stdTr
+            index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
+            mask_train      = mask_train[:,index,:,:]
+            x_train         = x_train[:,index,:,:]
+            x_train_init    = x_train_init[:,index,:,:]
+            x_train_missing = x_train_missing[:,index,:,:]
+            mask_test      = mask_test[:,index,:,:]
+            x_test         = x_test[:,index,:,:]
+            x_test_init    = x_test_init[:,index,:,:]
+            x_test_missing = x_test_missing[:,index,:,:]
+            meanTr = meanTr[0]
+            stdTr  = stdTr[0]
+
         mse_train,exp_var_train,\
         mse_test,exp_var_test,\
         mse_train_interp,exp_var_train_interp,\
         mse_test_interp,exp_var_test_interp =\
         eval_InterpPerformance(mask_train,x_train,x_train_missing,x_train_pred,\
                                mask_test,x_test,x_test_missing,x_test_pred)
-        exp_var_AE_Tr,exp_var_AE_Tt = eval_AEPerformance(x_train,rec_AE_Tr,x_test,rec_AE_Tt)
         
         print(".......... iter %d"%(iter))
         print('.... Error for all data (Tr)        : %.2e %.2f%%'%(mse_train[1]*stdTr**2,100.*exp_var_train[1]))
@@ -286,20 +370,46 @@ def learning_OSSE(dict_global_Params,genFilename,\
         print('.... Error for masked data (Tr)  : %.2e %.2f%%'%(mse_train_interp*stdTr**2,100.*exp_var_train_interp))
         print('.... Error for masked data (Tt)  : %.2e %.2f%%'%(mse_test_interp*stdTr**2,100.*exp_var_test_interp))
 
+
         # **************************** #
         # Plot figures and Save models #
         # **************************** #
 
-        ## save models
+        # save models
         genSuffixModel=save_Models(dict_global_Params,genFilename,alpha_Losss,\
                                    NBProjCurrent,NBGradCurrent,model_AE,model,iter)
-        ## generate some plots
-        plot_Figs(dirSAVE,genFilename,genSuffixModel,\
-                  gt_train,x_train_missing,mask_train,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\
-                  gt_test,x_test_missing,mask_test,x_test_pred,rec_AE_Tt,x_test_OI,\
-                  lday_pred,lday_test,iter)
-        ## save results in a pickle file
-        save_Pickle(dirSAVE,\
-                    gt_train,x_train_missing,x_train_pred,rec_AE_Tr,meanTr,stdTr,\     
-                    gt_test,x_test_missing,x_test_pred,rec_AE_Tt,\
-                    iter)       
+ 
+        idT = int(np.floor(x_test.shape[1]/2))
+        saved_path = dirSAVE+'/saved_path_%03d'%(iter)+'_FP_'+suf1+'_'+suf2+'.pickle'
+        if flagloadOIData == 1:
+            # generate some plots
+            plot_Figs(dirSAVE,genFilename,genSuffixModel,\
+                  (np.moveaxis(gt_train,1,3)*stdTr)+meanTr+x_train_OI,(np.moveaxis(x_train_missing,1,3)*stdTr)+meanTr+x_train_OI,np.moveaxis(mask_train,1,3),\
+                  (np.moveaxis(x_train_pred,1,3)*stdTr)+meanTr+x_train_OI,(np.moveaxis(rec_AE_Tr,1,3)*stdTr)+meanTr+x_train_OI,\
+                  (np.moveaxis(gt_test,1,3)*stdTr)+meanTr+x_test_OI,(np.moveaxis(x_test_missing,1,3)*stdTr)+meanTr+x_test_OI,np.moveaxis(mask_test,1,3),lday_test,\
+                  (np.moveaxis(x_test_pred,1,3)*stdTr)+meanTr+x_test_OI,(np.moveaxis(rec_AE_Tt,1,3)*stdTr)+meanTr+x_test_OI,iter)
+            # Save DINAE result         
+            with open(saved_path, 'wb') as handle:
+                pickle.dump([((np.moveaxis(gt_test,1,3)*stdTr)+meanTr+x_test_OI)[:,:,:,idT],((np.moveaxis(x_test_missing,1,3)*stdTr)+meanTr+x_test_OI)[:,:,:,idT],\
+                         ((np.moveaxis(x_test_pred,1,3)*stdTr)+meanTr+x_test_OI)[:,:,:,idT],((np.moveaxis(rec_AE_Tt,1,3)*stdTr)+meanTr+x_test_OI)[:,:,:,idT]], handle)
+
+        else:
+            # generate some plots
+            plot_Figs(dirSAVE,genFilename,genSuffixModel,\
+                  (np.moveaxis(gt_train,1,3)*stdTr)+meanTr,(np.moveaxis(x_train_missing,1,3)*stdTr)+meanTr,np.moveaxis(mask_train,1,3),\
+                  (np.moveaxis(x_train_pred,1,3)*stdTr)+meanTr,(np.moveaxis(rec_AE_Tr,1,3)*stdTr)+meanTr,\
+                  (np.moveaxis(gt_test,1,3)*stdTr)+meanTr,(np.moveaxis(x_test_missing,1,3)*stdTr)+meanTr,np.moveaxis(mask_test,1,3),lday_test,\
+                  (np.moveaxis(x_test_pred,1,3)*stdTr)+meanTr,(np.moveaxis(rec_AE_Tt,1,3)*stdTr)+meanTr,iter)
+            # Save DINAE result         
+            with open(saved_path, 'wb') as handle:
+                pickle.dump([((np.moveaxis(gt_test,1,3)*stdTr)+meanTr)[:,:,:,idT],((np.moveaxis(x_test_missing,1,3)*stdTr)+meanTr)[:,:,:,idT],\
+                         ((np.moveaxis(x_test_pred,1,3)*stdTr)+meanTr)[:,:,:,idT],((np.moveaxis(rec_AE_Tt,1,3)*stdTr)+meanTr)[:,:,:,idT]], handle)
+
+        # reset variables with additional covariates
+        if include_covariates == True:
+            mask_train, x_train, x_train_init, x_train_missing,\
+            mask_test, x_test, x_test_init, x_test_missing,\
+            meanTr, stdTr=\
+            mask_train_wc, x_train_wc, x_train_init_wc, x_train_missing_wc,\
+            mask_test_wc, x_test_wc, x_test_init_wc, x_test_missing_wc,\
+            meanTr_wc, stdTr_wc

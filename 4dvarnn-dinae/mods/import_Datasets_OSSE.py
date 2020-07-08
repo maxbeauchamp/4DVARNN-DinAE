@@ -32,6 +32,8 @@ def import_Data_OSSE(dict_global_Params,type_obs):
     indN_Tt = np.concatenate([np.arange(60,80),np.arange(140,160),\
                              np.arange(220,240),np.arange(300,320)])
     indN_Tr = np.delete(range(365),indN_Tt)
+    lday_pred=[ datetime.strftime(datetime.strptime("2012-10-01",'%Y-%m-%d')\
+                          + timedelta(days=np.float64(i)),"%Y-%m-%d") for i in indN_Tr ]
     lday_test=[ datetime.strftime(datetime.strptime("2012-10-01",'%Y-%m-%d')\
                           + timedelta(days=np.float64(i)),"%Y-%m-%d") for i in indN_Tt ]
 
@@ -302,5 +304,6 @@ def import_Data_OSSE(dict_global_Params,type_obs):
     print("... (after normalization) mean Tr = %f"%(np.mean(gt_train)))
     print("... (after normalization) mean Tt = %f"%(np.mean(gt_test)))
       
-    return genFilename, x_train,y_train, mask_train, gt_train, x_train_missing, meanTr, stdTr, x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_train_OI, x_test_OI
-
+    return genFilename,\
+           x_train,y_train,mask_train,gt_train,x_train_missing,x_train_OI,lday_pred,meanTr,stdTr,\
+           x_test,y_test,mask_test,gt_test,x_test_missing,x_test_OI,lday_test
