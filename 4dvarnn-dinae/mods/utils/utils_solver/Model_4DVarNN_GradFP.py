@@ -30,31 +30,32 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
         self.model_AE = mod_AE
         with torch.no_grad():
             print('Optim type %d'%OptimType)
-            self.OptimType = OptimType
-            self.NProjFP   = int(NiterProjection)
-            self.NGrad     = int(NiterGrad)
-            self.Ncov      = N_cov
+            self.OptimType   = OptimType
+            self.NProjFP     = int(NiterProjection)
+            self.NGrad       = int(NiterGrad)
+            self.Ncov        = N_cov
             self.InterpFlag  = InterpFlag
             self.periodicBnd = periodicBnd
+            self.shape       = ShapeData
         # Define Solver type according to OptimType
         ## Gradient-based minimization using a fixed-step descent
         if OptimType == 0:
-            self.model_Grad = model_GradUpdate0(replace_tup_at_idx(ShapeData,0,int(ShapeData[0]/(self.Ncov+1))),GradType)
+            self.model_Grad = model_GradUpdate0(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType)
         ## Gradient-based minimization using a CNN using a (sub)gradient as inputs 
         elif OptimType == 1:
-            self.model_Grad = model_GradUpdate1(replace_tup_at_idx(ShapeData,0,int(ShapeData[0]/(self.Ncov+1))),GradType,self.periodicBnd)
+            self.model_Grad = model_GradUpdate1(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,self.periodicBnd)
         ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs
         elif OptimType == 2:
-            self.model_Grad = model_GradUpdate2(replace_tup_at_idx(ShapeData,0,int(ShapeData[0]/(self.Ncov+1))),GradType,self.periodicBnd)
+            self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,self.periodicBnd)
         elif OptimType == 3:
-            self.model_Grad = model_GradUpdate2(replace_tup_at_idx(ShapeData,0,int(ShapeData[0]/(self.Ncov+1))),GradType,30)
+            self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,30)
                 
     def forward(self, x_inp,xobs,mask,g1=None,g2=None,normgrad=0.0):
         mask_  = torch.add(1.0,torch.mul(mask,-1.0)) #1. - mask
         x      = torch.mul(x_inp,1.0)
 
         # new index to select appropriate data if covariates are used
-        index = np.arange(0,ShapeData[0],self.Ncov+1)  
+        index = np.arange(0,self.shape[0],self.Ncov+1)  
 
         # fixed-point iterations
         if self.NProjFP > 0:
