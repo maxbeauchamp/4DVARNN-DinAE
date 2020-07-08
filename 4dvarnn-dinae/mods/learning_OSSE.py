@@ -154,12 +154,6 @@ def learning_OSSE(dict_global_Params,genFilename,x_train,x_train_missing,mask_tr
             if comptUpdate < len(NbProjection)-1:
                 comptUpdate += 1
 
-        print('..... AE Model type : %d '%(flagAEType))
-        print('..... Gradient type : %d '%(flagGradModel))
-        print('..... Optim type    : %d '%(flagOptimMethod))
-        print('..... DinAE learning: NBProj = %d -- NGrad = %d'%(NBProjCurrent,NBGradCurrent))
-        print('..... Learning rate : %f'%lrCurrent)
-        print('..... Loss          : I-Loss %.1f -- AE-Loss %.1f'%(alpha_Losss[0],alpha_Losss[1]))
         # Daloader during training phase                
         dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
                                    batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True),\
@@ -253,9 +247,6 @@ def learning_OSSE(dict_global_Params,genFilename,x_train,x_train_missing,mask_tr
                     epoch_nloss_I   = epoch_loss_I / stdTt**2
                     epoch_nloss_R   = epoch_loss_R / stdTt**2
                     epoch_nloss_AE   = loss_AE / stdTt**2
-    
-                print('.. {} Loss: {:.4f} NLossAll: {:.4f} NLossR: {:.4f} NLossI: {:.4f} NLossAE: {:.4f}'.format(
-                           phase, epoch_loss,epoch_nloss_All,epoch_nloss_R,epoch_nloss_I,epoch_nloss_AE))
             
                 # deep copy the model
                 if phase == 'val' and epoch_loss < best_loss:
@@ -309,7 +300,6 @@ def learning_OSSE(dict_global_Params,genFilename,x_train,x_train_missing,mask_tr
             else:
                 x_test_pred  = np.concatenate((x_test_pred,\
                                  torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
-
 
         ## AE performance of the trained AE applied to gap-free data
         # ouputs for training data
