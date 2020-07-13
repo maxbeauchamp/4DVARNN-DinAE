@@ -6,7 +6,7 @@ Created on Thu Aug  8 08:21:45 2019
 @author: rfablet, mbeaucha
 """
 
-from 4dvarnn-dinae import *
+from dinae_4dvarnn import *
 
 def ifelse(cond1,val1,val2):
     if cond1==True:
@@ -62,9 +62,11 @@ if __name__ == '__main__':
     flagAEType  		= 2     # model type, ConvAE or GE-NN
     flagLoadModel               = 0     # load pre-defined AE model or not
     flag_MultiScaleAEModel      = 0     # see flagProcess2_7: work on HR(0), LR(1), or HR+LR(2)
-    alpha_Losss                 = np.array([1.,0.1]) # ??
-    flagGradModel               = 0     # Gradient computation (0: subgradient, 1: true gradient/autograd)
-    flagOptimMethod             = 1     # 0: fixed-step gradient descent, 1: ConvNet_step gradient descent, 2: LSTM-based descent
+    # alpha ?? weights for loss function
+    alpha                       = np.array([1.,0.1])
+    alpha4DVar                  = np.array([0.01,1.])
+    flagGradModel               = 2     # Gradient computation (0: subgradient, 1: true gradient/autograd)
+    flagOptimMethod             = 2     # 0: fixed-step gradient descent, 1: ConvNet_step gradient descent, 2: LSTM-based descent
     sigNoise        		= 1e-1
     flagUseMaskinEncoder 	= 0
     flagTrOuputWOMissingData    = 1
@@ -84,11 +86,11 @@ if __name__ == '__main__':
         suf2 = "wmissing"
     else:
         suf2 = "wwmissing"
-    suf3 = "GB"+flagOptimMethod
+    suf3 = "GB"+str(flagOptimMethod)
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
     dirSAVE = ifelse(opt!='swot',\
-              '/gpfsscratch/rech/yrf/uba22to/DINAE/'+domain+'/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
-              '/gpfsscratch/rech/yrf/uba22to/DINAE/'+domain+'/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
+              '/gpfsscratch/rech/yrf/uba22to/4VARNN-DINAE/'+domain+'/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
+              '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/'+domain+'/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
     if not os.path.exists(dirSAVE):
         mk_dir_recursive(dirSAVE)
     else:
@@ -103,7 +105,7 @@ if __name__ == '__main__':
     'flagTrOuputWOMissingData','flagTrWMissingData',\
     'flagloadOIData','size_tw','Wsquare',\
     'Nsquare','DimAE','flagAEType','flagLoadModel',\
-    'flagOptimMethod','flagGradModel','alpha_Losss','sigNoise',\
+    'flagOptimMethod','flagGradModel','alpha','alpha4DVar','sigNoise',\
     'flagUseMaskinEncoder','stdMask',\
     'flagDataWindowing','dropout','wl2','batch_size',\
     'NbEpoc','Niter','flag_MultiScaleAEModel',\
@@ -116,7 +118,8 @@ if __name__ == '__main__':
     x_test,y_test,mask_test,gt_test,x_test_missing,x_test_OI,lday_test = import_Data_OSSE(globParams,type_obs)
 
     #2) *** Define AE architecture ***
-    genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,x_train,mask_train)
+    shapeData=(x_train.shape[3],x_train.shape[1],x_train.shape[2])
+    genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,shapeData)
 
     #5) *** Train ConvAE ***      
     learning_OSSE(globParams,genFilename,\
