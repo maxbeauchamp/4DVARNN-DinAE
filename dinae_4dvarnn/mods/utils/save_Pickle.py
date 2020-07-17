@@ -2,7 +2,7 @@ import os
 from tools import *
 from graphics import *
 
-def save_Pickle(dirSAVE,\
+def save_Pickle(dict_global_Params,\
                 x_train,x_train_missing,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\
                 x_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,\
                 iter):     
@@ -16,12 +16,8 @@ def save_Pickle(dirSAVE,\
     ## keep only the information on the target variable (remove covariates)
     if include_covariates == True:
         index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
-        x_train         = x_train[:,index,:,:]
         x_train_missing = x_train_missing[:,index,:,:]
-        x_test          = x_test[:,index,:,:]
         x_test_missing  = x_test_missing[:,index,:,:]
-        meanTr = meanTr[0]
-        stdTr  = stdTr[0]
 
     ## reshape and rescale variables
     x_train         = meanTr+ np.moveaxis(x_train,1,3)*stdTr

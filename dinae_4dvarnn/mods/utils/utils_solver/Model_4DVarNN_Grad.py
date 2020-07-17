@@ -66,7 +66,7 @@ class Model_4DVarNN_Grad(torch.nn.Module):
         # gradient iteration
         for kk in range(0,self.NGrad):
             # gradient normalisation
-            grad     = self.model_Grad.compute_Grad(x[:,index,:,:], self.model_AE(x),xobs,mask)
+            grad     = self.model_Grad.compute_Grad(x[:,index,:,:], self.model_AE(x),xobs[:,index,:,:],mask)
             if normgrad == 0. :
                 _normgrad = torch.sqrt( torch.mean( grad**2 ) )
             else:
@@ -76,20 +76,20 @@ class Model_4DVarNN_Grad(torch.nn.Module):
             # gradient update
             ## Gradient-based minimization using a fixed-step descent
             if self.OptimType == 0:
-                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], _normgrad )
+                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], _normgrad )
             ## Gradient-based minimization using a CNN using a (sub)gradient as inputs
             elif self.OptimType == 1:               
               if kk == 0:
-                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], g1, _normgrad )
+                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], g1, _normgrad )
               else:
-                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:],grad_old, _normgrad )
+                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:],grad_old, _normgrad )
               grad_old = torch.mul(1.,grad)
             ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs    
             elif self.OptimType == 2:               
               if kk == 0:
-                grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], g1, g2, _normgrad )
+                grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], g1, g2, _normgrad )
               else:
-                grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], hidden, cell, _normgrad )
+                grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], hidden, cell, _normgrad )
             # interpolation constraint
             if( self.InterpFlag == True ):
                 # optimization update

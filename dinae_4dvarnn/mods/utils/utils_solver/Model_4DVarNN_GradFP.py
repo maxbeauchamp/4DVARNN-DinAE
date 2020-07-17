@@ -52,7 +52,8 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 
     def forward(self, x_inp,xobs,mask,g1=None,g2=None,normgrad=0.0):
         mask_  = torch.add(1.0,torch.mul(mask,-1.0)) #1. - mask
-        x      = torch.mul(x_inp,1.0)
+        with torch.enable_grad():
+            x      = torch.mul(x_inp,1.0)
 
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)  
@@ -62,13 +63,13 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             for kk in range(0,self.NProjFP):        
                 x_proj   = self.model_AE(x)
                 x_proj   = torch.mul(x_proj,mask_[:,index,:,:])
-                x[:,index,:,:] = torch.mul(x[:,index,:,:], mask[:,index,:,:])   
-                x[:,index,:,:] = torch.add(x[:,index,:,:], x_proj)
+                x = torch.mul(x, mask)  
+                x[:,index,:,:] = torch.add(x[:,index,:,:],x_proj)
 
         # gradient iteration
         if self.NGrad > 0:
             # gradient normalisation
-            grad     = self.model_Grad.compute_Grad(x[:,index,:,:], self.model_AE(x),xobs,mask[:,index,:,:])
+            grad     = self.model_Grad.compute_Grad(x[:,index,:,:], self.model_AE(x),xobs[:,index,:,:],mask[:,index,:,:])
             if normgrad == 0. :
                 _normgrad = torch.sqrt( torch.mean( grad**2 ) )
             else:
@@ -79,20 +80,20 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 # gradient update
                 ## Gradient-based minimization using a fixed-step descent
                 if self.OptimType == 0:
-                    grad  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:] , _normgrad )
+                    grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:] , _normgrad )
                 ## Gradient-based minimization using a CNN using a (sub)gradient as inputs
-                elif self.OptimType == 1:               
+                elif self.OptimType == 1:
                     if kk == 0:
-                        grad  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], g1 , _normgrad)
+                        grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], g1 , _normgrad)
                     else:
-                        grad  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], grad_old , _normgrad)
+                        grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], grad_old , _normgrad)
                     grad_old = torch.mul(1.,grad)
                 ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs
-                elif self.OptimType == 2:               
+                elif self.OptimType == 2:
                     if kk == 0:
-                      grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], g1, g2 , _normgrad )
+                      grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], g1, g2 , _normgrad )
                     else:
-                      grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs, mask[:,index,:,:], hidden, cell , _normgrad )
+                      grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], hidden, cell , _normgrad )
                 # interpolation constraint
                 if( self.InterpFlag == True ):
                     # optimization update
@@ -100,9 +101,10 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                     x[:,index,:,:]    = torch.add(torch.mul(x[:,index,:,:],mask[:,index,:,:]), torch.mul(xnew,mask_[:,index,:,:]))
                 else:
                     # optimization update
-                    x[:,index,:,:] = torch.add(x[:,index,:,:],-grad)
+                    x[:,index,:,:] = torch.add(x[:,index,:,:],torch.mul(grad,-1.0))
 
-            target_x = x[:,index,:,:]
+            with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
+                target_x = x[:,index,:,:]
 
             if self.OptimType == 1:
                 return target_x,grad_old,_normgrad
@@ -112,7 +114,8 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 return target_x,_normgrad
         else:
 
-            target_x = x[:,index,:,:]
+            with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
+                target_x = x[:,index,:,:]
 
             _normgrad = 1.
             if self.OptimType == 1:
@@ -121,3 +124,4 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 return target_x,None,None,_normgrad
             else:
                 return target_x,_normgrad
+

@@ -54,11 +54,14 @@ if __name__ == '__main__':
         lid_cov                 = ["OI"]
         N_cov                   = len(lid_cov)
     else:
+        lfile_cov               = [""]
+        lname_cov               = [""]
+        lid_cov                 = [""]
         N_cov                   = 0
     size_tw                     = 11    # Length of the 4th dimension          
     Wsquare     		= 4     # half-width of holes
     Nsquare     		= 3     # number of holes
-    DimAE       		= 200   # Dimension of the latent space
+    DimAE       		= 40   # Dimension of the latent space
     flagAEType  		= 2     # model type, ConvAE or GE-NN
     flagLoadModel               = 0     # load pre-defined AE model or not
     flag_MultiScaleAEModel      = 0     # see flagProcess2_7: work on HR(0), LR(1), or HR+LR(2)
@@ -89,7 +92,7 @@ if __name__ == '__main__':
     suf3 = "GB"+str(flagOptimMethod)
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
     dirSAVE = ifelse(opt!='swot',\
-              '/gpfsscratch/rech/yrf/uba22to/4VARNN-DINAE/'+domain+'/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
+              '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/'+domain+'/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
               '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/'+domain+'/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
     if not os.path.exists(dirSAVE):
         mk_dir_recursive(dirSAVE)

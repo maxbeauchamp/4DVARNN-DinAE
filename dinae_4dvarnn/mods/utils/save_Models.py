@@ -1,14 +1,14 @@
 from dinae_4dvarnn import *
 
-def save_Models(dict_global_Params,genFilename,alpha_Losss,\
+def save_Models(dict_global_Params,genFilename,alpha_4DVar,\
                 NBProjCurrent,NBGradCurrent,model_AE,model,iter,*args):   
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
         exec("globals()['"+key+"']=val")
 
-    genSuffixModel = 'Torch_Alpha%03d'%(100*alpha_Losss[0]+10*alpha_Losss[1])
-    if alpha_Losss[0] < 1.0:
+    genSuffixModel = 'Torch_Alpha%03d'%(100*alpha_4DVar[0]+10*alpha_4DVar[1])
+    if alpha_4DVar[0] < 1.0:
         genSuffixModel = genSuffixModel+'_AETRwithTrueData'
     else:
         genSuffixModel = genSuffixModel+'_AETRwoTrueData'

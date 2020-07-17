@@ -137,9 +137,9 @@ def learning_OSSE(dict_global_Params,genFilename,\
                 comptUpdate += 1
         ## daloader for the training phase                
         dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
-                                 batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True),\
+                                 batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True),\
                         'val':   torch.utils.data.DataLoader(test_dataset,\
-                                 batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True), }
+                                 batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True), }
 
         ## run NbEpoc training epochs
         for epoch in range(NbEpoc):
@@ -193,8 +193,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
                         loss_I      = torch.sum((outputs - targets_GT)**2 * (1. - masks_GT) )
                         loss_I      = torch.mul(1.0 / torch.sum(1.-masks_GT),loss_I)
                         loss_All    = torch.mean((outputs - targets_GT)**2 )
-                        outputs_wcov = add_covariates_to_tensor(outputs,inputs_missing,N_cov).to(device) 
-                        targets_GT_wcov = add_covariates_to_tensor(targets_GT,inputs_missing,N_cov).to(device)
+                        if N_cov>0:
+                            outputs_wcov = add_covariates_to_tensor(outputs,inputs_missing,N_cov).to(device) 
+                            targets_GT_wcov = add_covariates_to_tensor(targets_GT,inputs_missing,N_cov).to(device)
+                        else:
+                            outputs_wcov = outputs
+                            targets_GT_wcov = targets_GT
                         loss_AE     = torch.mean((model.model_AE(outputs_wcov) - outputs)**2 )
                         loss_AE_GT  = torch.mean((model.model_AE(targets_GT_wcov) - targets_GT)**2 )
                         index      = np.arange(0,inputs_missing.shape[1],N_cov+1)
@@ -225,16 +229,14 @@ def learning_OSSE(dict_global_Params,genFilename,\
                 epoch_loss_I     = running_loss_I / num_loss
                 epoch_loss_R     = running_loss_R / num_loss
                         
-                if phase == 'train':
-                    epoch_nloss_All = epoch_loss_All / stdTr**2
-                    epoch_nloss_I   = epoch_loss_I / stdTr**2
-                    epoch_nloss_R   = epoch_loss_R / stdTr**2
-                    epoch_nloss_AE  = loss_AE / stdTr**2
-                else:
-                    epoch_nloss_All = epoch_loss_All / stdTt**2
-                    epoch_nloss_I   = epoch_loss_I / stdTt**2
-                    epoch_nloss_R   = epoch_loss_R / stdTt**2
-                    epoch_nloss_AE   = loss_AE / stdTt**2
+                if not isinstance(stdTr, list) :
+                    meanTr=[meanTr]
+                    stdTr=[stdTr]
+
+                epoch_nloss_All = epoch_loss_All / stdTr[0]**2
+                epoch_nloss_I   = epoch_loss_I / stdTr[0]**2
+                epoch_nloss_R   = epoch_loss_R / stdTr[0]**2
+                epoch_nloss_AE  = loss_AE / stdTr[0]**2
             
                 # deep copy the model
                 if phase == 'val' and epoch_loss < best_loss:
@@ -263,7 +265,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
             masks          = masks.to(device)
             targets_GT     = targets_GT.to(device)
             with torch.set_grad_enabled(True): 
-                outputs_ = model(inputs_missing,masks)[0]
+                outputs_ = model(inputs_init,inputs_missing,masks)[0]
             if len(x_train_pred) == 0:
                 x_train_pred  = torch.mul(1.0,outputs_).cpu().detach()
             else:
@@ -277,7 +279,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
             masks          = masks.to(device)
             targets_GT      = targets_GT.to(device)
             with torch.set_grad_enabled(True): 
-                outputs_ = model(inputs_missing,masks)[0]
+                outputs_ = model(inputs_init,inputs_missing,masks)[0]
             if len(x_test_pred) == 0:
                 x_test_pred  = torch.mul(1.0,outputs_).cpu().detach().numpy()
             else:
@@ -292,13 +294,21 @@ def learning_OSSE(dict_global_Params,genFilename,\
             inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
             targets_GT      = targets_GT.to(device)
+            if N_cov>0:
+                targets_GT_wcov = add_covariates_to_tensor(targets_GT,\
+                                inputs_missing,N_cov).to(device)
+            else:
+                targets_GT_wcov = targets_GT
             with torch.set_grad_enabled(True): 
-                outputs_ = model.model_AE(targets_GT)[0]
+                outputs_ = model.model_AE(targets_GT_wcov)
+            print(outputs_.shape)
             if len(rec_AE_Tr) == 0:
                 rec_AE_Tr  = torch.mul(1.0,outputs_).cpu().detach()
             else:
                 rec_AE_Tr  = np.concatenate((rec_AE_Tr,\
                                torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
+            print(rec_AE_Tr.shape)
+
         # ouputs for test data
         rec_AE_Tt = []
         for inputs_init,inputs_missing,masks,targets_GT in dataloaders['val']:
@@ -306,45 +316,56 @@ def learning_OSSE(dict_global_Params,genFilename,\
             inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
             targets_GT      = targets_GT.to(device)
+            if N_cov>0:
+                targets_GT_wcov = add_covariates_to_tensor(targets_GT,\
+                                inputs_missing,N_cov).to(device)
+            else:
+                targets_GT_wcov = targets_GT
             with torch.set_grad_enabled(True): 
-                outputs_ = model.model_AE(targets_GT)[0]
+                outputs_ = model.model_AE(targets_GT_wcov)
             if len(rec_AE_Tt) == 0:
                 rec_AE_Tt  = torch.mul(1.0,outputs_).cpu().detach().numpy()
             else:
                 rec_AE_Tt  = np.concatenate((rec_AE_Tt,torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
 
+        index = np.arange(0,x_train.shape[1],N_cov+1)
         mse_train,exp_var_train,\
         mse_test,exp_var_test,\
         mse_train_interp,exp_var_train_interp,\
         mse_test_interp,exp_var_test_interp =\
-        eval_InterpPerformance(mask_train,x_train,x_train_missing,x_train_pred,\
-                               mask_test,x_test,x_test_missing,x_test_pred)
-        exp_var_AE_Tr,exp_var_AE_Tt = eval_AEPerformance(x_train,rec_AE_Tr,x_test,rec_AE_Tt)
+        eval_InterpPerformance(mask_train[:,index,:,:],x_train[:,index,:,:],x_train_missing[:,index,:,:],x_train_pred,\
+                               mask_test[:,index,:,:],x_test[:,index,:,:],x_test_missing[:,index,:,:],x_test_pred)
+        exp_var_AE_Tr,exp_var_AE_Tt = eval_AEPerformance(x_train[:,index,:,:],rec_AE_Tr,x_test[:,index,:,:],rec_AE_Tt)
         
+        if not isinstance(stdTr, list) :
+            meanTr=[meanTr]
+            stdTr=[stdTr]
         print(".......... iter %d"%(iter))
-        print('.... Error for all data (Tr)        : %.2e %.2f%%'%(mse_train[1]*stdTr**2,100.*exp_var_train[1]))
-        print('.... Error for all data (Tt)        : %.2e %.2f%%'%(mse_test[1]*stdTr**2,100.*exp_var_test[1]))
+        print('.... Error for all data (Tr)        : %.2e %.2f%%'%(mse_train[1]*stdTr[0]**2,100.*exp_var_train[1]))
+        print('.... Error for all data (Tt)        : %.2e %.2f%%'%(mse_test[1]*stdTr[0]**2,100.*exp_var_test[1]))
         print('....')
-        print('.... Error for observed data (Tr)  : %.2e %.2f%%'%(mse_train[0]*stdTr**2,100.*exp_var_train[0]))
-        print('.... Error for observed data (Tt)  : %.2e %.2f%%'%(mse_test[0]*stdTr**2,100.*exp_var_test[0]))
+        print('.... Error for observed data (Tr)  : %.2e %.2f%%'%(mse_train[0]*stdTr[0]**2,100.*exp_var_train[0]))
+        print('.... Error for observed data (Tt)  : %.2e %.2f%%'%(mse_test[0]*stdTr[0]**2,100.*exp_var_test[0]))
         print('....')
-        print('.... Error for masked data (Tr)  : %.2e %.2f%%'%(mse_train_interp*stdTr**2,100.*exp_var_train_interp))
-        print('.... Error for masked data (Tt)  : %.2e %.2f%%'%(mse_test_interp*stdTr**2,100.*exp_var_test_interp))
+        print('.... Error for masked data (Tr)  : %.2e %.2f%%'%(mse_train_interp*stdTr[0]**2,100.*exp_var_train_interp))
+        print('.... Error for masked data (Tt)  : %.2e %.2f%%'%(mse_test_interp*stdTr[0]**2,100.*exp_var_test_interp))
 
         # **************************** #
         # Plot figures and Save models #
         # **************************** #
 
         ## save models
-        genSuffixModel=save_Models(dict_global_Params,genFilename,alpha_Losss,\
+        genSuffixModel=save_Models(dict_global_Params,genFilename,alpha4DVar,\
                                    NBProjCurrent,NBGradCurrent,model_AE,model,iter)
+
         ## generate some plots
-        plot_Figs(dirSAVE,genFilename,genSuffixModel,\
-                  gt_train,x_train_missing,mask_train,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\
+        plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
+                  gt_train,x_train_missing,mask_train,x_train_pred,rec_AE_Tr,x_train_OI,meanTr[0],stdTr[0],\
                   gt_test,x_test_missing,mask_test,x_test_pred,rec_AE_Tt,x_test_OI,\
                   lday_pred,lday_test,iter)
+
         ## save results in a pickle file
-        save_Pickle(dirSAVE,\
-                    gt_train,x_train_missing,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\
+        save_Pickle(dict_global_Params,\
+                    gt_train,x_train_missing,x_train_pred,rec_AE_Tr,x_train_OI,meanTr[0],stdTr[0],\
                     gt_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,\
                     iter)
