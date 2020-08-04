@@ -32,7 +32,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
     ## model parameters
     NbProjection   = [2,2,5,5,10,15,14]#[0,0,2,2,5,5,10,15,14]
-    NbGradIter     = [0,2,5,5,10,10,15]
+    NbGradIter     = [2,2,5,5,10,10,15]
     lrUpdate       = [1e-4,1e-5,1e-6,1e-7]#[1e-3,1e-4,1e-5,1e-5,1e-5,1e-6,1e-6,1e-5,1e-6]
     IterUpdate     = [0,3,10,15,20,25,30,35,40]
     val_split      = 0.1

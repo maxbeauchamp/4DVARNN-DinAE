@@ -25,7 +25,6 @@ class Compute_Grad(torch.nn.Module):
             self.NbEngTerms    = 3            
             self.alphaEngTerms = torch.nn.Parameter(torch.Tensor(np.ones((self.NbEngTerms,1))))
             self.alphaEngTerms.requires_grad = True
-
         if( self.GradType == 2 ):
             self.alphaL1    = torch.nn.Parameter(torch.Tensor([1.]))
             self.alphaL2    = torch.nn.Parameter(torch.Tensor([1.]))
@@ -47,7 +46,8 @@ class Compute_Grad(torch.nn.Module):
           grad = torch.autograd.grad(loss,x,create_graph=True)[0]
         ## true gradient using autograd for prior ||x-g(x)||
         elif self.GradType == 2: 
-          loss1 = self.alphaL2**2 * torch.mean( (xpred - x)**2 ) + self.alphaL1**2 * torch.mean( torch.abs(xpred - x) )
+          loss1 = self.alphaL2**2 * torch.mean( (xpred - x)**2 ) +\
+                  self.alphaL1**2 * torch.mean( torch.abs(xpred - x) )
           loss2 = torch.sum( (xobs - x)**2 * mask ) / torch.sum( mask )
           loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
           grad = torch.autograd.grad(loss,x,create_graph=True)[0]
