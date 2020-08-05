@@ -8,7 +8,7 @@
 # /!\ Attention, la ligne suivante est trompeuse mais dans le vocabulaire
 # de Slurm "multithread" fait bien référence à l'hyperthreading.
 #SBATCH --hint=nomultithread        # on réserve des coeurs physiques et non logiques
-#SBATCH --time=00:10:00             # temps exécution maximum demande (HH:MM:SS)
+#SBATCH --time=01:00:00             # temps exécution maximum demande (HH:MM:SS)
 #SBATCH --output=gpu_mono%j.out     # nom du fichier de sortie
 #SBATCH --error=gpu_mono%j.out      # nom du fichier erreur (ici commun avec la sortie)
  
@@ -24,4 +24,4 @@ export PYTHONPATH=${HOME}/4DVARNN-DinAE:${PYTHONPATH}
 set -x
  
 # exécution du code
-python launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}
+python -u launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}

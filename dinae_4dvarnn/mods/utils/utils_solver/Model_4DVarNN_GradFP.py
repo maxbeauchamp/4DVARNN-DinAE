@@ -55,36 +55,31 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
         with torch.enable_grad():
             x      = torch.mul(x_inp,1.0)
 
-        x_copy=x.clone().detach()
-
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)
-        torch_index = torch.tensor(np.float64(index))
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        torch_index = torch.LongTensor(np.float64(index)).to(device)
         with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
-            #target_x     = x[:,index,:,:]
-            #target_obs   = xobs[:,index,:,:] 
-            #target_mask  = mask[:,index,:,:]
-            #target_mask_ = mask_[:,index,:,:]
-            target_x     = x
-            target_obs   = xobs
-            target_mask  = mask
-            target_mask_ = mask_
+            target_x     = x[:,index,:,:]
+            target_obs   = xobs[:,index,:,:] 
+            target_mask  = mask[:,index,:,:]
+            target_mask_ = mask_[:,index,:,:]
 
         # fixed-point iterations
         if self.NProjFP > 0:
             for kk in range(0,self.NProjFP):        
-                #x_proj   = self.model_AE(x_copy)
-                x_proj   = self.model_AE(target_x)
+                x_proj   = self.model_AE(x)
                 x_proj   = torch.mul(x_proj,target_mask_)
                 target_x = torch.add(torch.mul(target_x,target_mask),x_proj)
-                #x_copy[:,index,:,:] = target_x
+                x = torch.Tensor.index_fill(x,1,torch_index,0)
+                x = torch.Tensor.index_add(x,1,torch_index,target_x)
 
         # gradient iteration
         if self.NGrad > 0:
             # gradient normalisation
-            #x_copy[:,index,:,:] = target_x
-            #xpred = self.model_AE(x_copy)
-            xpred = self.model_AE(target_x)
+            x = torch.Tensor.index_fill(x,1,torch_index,0)
+            x = torch.Tensor.index_add(x,1,torch_index,target_x)
+            xpred = self.model_AE(x)
             grad  = self.model_Grad.compute_Grad(target_x, xpred, target_obs, target_mask)
             if normgrad == 0. :
                 _normgrad = torch.sqrt( torch.mean( grad**2 ) )

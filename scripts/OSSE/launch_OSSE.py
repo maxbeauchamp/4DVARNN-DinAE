@@ -61,7 +61,7 @@ if __name__ == '__main__':
     size_tw                     = 11    # Length of the 4th dimension          
     Wsquare     		= 4     # half-width of holes
     Nsquare     		= 3     # number of holes
-    DimAE       		= 40   # Dimension of the latent space
+    DimAE       		= 40    # Dimension of the latent space
     flagAEType  		= 2     # model type, ConvAE or GE-NN
     flagLoadModel               = 0     # load pre-defined AE model or not
     flag_MultiScaleAEModel      = 0     # see flagProcess2_7: work on HR(0), LR(1), or HR+LR(2)
