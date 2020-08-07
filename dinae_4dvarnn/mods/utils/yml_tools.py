@@ -1,4 +1,5 @@
 from dinae_4dvarnn import *
+
 config_file = Path('config.yaml')
 
 yaml = ruamel.yaml.YAML(typ='safe')
@@ -10,7 +11,7 @@ class Array2d:
     @classmethod
     def from_yaml(cls, constructor, node):
         array = constructor.construct_sequence(node, deep=True)
-        return numpy.array(array)
+        return np.array(array)
 
 @yaml.register_class
 class Array1d:
@@ -18,4 +19,4 @@ class Array1d:
     @classmethod
     def from_yaml(cls, constructor, node):
         array = constructor.construct_sequence(node, deep=True)
-        return  numpy.reshape(numpy.array(array),numpy.array(array).size)
+        return  np.reshape(np.array(array),np.array(array).size)

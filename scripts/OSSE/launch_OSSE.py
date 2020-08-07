@@ -30,13 +30,13 @@ wCov     = str2bool(sys.argv[6])  # False/True
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    with open('config.yml', 'rb') as f:
+    with open('_PATH_/config.yml', 'rb') as f:
         conf = yaml.load(f.read())  
 
     # list of global parameters (comments to add)
-    fileMod             	= datapath+domain+conf['path_files']['file_Mod']
-    fileOI              	= datapath+domain+conf['path_files']['file_OI']
-    fileObs             	= datapath+domain+conf['path_files']['file_Obs']
+    fileMod             	= datapath+domain+conf['path_files']['fileMod']
+    fileOI              	= [ datapath+domain+x for x in conf['path_files']['fileOI'] ]
+    fileObs             	= [ datapath+domain+x for x in conf['path_files']['fileObs'] ]
     if opt=="nadir":
         fileObs         	= fileObs[0]
         fileOI          	= fileOI[0]
@@ -49,6 +49,9 @@ if __name__ == '__main__':
     flagTrWMissingData  	= conf['data_options']['flagTrWMissingData'] 
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
+    lfile_cov                   = conf['data_options']['lfile_cov']
+    lname_cov                   = conf['data_options']['lname_cov']
+    lid_cov                     = conf['data_options']['lid_cov']   
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
     size_tw             	= conf['data_options']['size_tw'] 
     Wsquare     		= conf['data_options']['Wsquare']

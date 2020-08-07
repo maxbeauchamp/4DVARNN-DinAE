@@ -8,7 +8,7 @@
 # /!\ Attention, la ligne suivante est trompeuse mais dans le vocabulaire
 # de Slurm "multithread" fait bien référence à l'hyperthreading.
 #SBATCH --hint=nomultithread        # on réserve des coeurs physiques et non logiques
-#SBATCH --time=08:00:00             # temps exécution maximum demande (HH:MM:SS)
+#SBATCH --time=00:10:00             # temps exécution maximum demande (HH:MM:SS)
 #SBATCH --output=gpu_mono%j.out     # nom du fichier de sortie
 #SBATCH --error=gpu_mono%j.out      # nom du fichier erreur (ici commun avec la sortie)
  
@@ -24,13 +24,15 @@ export PYTHONPATH=${HOME}/4DVARNN-DinAE:${PYTHONPATH}
 set -x
 
 # copie vers le WORK pour execution
-rsync -r --exclude 'figs' ${HOME}/4DVARNN-DinAE ${WORK}/4DVARNN-DinAE_%j
+JobID=$RANDOM
+rsync -avrz --exclude=figs ${HOME}/4DVARNN-DinAE/ ${WORK}/4DVARNN-DinAE_${JobID}
 # modify the yaml file according to parameters 
-sed -i -e 's|_LAG_|'"${2}"'|g' ${WORK}/4DVARNN-DinAE_%j/scripts/OSSE/config.yml
-sed -i -e 's|_DOMAIN_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_%j/scripts/OSSE/config.yml
+sed -i -e 's|_LAG_|'"${2}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config.yml
+sed -i -e 's|_DOMAIN_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config.yml
+sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py
 
 # exécution du code
-python -u ${WORK}/4DVARNN-DinAE_%j/scripts/OSSE/launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}
+python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}
 
 # remove copy
-rm -rf ${WORK}/4DVARNN-DinAE_%j
+rm -rf ${WORK}/4DVARNN-DinAE_${JobID}

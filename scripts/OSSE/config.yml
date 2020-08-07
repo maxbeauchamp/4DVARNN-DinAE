@@ -7,12 +7,12 @@ path_files:
     fileOI: 
     - /oi/ssh_NATL60_4nadir.nc
     - /oi/ssh_NATL60_swot.nc
-    - /oi/ssh_NATL60_swot4nadir.nc
+    - /oi/ssh_NATL60_swot_4nadir.nc
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
     fileObs:
     - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d.nc
     - /data/gridded_data_swot_wocorr/dataset_swot.nc
-    - /data/gridded_data_swot_wocorr/dataset_nadir___LAG_d_swot.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d_swot.nc
 
 # data options
 data_options:
