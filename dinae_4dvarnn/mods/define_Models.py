@@ -1,6 +1,7 @@
 from dinae_4dvarnn import *
 from ConvAE import ConvAE
 from GENN import GENN
+from PINN import PINN
 
 def define_Models(dict_global_Params,genFilename,shapeData):
 
@@ -14,6 +15,8 @@ def define_Models(dict_global_Params,genFilename,shapeData):
       Encoder, Decoder = ConvAE(dict_global_Params,genFilename,shapeData)     
     if flagAEType == 2:   ## GENN
       Encoder, Decoder = GENN(dict_global_Params,genFilename,shapeData)
+    if flagAEType == 3:   ## PINN
+      Encoder, Decoder = PINN(dict_global_Params,genFilename,shapeData)
 
     ## auto-encoder architecture
     class Model_AE(torch.nn.Module):

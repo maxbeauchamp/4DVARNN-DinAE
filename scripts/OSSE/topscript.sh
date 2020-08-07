@@ -1,15 +1,10 @@
 #!/bin/sh
 
+tobs=${1}
 domain="GULFSTREAM"
-for type_obs in 'mod' 'obs' ; do
-  sbatch mono_gpu_OSSE.slurm swot 0 ${type_obs} ${domain} 0 False
-  echo "NN-Learning with SWOT data ("${type_obs}")... Done"
-  #for lag in $(seq 0 5); do 
-  for lag in '0' '5' ; do
-      sbatch mono_gpu_OSSE.slurm nadir ${lag} ${type_obs} ${domain} 0 False
-      echo "NN-Learning with NADIR data ("${type_obs}") and lag "${lag}"... Done"
-      sbatch mono_gpu_OSSE.slurm nadirswot ${lag} ${type_obs} ${domain} 0 False
-      echo "NN-Learning with NADIR/SWOT data ("${type_obs}") and lag "${lag}"... Done"
-  done
-done
-
+sbatch mono_gpu_OSSE.slurm nadir 0 ${tobs} ${domain} 0 False
+sbatch mono_gpu_OSSE.slurm nadir 0 ${tobs} ${domain} 1 False
+sbatch mono_gpu_OSSE.slurm nadir 0 ${tobs} ${domain} 2 False
+sbatch mono_gpu_OSSE.slurm nadir 0 ${tobs} ${domain} 0 True
+sbatch mono_gpu_OSSE.slurm nadir 0 ${tobs} ${domain} 1 True
+sbatch mono_gpu_OSSE.slurm nadir 0 ${tobs} ${domain} 2 True

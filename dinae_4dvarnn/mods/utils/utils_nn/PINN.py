@@ -1,10 +1,9 @@
 from dinae_4dvarnn import *
 
-from ConstrainedConv1d  import ConstrainedConv1d
-from ConstrainedConv2d  import ConstrainedConv2d
+from PIConv2d           import PIConv2d
 from ResNetConv2d       import ResNetConv2d
 
-def GENN(dict_global_Params,genFilename,shapeData):
+def PINN(dict_global_Params,genFilename,shapeData):
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
@@ -19,12 +18,12 @@ def GENN(dict_global_Params,genFilename,shapeData):
     class Encoder(torch.nn.Module):
         def __init__(self):
             super(Encoder, self).__init__()
-            self.pool1   = torch.nn.AvgPool2d((4,4))
-            self.conv1   = ConstrainedConv2d(shapeData[0],NbFilter,(WFilter,WFilter),padding=int(WFilter/2),bias=False)
-            self.conv2   = torch.nn.Conv2d(NbFilter,DimAE,(1,1),padding=0,bias=False)
+            #self.pool1   = torch.nn.AvgPool2d((4,4))
+            self.conv1   = PIConv2d(shapeData[0],bias=False)
+            self.conv2   = torch.nn.Conv2d(shapeData[0],DimAE,(1,1),padding=0,bias=False)
             self.resnet1 = ResNetConv2d(NbResUnit,DimAE,5,1,0)
-            self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,DimAE,(4,4),stride=(4,4),bias=False)
-            self.resnet2 = ResNetConv2d(NbResUnit,DimAE,5,1,0)
+            #self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,DimAE,(4,4),stride=(4,4),bias=False)
+            #self.resnet2 = ResNetConv2d(NbResUnit,DimAE,5,1,0)
             self.convF   = torch.nn.Conv2d(DimAE,int(shapeData[0]/(N_cov+1)),(1,1),padding=0,bias=False)
                 
         def _make_ResNet(self,Nblocks,dim,K,kernel_size, padding):
@@ -36,12 +35,12 @@ def GENN(dict_global_Params,genFilename,shapeData):
             return torch.nn.Sequential(*layers)
 
         def forward(self, x):
-            x = self.pool1( x )
+            #x = self.pool1( x )
             x = self.conv1(x)
             x = self.conv2( F.relu(x) )
             x = self.resnet1( x )
-            x = self.conv1Tr( x )
-            x = self.resnet2( x )
+            #x = self.conv1Tr( x )
+            #x = self.resnet2( x )
             x = self.convF( x )
             return x
             

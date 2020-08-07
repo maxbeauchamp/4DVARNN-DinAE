@@ -30,46 +30,57 @@ wCov     = str2bool(sys.argv[6])  # False/True
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    with open('config.yml', 'rb') as f:
-        conf = yaml.load(f.read())  
 
     # list of global parameters (comments to add)
-    fileMod             	= datapath+domain+conf['path_files']['file_Mod']
-    fileOI              	= datapath+domain+conf['path_files']['file_OI']
-    fileObs             	= datapath+domain+conf['path_files']['file_Obs']
+    fileMod                     = datapath+domain+"/ref/NATL60-CJM165_"+domain+"_ssh_y2013.1y.nc" # Model file
+    fileOI                      = datapath+domain+"/oi/ssh_NATL60_4nadir.nc"            # OI file
     if opt=="nadir":
-        fileObs         	= fileObs[0]
-        fileOI          	= fileOI[0]
+        fileObs                 = datapath+domain+"/data/gridded_data_swot_wocorr/dataset_nadir_"+lag+"d.nc" # Obs file (1)
     elif opt=="swot": 
-        fileObs         	= fileObs[1]
-        fileOI          	= fileOI[1]
+        fileObs                 = datapath+domain+"/data/gridded_data_swot_wocorr/dataset_swot.nc"           # Obs file (2)
     else:
-        fileObs         	= fileObs[2]
-        fileOI          	= fileOI[2]
-    flagTrWMissingData  	= conf['data_options']['flagTrWMissingData'] 
-    flagloadOIData 		= conf['data_options']['flagloadOIData']
-    include_covariates  	= conf['data_options']['include_covariates']
-    N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
-    size_tw             	= conf['data_options']['size_tw'] 
-    Wsquare     		= conf['data_options']['Wsquare']
-    Nsquare     		= conf['data_options']['Nsquare']
-    DimAE       		= conf['NN_options']['DimAE']
-    flagAEType  		= conf['NN_options']['flagAEType']
-    flag_MultiScaleAEModel      = conf['NN_options']['flag_MultiScaleAEModel']
-    alpha                       = conf['loss_weighting']['alpha']
-    alpha4DVar                  = conf['loss_weighting']['alpha4DVar']
-    flagGradModel               = conf['solver_options']['flagGradModel']
-    flagOptimMethod             = conf['solver_options']['flagOptimMethod']
-    sigNoise        		= conf['data_options']['sigNoise']
-    flagTrOuputWOMissingData    = conf['data_options']['flagTrOuputWOMissingData']
-    stdMask              	= conf['data_options']['stdMask']
-    flagDataWindowing 		= conf['data_options']['flagDataWindowing']
-    dropout           		= conf['data_options']['dropout']
-    wl2               		= conf['data_options']['wl2']
-    flagLoadModel      		= conf['training_params']['flagLoadModel']
-    batch_size        		= conf['training_params']['batch_size']
-    NbEpoc            		= conf['training_params']['NbEpoc']
-    Niter			= conf['training_params']['Niter']
+        fileObs                 = datapath+domain+"/data/gridded_data_swot_wocorr/dataset_nadir_"+lag+"d_swot.nc" # Obs file (3)
+    flagTrWMissingData          = wMis  # Training phase with or without missing data
+    flagloadOIData 		= 1     # load OI: work on rough variable or anomaly
+    include_covariates          = wCov  # use additional covariates in initial layer
+    if include_covariates==True:
+        '''lfile_cov            = [datapath+domain+"/ref/NATL60-CJM165_sst_y2013.1y.nc",\
+                                       datapath+domain+"/ref/NATL60-CJM165_sss_y2013.1y.nc",\
+                                       datapath+domain+"/oi/ssh_NATL60_4nadir.nc"]
+        lname_cov               = ["sst","sss","ssh_mod"]
+        lid_cov                 = ["SST","SSS","OI"]'''
+        lfile_cov               = [datapath+domain+"/oi/ssh_NATL60_4nadir.nc"]
+        lname_cov               = ["ssh_mod"]
+        lid_cov                 = ["OI"]
+        N_cov                   = len(lid_cov)
+    else:
+        lfile_cov               = [""]
+        lname_cov               = [""]
+        lid_cov                 = [""]
+        N_cov                   = 0
+    size_tw                     = 11    # Length of the 4th dimension          
+    Wsquare     		= 4     # half-width of holes
+    Nsquare     		= 3     # number of holes
+    DimAE       		= 40    # Dimension of the latent space
+    flagAEType  		= 2     # model type, ConvAE or GE-NN
+    flagLoadModel               = 0     # load pre-defined AE model or not
+    flag_MultiScaleAEModel      = 0     # see flagProcess2_7: work on HR(0), LR(1), or HR+LR(2)
+    # alpha ?? weights for loss function
+    alpha                       = np.array([1.,0.1])
+    alpha4DVar                  = np.array([0.01,1.])
+    alpha4DVar                  = np.array([.25,.75])
+    flagGradModel               = 2     # Gradient computation (0: subgradient, 1: true gradient/autograd)
+    flagOptimMethod             = 2     # 0: fixed-step gradient descent, 1: ConvNet_step gradient descent, 2: LSTM-based descent
+    sigNoise        		= 1e-1
+    flagUseMaskinEncoder 	= 0
+    flagTrOuputWOMissingData    = 1
+    stdMask              	= 0.
+    flagDataWindowing 		= 2  # 2 for SSH case-study
+    dropout           		= 0.0
+    wl2               		= 0.0000
+    batch_size        		= 4
+    NbEpoc            		= 20
+    Niter = ifelse(flagTrWMissingData==1,20,20)
 
     # create the output directory
     if flagAEType==1:
@@ -104,7 +115,8 @@ if __name__ == '__main__':
     'flagloadOIData','size_tw','Wsquare',\
     'Nsquare','DimAE','flagAEType','flagLoadModel',\
     'flagOptimMethod','flagGradModel','alpha','alpha4DVar','sigNoise',\
-    'stdMask','flagDataWindowing','dropout','wl2','batch_size',\
+    'flagUseMaskinEncoder','stdMask',\
+    'flagDataWindowing','dropout','wl2','batch_size',\
     'NbEpoc','Niter','flag_MultiScaleAEModel',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   
