@@ -34,13 +34,21 @@ class Model_4DVarNN_FP(torch.nn.Module):
 
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)  
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        torch_index = torch.LongTensor(np.float64(index)).to(device)
+        with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
+            target_x     = x[:,index,:,:]
+            target_obs   = xobs[:,index,:,:]
+            target_mask  = mask[:,index,:,:]
+            target_mask_ = mask_[:,index,:,:]
 
         # fixed-point iterations
         for kk in range(0,self.NProjFP):
             x_proj   = self.model_AE(x)
-            x_proj   = torch.mul(x_proj,mask_[:,index,:,:])
-            x[:,index,:,:] = torch.mul(x[:,index,:,:], mask[:,index,:,:])   
-            x[:,index,:,:] = torch.add(x[:,index,:,:], x_proj )
+            x_proj   = torch.mul(x_proj,target_mask_)
+            target_x = torch.add(torch.mul(target_x,target_mask),x_proj)
+            x = torch.Tensor.index_fill(x,1,torch_index,0)
+            x = torch.Tensor.index_add(x,1,torch_index,target_x)
 
-        return x[:,index,:,:]
+        return target_x
 

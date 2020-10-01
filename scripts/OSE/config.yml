@@ -1,30 +1,22 @@
 # path files
 path_files:
-    domain: _DOMAIN_
-#   Model file
-    fileMod: /ref/NATL60-CJM165__DOMAIN__ssh_y2013.1y.nc
 #   OI file (list of 3 files: nadir, swot, nadir+swot)
-    fileOI: 
-    - /oi/ssh_NATL60_4nadir.nc
-    - /oi/ssh_NATL60_swot.nc
-    - /oi/ssh_NATL60_swot_4nadir.nc
+    fileOI: "/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
-    fileObs:
-    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d.nc
-    - /data/gridded_data_swot_wocorr/dataset_swot.nc
-    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d_swot.nc
+    fileObs: "/training/data/dataset_nadir__LAG_d.nc"
 
 # data options
 data_options:
-    flagTrWMissingData: _WMIS_
+    lag: _LAG_
+    domain: _DOMAIN_
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
-    include_covariates: _WCOV_  
+    include_covariates: True  
     lfile_cov:
-    - /oi/ssh_NATL60_4nadir.nc
+    - "/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
     lname_cov:
-    - ssh_mod
+    - ssh
     lid_cov:
     - OI
 #   Length of the 4th dimension 
@@ -45,9 +37,14 @@ NN_options:
 #   Dimension of the latent space
     DimAE: 40    
 #   model type, 1: ConvAE or 2: GENN 3: PINN
-    flagAEType: 3     
+    flagAEType: 2     
 #   multiscale model
     flag_MultiScaleAEModel: 0 
+# load model from NATL60 or not
+    load_model: _LMOD_
+# add regularization in loss function or not 
+    with_regul: _WREGUL_
+
 
 # loss function weighting
 loss_weighting: 
@@ -56,6 +53,9 @@ loss_weighting:
         - 0.1
     alpha4DVar: !1darray
       - - 0.
+        - 1.
+    regul: !1darray
+      - - 1.
         - 1.
 
 # solver parameters

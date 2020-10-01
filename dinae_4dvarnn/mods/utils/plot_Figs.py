@@ -165,3 +165,100 @@ def plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
         plt.savefig(figName)       # save the figure
         plt.close()                # close the figure
 
+
+def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
+              x_train,x_train_missing,mask_train,x_train_pred,rec_AE_Tr,x_train_OI,meanTr,stdTr,\
+              lday_pred,iter):
+
+    # import Global Parameters
+    for key,val in dict_global_Params.items():
+        exec("globals()['"+key+"']=val")
+
+    ## keep only the information on the target variable (remove covariates)
+    if include_covariates == True:
+        index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
+        mask_train      = mask_train[:,index,:,:]
+        x_train_missing = x_train_missing[:,index,:,:]
+
+    ## reshape and rescale variables
+    mask_train      = np.moveaxis(mask_train,1,3)
+    x_train         = meanTr+ np.moveaxis(x_train,1,3)*stdTr
+    x_train_missing = meanTr+ np.moveaxis(x_train_missing,1,3)*stdTr
+    x_train_pred    = meanTr+ np.moveaxis(x_train_pred,1,3)*stdTr
+    rec_AE_Tr       = meanTr+ np.moveaxis(rec_AE_Tr,1,3)*stdTr
+
+    ## add OI (large-scale) to state if required
+    if flagloadOIData == 1:
+        x_train         = x_train + x_train_OI
+        x_train_missing = x_train_missing + x_train_OI
+        x_train_pred    = x_train_pred + x_train_OI
+        rec_AE_Tr       = rec_AE_Tr + x_train_OI
+
+    ## generate some plots
+    figpathTr = dirSAVE+'FIGS/Iter_%03d'%(iter)+'_Tr'
+    if not os.path.exists(figpathTr):
+        mk_dir_recursive(figpathTr)
+    else:
+        shutil.rmtree(figpathTr)
+        mk_dir_recursive(figpathTr)
+
+    idT = int(np.floor(x_train.shape[3]/2))
+    lon = np.arange(-65,-55,1/20)
+    lat = np.arange(30,40,1/20)
+    indLat     = np.arange(0,200)
+    indLon     = np.arange(0,200)
+    lon = lon[indLon]
+    lat = lat[indLat]
+    extent_=[np.min(lon),np.max(lon),np.min(lat),np.max(lat)]
+    lfig=[20,40,60]
+
+    ## Training dataset
+    for ifig in lfig:
+        # Rough variables
+        figName = figpathTr+'/'+genFilename+genSuffixModel+'_examplesTr_%03d'%(ifig)+'_'+lday_pred[ifig]+'.png'
+        fig, ax = plt.subplots(2,2,figsize=(15,15),
+                      subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=0.0)))
+        vmin = np.quantile(x_train[ifig,:,:,idT].flatten() , 0.05 )
+        vmax = np.quantile(x_train[ifig,:,:,idT].flatten() , 0.95 )
+        cmap="coolwarm"
+        GT   = x_train[ifig,:,:,idT].squeeze()
+        OBS  = np.where(mask_train[ifig,:,:,idT].squeeze()==0,\
+                 np.nan, x_train_missing[ifig,:,:,idT].squeeze())
+        PRED = x_train_pred[ifig,:,:,idT].squeeze()
+        REC  = rec_AE_Tr[ifig,:,:,idT].squeeze()
+        plot(ax,0,0,lon,lat,GT,"GT",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,0,1,lon,lat,OBS,"Observations",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,1,0,lon,lat,PRED,"Pred",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,1,1,lon,lat,REC,"Rec",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plt.subplots_adjust(hspace=0.5,wspace=0.25)
+        plt.savefig(figName)       # save the figure
+        plt.close()                # close the figure
+        # Gradient
+        figName = figpathTr+'/'+genFilename+genSuffixModel+'_examplesTr_grads_%03d'%(ifig)+'_'+lday_pred[ifig]+'.png'
+        fig, ax = plt.subplots(2,2,figsize=(15,15),
+                      subplot_kw=dict(projection=ccrs.PlateCarree(central_longitude=0.0)))
+        vmin = np.quantile(Gradient(x_train[ifig,:,:,idT],2).flatten() , 0.05 )
+        vmax = np.quantile(Gradient(x_train[ifig,:,:,idT],2).flatten() , 0.95 )
+        cmap="viridis"
+        GT   = Gradient(x_train[ifig,:,:,idT].squeeze(),2)
+        OBS  = Gradient(np.where(mask_train[ifig,:,:,idT].squeeze()==0,\
+                 np.nan,x_train_missing[ifig,:,:,idT].squeeze()),2)
+        PRED = Gradient(x_train_pred[ifig,:,:,idT].squeeze(),2)
+        REC  = Gradient(rec_AE_Tr[ifig,:,:,idT].squeeze(),2)
+        plot(ax,0,0,lon,lat,GT,r"$\nabla_{GT}$",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,0,1,lon,lat,OBS,r"$\nabla_{Obs}$",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,1,0,lon,lat,PRED,r"$\nabla_{Pred}$",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,1,1,lon,lat,REC,r"$\nabla_{Rec}$",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plt.subplots_adjust(hspace=0.5,wspace=0.25)
+        plt.savefig(figName)       # save the figure
+        plt.close()                # close the figure
+
+

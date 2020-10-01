@@ -49,7 +49,7 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,self.periodicBnd)
         elif OptimType == 3:
             self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,30)
-                
+
     def forward(self, x_inp,xobs,mask,g1=None,g2=None,normgrad=0.0):
         mask_  = torch.add(1.0,torch.mul(mask,-1.0)) #1. - mask
         with torch.enable_grad():
@@ -73,6 +73,12 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 target_x = torch.add(torch.mul(target_x,target_mask),x_proj)
                 x = torch.Tensor.index_fill(x,1,torch_index,0)
                 x = torch.Tensor.index_add(x,1,torch_index,target_x)
+
+        if self.InterpFlag == False:
+            x_proj   = self.model_AE(x)
+            target_x = x_proj
+            x = torch.Tensor.index_fill(x,1,torch_index,0)
+            x = torch.Tensor.index_add(x,1,torch_index,target_x)
 
         # gradient iteration
         if self.NGrad > 0:
@@ -122,9 +128,15 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
 
             _normgrad = 1.
             if self.OptimType == 1:
-                return target_x,None,_normgrad
+                if ( (torch.cuda.is_available()) and (torch.cuda.device_count()>1) ) :
+                    return target_x,torch.zeros(1),_normgrad
+                else:
+                    return target_x,None,_normgrad
             if self.OptimType == 2:
-                return target_x,None,None,_normgrad
+                if ( (torch.cuda.is_available()) and (torch.cuda.device_count()>1) ) :
+                    return target_x,torch.zeros(1),torch.zeros(1),_normgrad
+                else:
+                    return target_x,None,None,_normgrad
             else:
                 return target_x,_normgrad
 

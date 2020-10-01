@@ -18,6 +18,30 @@ def add_covariates_to_tensor(tensor1,tensor2,N_cov):
     new_tensor[:,index2,:,:] = (tensor2.cpu().detach().numpy())[:,index2,:,:]
     return torch.Tensor(new_tensor)
 
+class MyDataParallel(torch.nn.DataParallel):
+    """
+    Allow nn.DataParallel to call model's attributes.
+    """
+    def __getattr__(self, name):
+        try:
+            return super().__getattr__(name)
+        except AttributeError:
+            return getattr(self.module, name)
+
+def model_to_MultiGPU(model):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.cuda.is_available():
+        print('... Number of GPUs: %d'%torch.cuda.device_count())
+        if torch.cuda.device_count() > 1:
+            print("Let's use", torch.cuda.device_count(), "GPUs!")
+            model      = MyDataParallel(model)
+            model.model_AE   = MyDataParallel(model.model_AE)
+            model.model_Grad = MyDataParallel(model.model_Grad)
+    model.to(device)
+    model.model_AE.to(device)
+    model.model_Grad.to(device)
+    return model
+
 def learning_OSSE(dict_global_Params,genFilename,\
                   x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_pred,meanTr,stdTr,\
                   x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,model_AE,DIMCAE):
@@ -31,9 +55,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
     # ***************** #
 
     ## model parameters
-    NbProjection   = [2,2,5,5,10,15,14]#[0,0,2,2,5,5,10,15,14]
-    NbGradIter     = [2,2,5,5,10,10,15]
-    lrUpdate       = [1e-4,1e-5,1e-6,1e-7]#[1e-3,1e-4,1e-5,1e-5,1e-5,1e-6,1e-6,1e-5,1e-6]
+    NbProjection   = [2,2,5,5,10,12,15]
+    NbGradIter     = [2,5,7,9,10,12,15]
+    if flagTrWMissingData==2:
+        lrUpdate       = [1e-4,1e-5,1e-6,1e-7]
+    else:
+        lrUpdate       = [1e-3,1e-4,1e-5,1e-6]
     IterUpdate     = [0,3,10,15,20,25,30,35,40]
     val_split      = 0.1
     iterInit       = 0
@@ -80,6 +107,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
         model = Model_4DVarNN_GradFP(\
               model_AE,shapeData,NBProjCurrent,NBGradCurrent,\
               flagGradModel,flagOptimMethod,N_cov=N_cov)    
+    model =  model_to_MultiGPU(model)
     ## create an optimizer object (Adam with lr 1e-3)
     lrCurrent        = lrUpdate[0]
     lambda_LRAE = 0.5
@@ -124,7 +152,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
             model = Model_4DVarNN_GradFP(\
                       model_AE,shapeData,NBProjCurrent,NBGradCurrent,\
                       flagGradModel,flagOptimMethod,N_cov=N_cov)
-            model = model.to(device)        
+            model =  model_to_MultiGPU(model)
             # update optimizer
             optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
                                     {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
@@ -188,8 +216,13 @@ def learning_OSSE(dict_global_Params,genFilename,\
                             outputs,hidden_new,cell_new,normgrad = model(inputs_init,inputs_missing,masks,None,None)
                         else:
                             outputs,normgrad = model(inputs_init,inputs_missing,masks)
+                        # compute Gradient of the outputs
+                        Grad_pred = gradient_imageTS(outputs)
+                        Grad_true = gradient_imageTS(targets_GT)
+                        loss_Grad = torch.mean((Grad_pred-Grad_true)**2)
+                        # compute losses
                         loss_R      = torch.sum((outputs - targets_GT)**2 * masks_GT )
-                        loss_R      = torch.mul(1.0 / torch.sum(masks),loss_R)
+                        loss_R      = torch.mul(1.0 / torch.sum(masks_GT),loss_R)
                         loss_I      = torch.sum((outputs - targets_GT)**2 * (1. - masks_GT) )
                         loss_I      = torch.mul(1.0 / torch.sum(1.-masks_GT),loss_I)
                         loss_All    = torch.mean((outputs - targets_GT)**2 )
@@ -207,8 +240,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
                         if flagTrWMissingData == 2:
                             loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE
+                            loss        = torch.add(loss_R,torch.mul(1.0,loss_AE))
+                            loss        = loss_R
+                            #loss        = loss + torch.mean(Grad_pred**2)
                         else:
-                            loss        = alpha_Grad * loss_All + 0.5 * alpha_AE * ( loss_AE + loss_AE_GT )
+                            #loss        = alpha_Grad * loss_All + 0.5 * alpha_AE * ( loss_AE + loss_AE_GT )
+                            loss        = loss_All + torch.mean(Grad_pred**2) 
 
                         # backward + optimize only if in training phase
                         if phase == 'train':

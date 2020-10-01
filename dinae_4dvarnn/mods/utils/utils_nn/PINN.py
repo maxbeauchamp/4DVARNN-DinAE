@@ -9,9 +9,9 @@ def PINN(dict_global_Params,genFilename,shapeData):
     for key,val in dict_global_Params.items():
         exec("globals()['"+key+"']=val")
 
-    WFilter       = 5#11#
-    NbResUnit     = 3#10#
-    NbFilter      = 5*DimAE#20*DimAE
+    WFilter       = 11
+    NbResUnit     = 4
+    NbFilter      = 1*DimAE
 
     genFilename = genFilename+str('WFilter%03d_'%WFilter)+str('NFilter%03d_'%NbFilter)+str('RU%03d_'%NbResUnit)
 
@@ -25,14 +25,6 @@ def PINN(dict_global_Params,genFilename,shapeData):
             #self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,DimAE,(4,4),stride=(4,4),bias=False)
             #self.resnet2 = ResNetConv2d(NbResUnit,DimAE,5,1,0)
             self.convF   = torch.nn.Conv2d(DimAE,int(shapeData[0]/(N_cov+1)),(1,1),padding=0,bias=False)
-                
-        def _make_ResNet(self,Nblocks,dim,K,kernel_size, padding):
-            layers = []
-            for kk in range(0,Nblocks):
-                layers.append(torch.nn.Conv2d(dim,K*dim,kernel_size,padding=padding,bias=False))
-                layers.append(torch.nn.ReLU())
-                layers.append(torch.nn.Conv2d(K*dim,dim,kernel_size,padding=padding,bias=False))
-            return torch.nn.Sequential(*layers)
 
         def forward(self, x):
             #x = self.pool1( x )

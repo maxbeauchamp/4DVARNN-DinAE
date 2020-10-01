@@ -49,9 +49,9 @@ if __name__ == '__main__':
     flagTrWMissingData  	= conf['data_options']['flagTrWMissingData'] 
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
-    lfile_cov                   = conf['data_options']['lfile_cov']
+    lfile_cov                   = [ datapath+domain+x for x in conf['data_options']['lfile_cov'] ]
     lname_cov                   = conf['data_options']['lname_cov']
-    lid_cov                     = conf['data_options']['lid_cov']   
+    lid_cov                     = conf['data_options']['lid_cov'] 
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
     size_tw             	= conf['data_options']['size_tw'] 
     Wsquare     		= conf['data_options']['Wsquare']
@@ -71,6 +71,9 @@ if __name__ == '__main__':
     wl2               		= conf['data_options']['wl2']
     flagLoadModel      		= conf['training_params']['flagLoadModel']
     batch_size        		= conf['training_params']['batch_size']
+    if ( (torch.cuda.is_available()) and (torch.cuda.device_count()>1) ):
+        batch_size = batch_size*torch.cuda.device_count()
+    print("Batch size="+str(batch_size)+" on "+str(torch.cuda.device_count())+" GPUs")
     NbEpoc            		= conf['training_params']['NbEpoc']
     Niter			= conf['training_params']['Niter']
 

@@ -6,7 +6,7 @@ Created on Thu Aug  8 08:21:45 2019
 @author: rfablet, mbeaucha
 """
 
-from 4dvarnn-dinae import *
+from dinae_4dvarnn import *
 
 def ifelse(cond1,val1,val2):
     if cond1==True:
@@ -15,58 +15,74 @@ def ifelse(cond1,val1,val2):
         res = val2
     return res
 
-lag      = sys.argv[1]
-domain   = sys.argv[2]
-  
+def str2bool(v):
+  return v.lower() in ("yes", "true", "t", "1")
+
 # main code
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+    with open('_PATH_/config.yml', 'rb') as f:
+        conf = yaml.load(f.read())  
+
+    lag        = str(conf['data_options']['lag'])
+    domain     = conf['data_options']['domain']
+    load_Model = conf['NN_options']['load_model']
+    wregul     = conf['NN_options']['with_regul']
 
     # list of global parameters (comments to add)
-    fileOI                      = datapath+"/OSE/"+domain+"/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc" # OI file
-    fileObs                     = datapath+"/OSE/"+domain+"/training/data/dataset_nadir_"+lag+"d.nc"         # Obs file (1)
-    flagTrWMissingData          = 2     # Training phase with or without missing data
-    flagloadOIData 		= 1     # load OI: work on rough variable or anomaly
-    include_covariates          = True  # use additional covariates in initial layer
-    N_cov                       = 1     # SST, SSS and OI
-    lfile_cov                   = [datapath+"/OSE/"+domain+"/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"]
-    lname_cov                   = ["ssh"]
-    lid_cov                     = ["OI"]
-    size_tw                     = 11    # Length of the 4th dimension          
-    Wsquare     		= 4     # half-width of holes
-    Nsquare     		= 3     # number of holes
-    DimAE       		= 200   # Dimension of the latent space
-    flagAEType  		= 2     # model type, ConvAE or GE-NN
-    flagLoadModel               = 0     # load pre-defined AE model or not
-    flag_MultiScaleAEModel      = 0     # see flagProcess2_7: work on HR(0), LR(1), or HR+LR(2)
-    alpha_Losss                 = np.array([1.,0.1]) # ??
-    flagGradModel               = 0     # Gradient computation (0: subgradient, 1: true gradient/autograd)
-    flagOptimMethod             = 1     # 0: fixed-step gradient descent, 1: ConvNet_step gradient descent, 2: LSTM-based descent
-    load_Model                  = False # use a pre-trained model or not
-    sigNoise        		= 1e-1
-    flagUseMaskinEncoder 	= 0
-    flagTrOuputWOMissingData    = 1
-    stdMask              	= 0.
-    flagDataWindowing 		= 2     # 2 for SSH case-study
-    dropout           		= 0.0
-    wl2               		= 0.0000
-    batch_size        		= 4
-    NbEpoc            		= 20
-    Niter = ifelse(flagTrWMissingData==1,20,20)
+    fileOI              	= datapath+'OSE/'+domain+conf['path_files']['fileOI']
+    fileObs             	= datapath+'OSE/'+domain+conf['path_files']['fileObs']
+    flagTrWMissingData  	= 2
+    flagloadOIData 		= conf['data_options']['flagloadOIData']
+    include_covariates  	= conf['data_options']['include_covariates']
+    lfile_cov                   = [ datapath+'OSE/'+domain+x for x in conf['data_options']['lfile_cov'] ]
+    lname_cov                   = conf['data_options']['lname_cov']
+    lid_cov                     = conf['data_options']['lid_cov']
+    N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
+    size_tw             	= conf['data_options']['size_tw'] 
+    Wsquare     		= conf['data_options']['Wsquare']
+    Nsquare     		= conf['data_options']['Nsquare']
+    DimAE       		= conf['NN_options']['DimAE']
+    flagAEType  		= conf['NN_options']['flagAEType']
+    flag_MultiScaleAEModel      = conf['NN_options']['flag_MultiScaleAEModel']
+    alpha                       = conf['loss_weighting']['alpha']
+    alpha4DVar                  = conf['loss_weighting']['alpha4DVar']
+    regul                       = conf['loss_weighting']['regul']
+    flagGradModel               = conf['solver_options']['flagGradModel']
+    flagOptimMethod             = conf['solver_options']['flagOptimMethod']
+    sigNoise        		= conf['data_options']['sigNoise']
+    flagTrOuputWOMissingData    = conf['data_options']['flagTrOuputWOMissingData']
+    stdMask              	= conf['data_options']['stdMask']
+    flagDataWindowing 		= conf['data_options']['flagDataWindowing']
+    dropout           		= conf['data_options']['dropout']
+    wl2               		= conf['data_options']['wl2']
+    batch_size        		= conf['training_params']['batch_size']
+    if ( (torch.cuda.is_available()) and (torch.cuda.device_count()>1) ):
+        batch_size = batch_size*torch.cuda.device_count()
+    print("Batch size="+str(batch_size)+" on "+str(torch.cuda.device_count())+" GPUs")
+    NbEpoc            		= conf['training_params']['NbEpoc']
+    Niter			= conf['training_params']['Niter']
 
     # create the output directory
-    suf1 = ifelse(flagAEType==1,"ConvAE","GENN")
+    if flagAEType==1:
+        suf1="ConvAE",
+    elif flagAEType==2:
+        suf1="GENN"
+    else:
+        suf1="PINN"
     if flagTrWMissingData==0:
         suf2 = "womissing"
     elif flagTrWMissingData==1:
         suf2 = "wmissing"
     else:
         suf2 = "wwmissing"
-    suf3 = "GB"+flagOptimMethod
+    suf3 = "GB"+str(flagOptimMethod)
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
     suf5 = ifelse(load_Model==True,"wotrain","wtrain")
-    dirSAVE = '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DinAE/OSE/'+domain+'/resIA_nadir_nadlag_'+lag+"_obs/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'_'+suf5+'/'
+    dirSAVE = '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/'+domain+'/resIA_nadir_nadlag_'+lag+"_obs/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'_'+suf5+'/'
+    if wregul == True:
+        dirSAVE = dirSAVE[:-1]+'_wregul/'
     if not os.path.exists(dirSAVE):
         mk_dir_recursive(dirSAVE)
     #else:
@@ -76,27 +92,25 @@ if __name__ == '__main__':
     # push all global parameters in a list
     def createGlobParams(params):
         return dict(((k, eval(k)) for k in params))
-    list_globParams=['domain','fileObs','fileOI',\
+    list_globParams=['lag','domain','load_Model','wregul','fileObs','fileOI',\
     'include_covariates','N_cov','lfile_cov','lid_cov','lname_cov',\
     'flagTrOuputWOMissingData','flagTrWMissingData',\
     'flagloadOIData','size_tw','Wsquare',\
-    'Nsquare','DimAE','flagAEType','flagLoadModel',\
-    'flagOptimMethod','flagGradModel','alpha_Losss','sigNoise',\
-    'load_Model','flagUseMaskinEncoder','stdMask',\
-    'flagDataWindowing','dropout','wl2','batch_size',\
+    'Nsquare','DimAE','flagAEType',\
+    'flagOptimMethod','flagGradModel','alpha','alpha4DVar','regul',\
+    'sigNoise','stdMask','flagDataWindowing','dropout','wl2','batch_size',\
     'NbEpoc','Niter','flag_MultiScaleAEModel',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   
 
     #1) *** Read the data ***
-    genFilename, meanTt, stdTt,\
-    x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_test_OI = import_Data_OSE(globParams)
+    genFilename, meanTr, stdTr,\
+    x_train, y_train, mask_train, gt_train, x_train_missing, lday_train, x_train_OI = import_Data_OSE(globParams)
 
     #2) *** Define AE architecture ***
-    genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,x_test,mask_test)
+    shapeData=(x_train.shape[3],x_train.shape[1],x_train.shape[2])
+    genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,shapeData)
 
     #5) *** Train ConvAE ***      
-    learning_OSE(globParams,genFilename,meanTt,stdTt,\
-                 x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,\
-                 encoder,decoder,model_AE,DIMCAE)
-
+    learning_OSE(globParams,genFilename,meanTr,stdTr,\
+                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_train,model_AE,DIMCAE)

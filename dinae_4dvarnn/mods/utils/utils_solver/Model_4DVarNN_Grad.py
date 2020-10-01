@@ -62,45 +62,54 @@ class Model_4DVarNN_Grad(torch.nn.Module):
 
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)  
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        torch_index = torch.LongTensor(np.float64(index)).to(device)
+        with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
+            target_x     = x[:,index,:,:]
+            target_obs   = xobs[:,index,:,:]
+            target_mask  = mask[:,index,:,:]
+            target_mask_ = mask_[:,index,:,:]
 
-        # gradient iteration
+        # gradient normalisation
+        x = torch.Tensor.index_fill(x,1,torch_index,0)
+        x = torch.Tensor.index_add(x,1,torch_index,target_x)
+        xpred = self.model_AE(x)
+        grad  = self.model_Grad.compute_Grad(target_x, xpred, target_obs, target_mask)
+        if normgrad == 0. :
+            _normgrad = torch.sqrt( torch.mean( grad**2 ) )
+        else:
+            _normgrad = normgrad
         for kk in range(0,self.NGrad):
-            # gradient normalisation
-            grad     = self.model_Grad.compute_Grad(x[:,index,:,:], self.model_AE(x),xobs[:,index,:,:],mask)
-            if normgrad == 0. :
-                _normgrad = torch.sqrt( torch.mean( grad**2 ) )
-            else:
-                _normgrad = normgrad
-            # AE pediction
-            xpred = self.model_AE(x)
             # gradient update
             ## Gradient-based minimization using a fixed-step descent
             if self.OptimType == 0:
-                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], _normgrad )
+                grad  = self.model_Grad( target_x, xpred, target_obs, target_mask , _normgrad )
             ## Gradient-based minimization using a CNN using a (sub)gradient as inputs
-            elif self.OptimType == 1:               
-              if kk == 0:
-                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], g1, _normgrad )
-              else:
-                grad  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:],grad_old, _normgrad )
-              grad_old = torch.mul(1.,grad)
-            ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs    
-            elif self.OptimType == 2:               
-              if kk == 0:
-                grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], g1, g2, _normgrad )
-              else:
-                grad,hidden,cell  = self.model_Grad( x[:,index,:,:], xpred, xobs[:,index,:,:], mask[:,index,:,:], hidden, cell, _normgrad )
+            elif self.OptimType == 1:
+                if kk == 0:
+                    grad  = self.model_Grad( target_x, xpred, target_obs, target_mask, g1 , _normgrad)
+                else:
+                    grad  = self.model_Grad( target_x, xpred, target_obs, target_mask, grad_old , _normgrad)
+                grad_old = torch.mul(1.,grad)
+            ## Gradient-based minimization using a LSTM using a (sub)gradient as inputs
+            elif self.OptimType == 2:
+                if kk == 0:
+                    grad,hidden,cell  = self.model_Grad( target_x, xpred, target_obs, target_mask, g1, g2 , _normgrad )
+                else:
+                    grad,hidden,cell  = self.model_Grad( target_x, xpred, target_obs, target_mask, hidden, cell , _normgrad )
             # interpolation constraint
             if( self.InterpFlag == True ):
                 # optimization update
-                xnew = x[:,index,:,:] - grad
-                x[:,index,:,:]    = x[:,index,:,:] * mask[:,index,:,:] + xnew * mask_[:,index,:,:]
+                xnew = target_x - grad
+                target_x = torch.add(torch.mul(target_x,target_mask), torch.mul(xnew,target_mask_))
             else:
                 # optimization update
-                x[:,index,:,:] = x[:,index,:,:] - grad
+                target_x = torch.add(target_x,torch.mul(grad,-1.0))
+
         if self.OptimType == 1:
-            return x[:,index,:,:],grad_old,_normgrad
+            return target_x,grad_old,_normgrad
         if self.OptimType == 2:
-            return x[:,index,:,:],hidden,cell,_normgrad
+            return target_x,hidden,cell,_normgrad
         else:
-            return x[:,index,:,:],_normgrad
+            return target_x,_normgrad
+
