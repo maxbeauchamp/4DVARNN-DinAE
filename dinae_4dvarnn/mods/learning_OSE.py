@@ -1,4 +1,5 @@
 from dinae_4dvarnn import *
+from sklearn import preprocessing
 from tools import *
 from graphics import *
 from eval_Performance      import eval_AEPerformance2 as eval_AEPerformance
@@ -43,7 +44,8 @@ def model_to_MultiGPU(model):
     return model
 
 def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
-                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_train,model_AE,DIMCAE):
+                  x_train,x_train_missing,mask_train,gt_train,sat_train,time_train,\
+                  x_train_OI,lday_train,model_AE,DIMCAE):
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
@@ -68,17 +70,23 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
     x_train_missing = np.nan_to_num(np.moveaxis(x_train_missing, -1, 1))
     mask_train      = np.nan_to_num(np.moveaxis(mask_train, -1, 1))
     gt_train        = np.nan_to_num(np.moveaxis(gt_train, -1, 1))
+    sat_train       = np.nan_to_num(np.moveaxis(sat_train, -1, 1))
+    time_train      = np.nan_to_num(np.moveaxis(time_train, -1, 1))
 
     # first initialize the solution
     x_train_init    = x_train_missing
 
     print("... Training datashape    : "+str(x_train.shape))
+    pre = preprocessing.LabelEncoder()
+    pre.fit(np.asarray(['','alg','h2g','j2g','j2n','j3','s3a','c2']))
     ## define dataloaders with randomised batches (no random shuffling for validation/test data)
     training_dataset = torch.utils.data.TensorDataset(\
                             torch.Tensor(x_train_init),\
                             torch.Tensor(x_train_missing),\
                             torch.Tensor(mask_train),\
-                            torch.Tensor(gt_train))
+                            torch.Tensor(gt_train),\
+                            torch.Tensor(pre.transform(sat_train.flatten()).reshape(sat_train.shape)),\
+                            torch.Tensor(time_train))
     dataset_sizes = {'train': len(training_dataset)} 
     ## instantiate model for GPU implementation
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -165,7 +173,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
             num_loss     = 0
             # Iterate over data.
             compt = 0
-            for inputs_init,inputs_missing,masks,targets_GT in dataloaders['train']:
+            for inputs_init,inputs_missing,masks,targets_GT,sat,Time in dataloaders['train']:
                 compt = compt+1
                 inputs_init    = inputs_init.to(device)
                 inputs_missing = inputs_missing.to(device)
@@ -173,6 +181,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                 index = np.arange(0,masks.shape[1],N_cov+1)
                 masks_GT       = masks[:,index,:,:]
                 targets_GT     = targets_GT.to(device)
+                sat            = sat.to(device)
+                Time           = Time.to(device)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
@@ -214,12 +224,24 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                         loss        = torch.add(loss_R,torch.mul(1.0,loss_AE))
                         loss        = loss_R
                         if wregul==True:
-                            #loss_Grad = torch.mean(Grad_pred**2)
                             #print('loss_R={:4f}'.format(loss))
-                            #print('loss_Grad={:4f}'.format(loss_Grad))
-                            #loss    = torch.add(regul[0]*loss,\
-                            #                     regul[1]*loss_Grad)
-                            Lp_reg = torch.tensor(0., requires_grad=True)
+                            #loss_alt_Grad = torch.tensor(0., requires_grad=True)
+                            loss_alt_Grad = along_track_gradient_loss(
+                                                          inputs_missing[:,index[6],:,:].cpu().detach(),
+                                                          masks_GT[:,6,:,:].cpu().detach(),
+                                                          outputs[:,6,:,:].cpu().detach(),
+                                                          Time[:,6,:,:].cpu().detach(),
+                                                          sat[:,6,:,:].cpu().detach())
+                            #print('loss_alt_Grad={:4f}'.format(loss_alt_Grad))
+                            loss    = torch.add(regul[0]*loss,\
+                                                regul[1]*loss_alt_Grad)
+                            # Grad regularization
+                            '''loss_Grad = torch.mean(Grad_pred**2)
+                            print('loss_Grad={:4f}'.format(loss_Grad))
+                            loss    = torch.add(regul[0]*loss,\
+                                                regul[1]*loss_Grad)'''
+                            # Lp weight regularization
+                            '''Lp_reg = torch.tensor(0., requires_grad=True)
                             Lp_reg = Lp_reg.to(device)
                             for name, param in model.model_AE.encoder.named_parameters():
                                 if 'weight' in name:
@@ -227,7 +249,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                             for name, param in model.model_Grad.named_parameters():
                                 if 'weight' in name:
                                     Lp_reg = Lp_reg + torch.norm(param, 2)
-                            loss = loss + 10e-3 * Lp_reg
+                            loss = loss + 10e-3 * Lp_reg'''
                     else:
                         loss        = alpha_Grad * loss_All + 0.5 * alpha_AE * ( loss_AE + loss_AE_GT )
                         #loss        = loss_All + torch.mean(Grad_pred**2) 
@@ -280,7 +302,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## AE performance on training and validation datasets
         # outputs for training data
         x_train_pred = []
-        for inputs_init,inputs_missing,masks,targets_GT in dataloaders['train']:
+        for inputs_init,inputs_missing,masks,targets_GT,sat,Time in dataloaders['train']:
             inputs_init    = inputs_init.to(device)
             inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
@@ -296,7 +318,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## AE performance of the trained AE applied to gap-free data
         # ouputs for training data
         rec_AE_Tr = []
-        for inputs_init,inputs_missing,masks,targets_GT in dataloaders['train']:
+        for inputs_init,inputs_missing,masks,targets_GT,sat,Time in dataloaders['train']:
             inputs_init    = inputs_init.to(device)
             inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)

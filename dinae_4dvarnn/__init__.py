@@ -43,7 +43,7 @@ assert sys.version_info >= (3,5), "Need Python>=3.6"
 dirs = {}
 
 # Define paths
-datapath="/gpfswork/rech/yrf/uba22to/DATA/"
+datapath="/gpfswork/rech/yrf/uba22to/"
 basepath="/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/"
 
 print("Initializing 4DVARNN-DinAE libraries...",flush=True)
@@ -80,6 +80,7 @@ from pyflann import *
 # Tools
 ##################################
 import torch
+torch.set_printoptions(precision=8)
 import torch.optim as optim
 import torchvision
 from torch.optim import lr_scheduler

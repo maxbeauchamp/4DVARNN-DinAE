@@ -1,9 +1,9 @@
 # path files
 path_files:
 #   OI file (list of 3 files: nadir, swot, nadir+swot)
-    fileOI: "/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
+    fileOI: "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
-    fileObs: "/training/data/dataset_nadir__LAG_d.nc"
+    fileObs: "/training/dataset_nadir__LAG_d.nc"
 
 # data options
 data_options:
@@ -14,7 +14,7 @@ data_options:
 #   use additional covariates in initial layer
     include_covariates: True  
     lfile_cov:
-    - "/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
+    - "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
     lname_cov:
     - ssh
     lid_cov:
@@ -56,7 +56,7 @@ loss_weighting:
         - 1.
     regul: !1darray
       - - 1.
-        - 1.
+        - 0.2
 
 # solver parameters
 solver_options: 

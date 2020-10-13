@@ -1,4 +1,5 @@
 from dinae_4dvarnn import *
+from tools import *
 
 def Imputing_NaN(data, invalid=None):
     """
@@ -46,6 +47,10 @@ def import_Data_OSE(dict_global_Params):
     # masking strategie differs according to flagTrWMissingData flag 
     mask_orig         = np.copy(x_orig)
     mask_orig         = np.asarray(~np.isnan(mask_orig))
+    sat_orig          = np.copy(nc_data_obs['sat'][:,indLat,indLon])
+    #time_orig         = np.copy(compress_masked_array(\
+    #                            nc_data_obs.variables.get('Time')[:,indLat,indLon])%86400)
+    time_orig         = np.copy(nc_data_obs.variables.get('Time')[:,indLat,indLon]%86400)
     nc_data_obs.close()
     # load OI data
     if flagloadOIData == 1:
@@ -65,6 +70,9 @@ def import_Data_OSE(dict_global_Params):
     # create the time series (additional 4th time dimension)
     x_test    = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     mask_test = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
+    sat_test  = np.empty((len(indN_Tt),len(indLat),len(indLon),size_tw),dtype=object)
+    sat_test.fill('')
+    time_test = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     x_test_OI = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     if include_covariates==True:
         cov_test      = []
@@ -81,6 +89,8 @@ def import_Data_OSE(dict_global_Params):
             x_test[k,:,:,idt2]    = x_orig[idt,:,:] - x_OI[idt,:,:]
         else:
             x_test[k,:,:,idt2]    = x_orig[idt,:,:]
+        sat_test[k,:,:,idt2]    = sat_orig[idt,:,:]
+        time_test[k,:,:,idt2]   = time_orig[idt,:,:]
         # import covariates
         if include_covariates==True:
             for icov in range(N_cov):
@@ -106,6 +116,8 @@ def import_Data_OSE(dict_global_Params):
     ind           = np.where( ss == 0 )
     x_test         = x_test[ind[0],:,:,:]
     gt_test        = gt_test[ind[0],:,:,:]
+    sat_test       = sat_test[ind[0],:,:,:]
+    time_test      = time_test[ind[0],:,:,:]
     x_test_missing = x_test_missing[ind[0],:,:,:]
     mask_test      = mask_test[ind[0],:,:,:]
     if flagloadOIData == 1:
@@ -114,6 +126,8 @@ def import_Data_OSE(dict_global_Params):
     rateMissDataTr_ /= mask_test.shape[1]*mask_test.shape[2]*mask_test.shape[3]
     ind        = np.where( rateMissDataTr_  >= thrMisData )
     x_test         = x_test[ind[0],:,:,:]
+    sat_test       = sat_test[ind[0],:,:,:]
+    time_test      = time_test[ind[0],:,:,:]
     gt_test        = gt_test[ind[0],:,:,:]
     x_test_missing = x_test_missing[ind[0],:,:,:]
     mask_test      = mask_test[ind[0],:,:,:]
@@ -168,6 +182,6 @@ def import_Data_OSE(dict_global_Params):
         print(".... Test set shape     %dx%dx%dx%d"%(x_test.shape[0],x_test.shape[1],x_test.shape[2],x_test.shape[3]))
       
     print("... (after normalization) mean Tt = %f"%(np.nanmean(gt_test)))
-      
-    return genFilename, meanTt, stdTt, x_test, y_test, mask_test, gt_test, x_test_missing, lday_test, x_test_OI
+
+    return genFilename, meanTt, stdTt, x_test, y_test, mask_test, gt_test, x_test_missing, sat_test, time_test, lday_test, x_test_OI
 

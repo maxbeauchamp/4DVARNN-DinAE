@@ -31,12 +31,12 @@ if __name__ == '__main__':
     wregul     = conf['NN_options']['with_regul']
 
     # list of global parameters (comments to add)
-    fileOI              	= datapath+'OSE/'+domain+conf['path_files']['fileOI']
-    fileObs             	= datapath+'OSE/'+domain+conf['path_files']['fileObs']
+    fileOI              	= datapath+'NADIR/'+domain+conf['path_files']['fileOI']
+    fileObs             	= datapath+'NADIR/'+domain+conf['path_files']['fileObs']
     flagTrWMissingData  	= 2
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
-    lfile_cov                   = [ datapath+'OSE/'+domain+x for x in conf['data_options']['lfile_cov'] ]
+    lfile_cov                   = [ datapath+'NADIR/'+domain+x for x in conf['data_options']['lfile_cov'] ]
     lname_cov                   = conf['data_options']['lname_cov']
     lid_cov                     = conf['data_options']['lid_cov']
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
@@ -105,7 +105,8 @@ if __name__ == '__main__':
 
     #1) *** Read the data ***
     genFilename, meanTr, stdTr,\
-    x_train, y_train, mask_train, gt_train, x_train_missing, lday_train, x_train_OI = import_Data_OSE(globParams)
+    x_train, y_train, mask_train, gt_train, x_train_missing,\
+    sat_train, time_train, lday_train, x_train_OI = import_Data_OSE(globParams)
 
     #2) *** Define AE architecture ***
     shapeData=(x_train.shape[3],x_train.shape[1],x_train.shape[2])
@@ -113,4 +114,5 @@ if __name__ == '__main__':
 
     #5) *** Train ConvAE ***      
     learning_OSE(globParams,genFilename,meanTr,stdTr,\
-                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_train,model_AE,DIMCAE)
+                  x_train,x_train_missing,mask_train,gt_train,sat_train,time_train,\
+                  x_train_OI,lday_train,model_AE,DIMCAE)

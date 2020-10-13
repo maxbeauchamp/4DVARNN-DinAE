@@ -1,10 +1,5 @@
-Loading pytorch-gpu/py3/1.4.0
-  Loading requirement: cuda/10.1.1 nccl/2.4.8-1-cuda cudnn/10.1-v7.5.1.10
-    gcc/8.3.1 openmpi/4.0.2-cuda
-+ JobID=2115
-+ rsync -avrz --exclude=figs /linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/ /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115
 sending incremental file list
-created directory /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115
+created directory /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_16742
 ./
 .gitignore
 README.md
@@ -41,14 +36,21 @@ license.md
 .git/logs/refs/remotes/origin/HEAD
 .git/logs/refs/remotes/origin/master
 .git/objects/
+.git/objects/01/
+.git/objects/01/0845d596dde3b31638aa7b109915af36767df1
+.git/objects/02/
+.git/objects/02/77180397f669a42c79a21e6856562ff9c60bc4
 .git/objects/03/
 .git/objects/03/320149c0ab19e85031bc6734e01bb0a45027a7
+.git/objects/04/
+.git/objects/04/55ce607f7cc371be144e52d19be88ade81c030
 .git/objects/05/
 .git/objects/05/4607f1c1462fa4101c114d72c869fd755a0e59
 .git/objects/05/8b6a6f74585ece7e1ba03836d217443385ad4a
 .git/objects/06/
 .git/objects/06/95edc7d80ef680425aedda711016ef3bc66f9e
 .git/objects/07/
+.git/objects/07/d162094ae40d564974c3f70641ab814b32f23b
 .git/objects/07/f5a479a842abf7c2beaa41bce9b0d8c0f79f50
 .git/objects/09/
 .git/objects/09/11360730bb2108cccbabd58cdd102533382699
@@ -58,11 +60,15 @@ license.md
 .git/objects/0d/977d68f048486616226e050e5f539d26d6a765
 .git/objects/12/
 .git/objects/12/c818fd7583ee0b69d64b8c2f3c72e82db5642d
+.git/objects/12/c9824c21bf27e9f0e2ff4b06940f651d108fbd
 .git/objects/14/
 .git/objects/14/b11b92cd584ebc2486b0a154040edb4cea78f2
 .git/objects/14/d9958dee0a8d5d2a2b47809704f6d7cc7f16f9
 .git/objects/15/
+.git/objects/15/7e173b45c8e708673cbcd47110d526c5cad9fb
 .git/objects/15/8ace72ac2c5e6adc8d88f37296273976673b80
+.git/objects/16/
+.git/objects/16/201c53b4bb70465a1e4f3ce4161b21e25a71a2
 .git/objects/17/
 .git/objects/17/d5c6eb5252ff980bce282bc5ab1ff1c8f5b0a6
 .git/objects/1a/
@@ -79,6 +85,7 @@ license.md
 .git/objects/1f/
 .git/objects/1f/454b9762f95622a5c1f04f9c4066ef8e684f16
 .git/objects/1f/6b1f25aeef1f2ac6c12a91399e92e56689ee8b
+.git/objects/1f/97d0e8d5d227303acc032fa781caa8b7bbd833
 .git/objects/1f/c1ddbb6f87ea79668ff3cf43fac40aca644c9c
 .git/objects/20/
 .git/objects/20/b0350075e73c57a8238a6eb620b1e272dc1af5
@@ -91,10 +98,14 @@ license.md
 .git/objects/25/
 .git/objects/25/1947b097cb48979944d27032b774f33604b20e
 .git/objects/25/e639db72b95cdc32140688955a1de299133e93
+.git/objects/26/
+.git/objects/26/48eef8ba9054f9a8324ceedd76fc3d44f868f2
 .git/objects/27/
 .git/objects/27/72e0aa5bed00783f145eed4f82f95f0f4972cd
 .git/objects/2a/
 .git/objects/2a/c1645b840c866e3fad3f072701ca6a3ae093d1
+.git/objects/2b/
+.git/objects/2b/3f824a2ea478e356ada38ee2a29fa68b33377f
 .git/objects/2c/
 .git/objects/2c/1b40c0b403a9061a073d756039ad0d79e098c5
 .git/objects/2f/
@@ -108,6 +119,7 @@ license.md
 .git/objects/37/
 .git/objects/37/886f8178f4b3c5c997e3f225507d86e02cc19f
 .git/objects/37/ba2994f2d6b3c362263a662445bca21bfa8576
+.git/objects/37/e72b08a5ac60754bd909b8e76315a83c4c0542
 .git/objects/38/
 .git/objects/38/4ce9525f572598037b471c2f9f771455d6f235
 .git/objects/38/512cb4a24ffc87c36f8f57b6e424bdb5c95abc
@@ -115,6 +127,7 @@ license.md
 .git/objects/38/d8c3ce740aec349a5199c848d2fb7dfd383750
 .git/objects/39/
 .git/objects/39/34256adc0f209aff9f338b62cb57fc85dba99b
+.git/objects/39/b8824276f0e039a2a38cafa50671bc66bcd42e
 .git/objects/39/c74139361870bab372b1d6e46a175a1554c30f
 .git/objects/3d/
 .git/objects/3d/4e2e9dbc72927dfc1c094b89d115a1b451a101
@@ -128,32 +141,50 @@ license.md
 .git/objects/44/
 .git/objects/44/5970dd8fc5445ca64b7ae0ac24566af1471ae0
 .git/objects/44/fdb3b03ac457b57de8f528592167f63ce06e67
+.git/objects/45/
+.git/objects/45/30143ccefff7c46594cf529c6d369e86f3a17d
 .git/objects/49/
 .git/objects/49/ee8f15475710515a1e8e10c92be56c06ffc17d
 .git/objects/4a/
 .git/objects/4a/3eeb37484daa78f1be10cdab17648cfd110a5f
+.git/objects/4a/5491d0061b459526edeee397f9363a09465603
 .git/objects/4c/
 .git/objects/4c/05922e32dfddbe9515a8e2d3215d022bf983b2
 .git/objects/4d/
 .git/objects/4d/0e1fd42458d180f7e7bb8cea5c0bb7f7ff6d2f
+.git/objects/4e/
+.git/objects/4e/45ec9ff1d38dc46979f699fd1752e352479653
 .git/objects/4f/
 .git/objects/4f/e2a35c19b5931e0105ad2d568c3ce94dd91875
 .git/objects/51/
 .git/objects/51/792c2947e58cbc08746de4956bf71158f912fc
 .git/objects/51/9129063d206d8d22e8a9a0f741cff8d0752e64
+.git/objects/53/
+.git/objects/53/8ccf7de2a29f21ceeaf5b448bf4e97775786c4
+.git/objects/56/
+.git/objects/56/c6e44a350f42a7373cf823d86c1107b27cafc3
+.git/objects/57/
+.git/objects/57/0c3f47ab486487216547be112deeee4c4c0c74
+.git/objects/57/a2ba1a2fc49e04e81d01e6012bf001f83dcb9a
 .git/objects/58/
 .git/objects/58/0b6dc01c491d193b468f3c7094f749c10c6b6c
 .git/objects/58/ab7484c51b18bc749ef8989fdf42b6abe0bec6
 .git/objects/5b/
 .git/objects/5b/8f028cf8770645297c90d347456e59d84c528e
+.git/objects/5b/a77c7f09eff2ffb2c4278f90a3e1a3ffaf522b
 .git/objects/5d/
 .git/objects/5d/53602eb3898cc513c5b6bdae3614ce1976cb85
 .git/objects/5e/
 .git/objects/5e/d1acddb2ca0a2e95b3b4d8647fb9e47b176933
 .git/objects/5f/
 .git/objects/5f/1a873efaac36c601f65e6a246a5ccb333c543d
+.git/objects/62/
+.git/objects/62/930c88a35dd9172e335e5268ae426f4e115018
 .git/objects/63/
 .git/objects/63/08e175006fb9477fab3ca303718dd7ed0d1ea4
+.git/objects/63/92e1db7ac867eb967bc19be964b3613cece1c9
+.git/objects/64/
+.git/objects/64/3955b2caf7f1860ea2ecb554194f8cf7622849
 .git/objects/66/
 .git/objects/66/1f2d3d2b3b6072f16fdb8eb38495d4e563d839
 .git/objects/67/
@@ -161,6 +192,7 @@ license.md
 .git/objects/68/
 .git/objects/68/82ca247656b05ea46ccfa15ac57bcb8f5428e1
 .git/objects/69/
+.git/objects/69/2caf133f5124361aec5375553367924bf41bb3
 .git/objects/69/35f5b5925ff5fb00a2d9921ecbfb61307fd60b
 .git/objects/69/fdbfbecfb8d0860301772c9781ef935cfd547f
 .git/objects/6a/
@@ -173,12 +205,17 @@ license.md
 .git/objects/6f/f5d13a71d9970fac4d004f5a3ce48767109d30
 .git/objects/70/
 .git/objects/70/1f9767ee4629929852351f1a535f5943cfea61
+.git/objects/71/
+.git/objects/71/4ca36e700b8c0a207ccec16953f72f5504fed9
 .git/objects/73/
 .git/objects/73/29a06f7f8f465acaf9749540a99f4460a51803
+.git/objects/73/fc77be48dcc299ace9bcd07d4fb65a60fcf961
 .git/objects/76/
+.git/objects/76/b4fdec8ae12f3bf553d6e0a56b5be0be6c17e2
 .git/objects/76/f175dd988e1181d7b0f2816c57ef2d3a71e0a6
 .git/objects/77/
 .git/objects/77/1f15cf0471eb17a65f541f551b597a25bb9708
+.git/objects/77/acbf178a8ce3d0908cb316e07d93f4ef7aa9fe
 .git/objects/77/ce961c9baae0ae3832b12e2e6d4b2a32e81a7c
 .git/objects/78/
 .git/objects/78/2cbc265474dfc22cbd5c895100f4f71ccd9efa
@@ -189,6 +226,8 @@ license.md
 .git/objects/80/
 .git/objects/80/297aeb6c284da647ede7f444f75e8a81f7ab07
 .git/objects/80/639fdbb4fcca448820096a9d88dd81bedf193b
+.git/objects/81/
+.git/objects/81/fe0efac0c04ccc8beff9f5e2106e5b0af8240b
 .git/objects/82/
 .git/objects/82/a28bebae7e070fbe8d5d8746120b0cb86d9515
 .git/objects/83/
@@ -199,22 +238,30 @@ license.md
 .git/objects/84/04f996c19a43be6546342487b26b9b609a89ca
 .git/objects/85/
 .git/objects/85/bc3e942e72d2d59a5af8727e6ab7b42ca79199
+.git/objects/87/
+.git/objects/87/4481fe63a816f093999093eeb2f1e1b3ef6484
 .git/objects/88/
 .git/objects/88/8926e16a157b83d5121b2d6137b89bb0113c1a
 .git/objects/89/
+.git/objects/89/65894c139ac52752337e92286e248917c48985
 .git/objects/89/75afb7a1ac6533af1c4095c3373f892c059eab
+.git/objects/89/9f3622106b32ce3d32de6f642fa12359d4eadb
 .git/objects/8a/
+.git/objects/8a/c7df1e4c22817a994bd3eaf6c9461d627cf8b5
 .git/objects/8a/fba9ec321a53b2659d84a1d0db9d1d6efd2910
 .git/objects/8b/
 .git/objects/8b/6699c8cf2415cb9d0cd1882d704decea7e284f
 .git/objects/8d/
 .git/objects/8d/bf2373a2f1931fb54937baf05b23a83306382e
+.git/objects/8f/
+.git/objects/8f/d889d51fa42624e9f2b253ac34844ece84814c
 .git/objects/90/
 .git/objects/90/5466d0a5ce70f6435d6bedc87ef8196ce42d99
 .git/objects/91/
 .git/objects/91/23e999c337f6656592bcdf17d4be3d6eb97daa
 .git/objects/93/
 .git/objects/93/37d8525442cadc038e875d7e888e79b7529c2f
+.git/objects/93/3c74015086422c702efd7c62fc931035677ec5
 .git/objects/93/76153a8dd72b0be31bfaa0050246af5e3488eb
 .git/objects/95/
 .git/objects/95/6dc9503310fdbec9c0d0d6043d138a169f3030
@@ -225,9 +272,11 @@ license.md
 .git/objects/97/
 .git/objects/97/2147be09aeb836520c7a30fdcf9eb5e255a992
 .git/objects/97/2d948d630c17233f33844a9560e36cdd7cdbb7
+.git/objects/97/bd378b5de25957c4ccf6802f0f81d69e210cc9
 .git/objects/98/
 .git/objects/98/3c0aaa0fd0b2849f4e9c92952113b4079f282c
 .git/objects/9c/
+.git/objects/9c/5601ff95670454dee29eb9ce52fb75269b49f0
 .git/objects/9c/d47f57ac31fe291b2fb3a3ce55d52501708ca6
 .git/objects/9d/
 .git/objects/9d/cdcbcaad382acd22785807548682dd7aabe96a
@@ -247,20 +296,27 @@ license.md
 .git/objects/a6/f9867cfdfd788549a18267cbc31c52e2d796ce
 .git/objects/a8/
 .git/objects/a8/da46028b5512ef746a51315f2f9876eb0db60b
+.git/objects/a9/
+.git/objects/a9/a77ea2d6d2c34137a3df60c5d5348fca5b0e8c
 .git/objects/aa/
 .git/objects/aa/18bc41cafc3ded47eaf149b7ba7b007361d899
 .git/objects/ab/
 .git/objects/ab/d9c388977376be2055d73d011c8cbdfb6c4f5c
 .git/objects/ac/
 .git/objects/ac/0e4a50622aef534c69d111c1f9a7c65b90cfd3
+.git/objects/ac/5fb93cc6a221afe1765f296fc547ff1c866b3d
 .git/objects/ad/
 .git/objects/ad/217f840fa40cd7b856bebca242aa8bf61776d8
 .git/objects/af/
+.git/objects/af/28021e104527a86c186a4cdfb2e1978acd7a05
 .git/objects/af/a00272249f6ab0a3f82f059ee6c319c2a4b2c6
 .git/objects/b0/
 .git/objects/b0/f2b285533efb075f14c4bd34f26ca8270ce749
 .git/objects/b4/
 .git/objects/b4/067926b00a5fe0b7a91df9f865878cb0a89c60
+.git/objects/b6/
+.git/objects/b6/0bc35a4f8bf45720c637ff2b887b1fbb2bcefc
+.git/objects/b6/c3e84005b1f5cea91e51269621a6bfafe4503d
 .git/objects/b9/
 .git/objects/b9/3235495023f5570b3fe25009642636451ea7e5
 .git/objects/bc/
@@ -269,8 +325,13 @@ license.md
 .git/objects/bd/937e12579aed0c5f8dbe5db93aa17d61935230
 .git/objects/c1/
 .git/objects/c1/83357ab711f2c960c91e138c351e0008aa741f
+.git/objects/c1/fe8845d8c7df2ab6a530821d97110e6ceb2403
 .git/objects/c2/
 .git/objects/c2/640f87476d2803536c0a0b1b15f50d6985eb71
+.git/objects/c3/
+.git/objects/c3/3aa43e62f3d41dfd0e78a066edc94fa430609d
+.git/objects/c3/937453cd96c2bef98d4bf3e340eea553b50056
+.git/objects/c3/f911713e095146381b2d26968a74a67c24f50f
 .git/objects/c5/
 .git/objects/c5/dd3382b67b99c4caf10f9d07098f6c8b080379
 .git/objects/c6/
@@ -282,16 +343,25 @@ license.md
 .git/objects/c8/a52e5a87dcf9f75fe5f86a3cadf5df575bc36f
 .git/objects/c9/
 .git/objects/c9/4265f7b82d986cbd448920b370a1ea668841e5
+.git/objects/ca/
+.git/objects/ca/e4ca23ac5ec3dd6f865dc68d9f040d4f4f64c6
+.git/objects/cb/
+.git/objects/cb/febd6902fabf11d0981c310999edfdaca1046a
 .git/objects/cd/
 .git/objects/cd/2f57ac2ea7ae59e32f7b18081254b0057da9cd
 .git/objects/cd/326340c3ce92354a4401a728de782817d0feb1
 .git/objects/cd/f7b8a5624a15ee5dfbd239c9e0c2d5be352c91
+.git/objects/ce/
+.git/objects/ce/c6f2189c7f908b17dd7c3f805a1f388582c057
 .git/objects/cf/
 .git/objects/cf/7e88ed709a5928d29cfa9a9e12fb170e3ab347
 .git/objects/d1/
 .git/objects/d1/748fe888f2f82821164cae0219ff500f5abf77
 .git/objects/d5/
 .git/objects/d5/60b0ac75c57f20304beb5a9026c8462d32f51d
+.git/objects/d6/
+.git/objects/d6/286c9c2f57b9f16d1a9f45a331ae6a6d9e03b4
+.git/objects/d6/4522b95d480ae2c24035a27cb0eb33b92b6577
 .git/objects/d7/
 .git/objects/d7/3aa4dbbad48a7d37157389b0083c48f6079064
 .git/objects/d7/79e82205b93b33182b65bf16b412058c19113a
@@ -303,6 +373,8 @@ license.md
 .git/objects/db/
 .git/objects/db/71391ab08a00746341db6f02a0aea6ae81688c
 .git/objects/db/efa77c67bfbbde569fd554b910ad213e2aed8e
+.git/objects/de/
+.git/objects/de/a7b114613603e4afd0318e878427fdc1a51153
 .git/objects/df/
 .git/objects/df/b740b1f2a77f27697f9b66a8c89072de8a5f57
 .git/objects/df/b9e1e1dcd6f73ad6914c2e7d980b75cfae952d
@@ -323,6 +395,9 @@ license.md
 .git/objects/eb/769def2f4b35194fdccbd7054699825c761752
 .git/objects/ec/
 .git/objects/ec/35909056b31650cc981cc98ad22b041397380f
+.git/objects/ec/acbf9f330030f4ddbcef91b4bb268e51cda9ed
+.git/objects/ef/
+.git/objects/ef/7afc3eb864ae1cf7a0a0303316405105636335
 .git/objects/f0/
 .git/objects/f0/a509d3ea93e3f872dd29aec43e74c483d65fd5
 .git/objects/f1/
@@ -368,6 +443,7 @@ dinae_4dvarnn/__init__.py
 dinae_4dvarnn/__pycache__/
 dinae_4dvarnn/__pycache__/__init__.cpython-37.pyc
 dinae_4dvarnn/mods/
+dinae_4dvarnn/mods/.learning_OSE.py.swp
 dinae_4dvarnn/mods/define_Classifiers.py
 dinae_4dvarnn/mods/define_Models.py
 dinae_4dvarnn/mods/import_Datasets_OSE.py
@@ -382,6 +458,7 @@ dinae_4dvarnn/mods/__pycache__/import_Datasets_OSSE.cpython-37.pyc
 dinae_4dvarnn/mods/__pycache__/learning_OSE.cpython-37.pyc
 dinae_4dvarnn/mods/__pycache__/learning_OSSE.cpython-37.pyc
 dinae_4dvarnn/mods/utils/
+dinae_4dvarnn/mods/utils/.tools.py.swp
 dinae_4dvarnn/mods/utils/eval_Performance.py
 dinae_4dvarnn/mods/utils/graphics.py
 dinae_4dvarnn/mods/utils/plot_Figs.py
@@ -441,10 +518,11 @@ dinae_4dvarnn/mods/utils/utils_solver/__pycache__/model_GradUpdate3.cpython-37.p
 scripts/
 scripts/clean.sh
 scripts/OSE/
-scripts/OSE/.gpu_mono256009.out.swp
+scripts/OSE/.gpu_mono477756.out.swp
 scripts/OSE/clean.sh
 scripts/OSE/config.yml
-scripts/OSE/gpu_mono408919.out
+scripts/OSE/gpu_mono482041.err
+scripts/OSE/gpu_mono482041.out
 scripts/OSE/launch_OSE.py
 scripts/OSE/mono_gpu_OSE.slurm
 scripts/OSE/topscript.sh
@@ -456,29 +534,21 @@ scripts/OSSE/launch_OSSE.py
 scripts/OSSE/mono_gpu_OSSE.slurm
 scripts/OSSE/topscript.sh
 
-sent 5,214,811 bytes  received 6,244 bytes  3,480,703.33 bytes/sec
-total size is 5,405,349  speedup is 1.04
-+ sed -i -e 's|_LAG_|0|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE/config.yml
-+ sed -i -e 's|_DOMAIN_|GULFSTREAM|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE/config.yml
-+ sed -i -e 's|_LMOD_|False|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE/config.yml
-+ sed -i -e 's|_WREGUL_|True|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE/config.yml
-+ sed -i -e 's|_PATH_|/gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE/launch_OSE.py
-+ python -u /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_2115/scripts/OSE/launch_OSE.py
+sent 5,309,071 bytes  received 7,448 bytes  2,126,607.60 bytes/sec
+total size is 5,525,338  speedup is 1.04
 Initializing 4DVARNN-DinAE libraries...
 ...Done
 Batch size=4 on 1 GPUs
-1) .... Load SSH dataset (training data): /gpfswork/rech/yrf/uba22to/DATA/OSE/GULFSTREAM/training/data/dataset_nadir_0d.nc
-.... Load OI SSH dataset (training data): /gpfswork/rech/yrf/uba22to/DATA/OSE/GULFSTREAM/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc
-.... Load OI dataset (training data): /gpfswork/rech/yrf/uba22to/DATA/OSE/GULFSTREAM/training/oi/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc
+1) .... Load SSH dataset (training data): /gpfswork/rech/yrf/uba22to/NADIR/GULFSTREAM/training/dataset_nadir_0d.nc
+.... Load OI SSH dataset (training data): /gpfswork/rech/yrf/uba22to/NADIR/GULFSTREAM/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc
+.... Load OI dataset (training data): /gpfswork/rech/yrf/uba22to/NADIR/GULFSTREAM/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc
 .... # loaded samples: 365 
-/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/import_Datasets_OSE.py:105: RuntimeWarning: invalid value encountered in less
-  ss            = np.sum( np.sum( np.sum( x_test < -100 , axis = -1) , axis = -1 ) , axis = -1)
 ....... # of test patches: 365 /365
-... mean Tt = 0.006975
+... mean Tt = 0.006974
 .... Test set shape     365x200x200
 ....... Generic model filename: modelNATL60_SSH_365_200_200
 .... Test set shape     365x200x200x22
-... (after normalization) mean Tt = -0.063796
+... (after normalization) mean Tt = -0.063806
 Model_AE(
   (encoder): Encoder(
     (pool1): AvgPool2d(kernel_size=(4, 4), stride=(4, 4), padding=0)
@@ -536,84 +606,84 @@ Optim type 1
 ... Number of GPUs: 1
 Epoc 0/20
 ..... Training step
-Training complete in 0m 22s
-Best val loss: 1.477147
+Training complete in 0m 42s
+Best val loss: 0.419546
 Epoc 1/20
 ..... Training step
-Training complete in 0m 40s
-Best val loss: 1.355258
+Training complete in 1m 21s
+Best val loss: 0.392682
 Epoc 2/20
 ..... Training step
-Training complete in 0m 59s
-Best val loss: 1.250699
+Training complete in 1m 59s
+Best val loss: 0.369226
 Epoc 3/20
 ..... Training step
-Training complete in 1m 18s
-Best val loss: 1.171929
+Training complete in 2m 38s
+Best val loss: 0.328853
 Epoc 4/20
 ..... Training step
-Training complete in 1m 36s
-Best val loss: 1.110531
+Training complete in 3m 17s
+Best val loss: 0.317812
 Epoc 5/20
 ..... Training step
-Training complete in 1m 55s
-Best val loss: 1.054178
+Training complete in 3m 56s
+Best val loss: 0.307164
 Epoc 6/20
 ..... Training step
-Training complete in 2m 14s
-Best val loss: 0.999890
+Training complete in 4m 35s
+Best val loss: 0.288265
 Epoc 7/20
 ..... Training step
-Training complete in 2m 32s
-Best val loss: 0.952142
+Training complete in 5m 17s
+Best val loss: 0.288265
 Epoc 8/20
 ..... Training step
-Training complete in 2m 51s
-Best val loss: 0.906642
+Training complete in 5m 58s
+Best val loss: 0.279153
 Epoc 9/20
 ..... Training step
-Training complete in 3m 10s
-Best val loss: 0.862972
+Training complete in 6m 38s
+Best val loss: 0.276053
 Epoc 10/20
 ..... Training step
-Training complete in 3m 28s
-Best val loss: 0.819841
+Training complete in 7m 20s
+Best val loss: 0.257284
 Epoc 11/20
 ..... Training step
-Training complete in 3m 47s
-Best val loss: 0.779238
+Training complete in 8m 3s
+Best val loss: 0.257284
 Epoc 12/20
 ..... Training step
-Training complete in 4m 6s
-Best val loss: 0.742582
+Training complete in 8m 46s
+Best val loss: 0.257045
 Epoc 13/20
 ..... Training step
-Training complete in 4m 24s
-Best val loss: 0.708832
+Training complete in 9m 29s
+Best val loss: 0.257045
 Epoc 14/20
 ..... Training step
-Training complete in 4m 43s
-Best val loss: 0.678896
+Training complete in 10m 11s
+Best val loss: 0.254117
 Epoc 15/20
 ..... Training step
-Training complete in 5m 1s
-Best val loss: 0.651069
+Training complete in 10m 54s
+Best val loss: 0.253993
 Epoc 16/20
 ..... Training step
-Training complete in 5m 20s
-Best val loss: 0.627322
+Training complete in 11m 37s
+Best val loss: 0.250170
 Epoc 17/20
 ..... Training step
-Training complete in 5m 39s
-Best val loss: 0.603119
+Training complete in 12m 20s
+Best val loss: 0.243369
 Epoc 18/20
 ..... Training step
-Training complete in 5m 57s
-Best val loss: 0.579632
+Training complete in 13m 2s
+Best val loss: 0.239817
 Epoc 19/20
 ..... Training step
-Training complete in 6m 16s
-Best val loss: 0.557208
+Training complete in 13m 45s
+Best val loss: 0.239817
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -799,93 +869,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 0
-.... Error for all data (Tr)        : 3.34e-04 95.28%
+.... Error for all data (Tr)        : 7.70e-04 89.12%
 ....
-.... Error for observed data (Tr)  : 2.69e-03 61.93%
+.... Error for observed data (Tr)  : 3.03e-03 57.20%
 ....
-.... Error for masked data (Tr)  : 3.03e-04 95.72%
+.... Error for masked data (Tr)  : 7.40e-04 89.53%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter000.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter000.mod
 Epoc 0/20
 ..... Training step
-Training complete in 7m 6s
-Best val loss: 0.537052
+Training complete in 15m 1s
+Best val loss: 0.239450
 Epoc 1/20
 ..... Training step
-Training complete in 7m 25s
-Best val loss: 0.515867
+Training complete in 15m 44s
+Best val loss: 0.239450
 Epoc 2/20
 ..... Training step
-Training complete in 7m 43s
-Best val loss: 0.495245
+Training complete in 16m 25s
+Best val loss: 0.232483
 Epoc 3/20
 ..... Training step
-Training complete in 8m 2s
-Best val loss: 0.475802
+Training complete in 17m 5s
+Best val loss: 0.215776
 Epoc 4/20
 ..... Training step
-Training complete in 8m 21s
-Best val loss: 0.457186
+Training complete in 17m 45s
+Best val loss: 0.215776
 Epoc 5/20
 ..... Training step
-Training complete in 8m 39s
-Best val loss: 0.437933
+Training complete in 18m 25s
+Best val loss: 0.206766
 Epoc 6/20
 ..... Training step
-Training complete in 8m 58s
-Best val loss: 0.420625
+Training complete in 19m 5s
+Best val loss: 0.206766
 Epoc 7/20
 ..... Training step
-Training complete in 9m 17s
-Best val loss: 0.403879
+Training complete in 19m 44s
+Best val loss: 0.206766
 Epoc 8/20
 ..... Training step
-Training complete in 9m 35s
-Best val loss: 0.388499
+Training complete in 20m 24s
+Best val loss: 0.206766
 Epoc 9/20
 ..... Training step
-Training complete in 9m 54s
-Best val loss: 0.375098
+Training complete in 21m 4s
+Best val loss: 0.206766
 Epoc 10/20
 ..... Training step
-Training complete in 10m 13s
-Best val loss: 0.363651
+Training complete in 21m 43s
+Best val loss: 0.204932
 Epoc 11/20
 ..... Training step
-Training complete in 10m 31s
-Best val loss: 0.359910
+Training complete in 22m 23s
+Best val loss: 0.204932
 Epoc 12/20
 ..... Training step
-Training complete in 10m 50s
-Best val loss: 0.358176
+Training complete in 23m 3s
+Best val loss: 0.196049
 Epoc 13/20
 ..... Training step
-Training complete in 11m 9s
-Best val loss: 0.357065
+Training complete in 23m 43s
+Best val loss: 0.196049
 Epoc 14/20
 ..... Training step
-Training complete in 11m 27s
-Best val loss: 0.356318
+Training complete in 24m 23s
+Best val loss: 0.196049
 Epoc 15/20
 ..... Training step
-Training complete in 11m 46s
-Best val loss: 0.355231
+Training complete in 25m 2s
+Best val loss: 0.196049
 Epoc 16/20
 ..... Training step
-Training complete in 12m 5s
-Best val loss: 0.354807
+Training complete in 25m 41s
+Best val loss: 0.196049
 Epoc 17/20
 ..... Training step
-Training complete in 12m 23s
-Best val loss: 0.354502
+Training complete in 26m 20s
+Best val loss: 0.196049
 Epoc 18/20
 ..... Training step
-Training complete in 12m 42s
-Best val loss: 0.353191
+Training complete in 26m 59s
+Best val loss: 0.196049
 Epoc 19/20
 ..... Training step
-Training complete in 13m 1s
-Best val loss: 0.352551
+Training complete in 27m 39s
+Best val loss: 0.196049
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -1071,93 +1141,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 1
-.... Error for all data (Tr)        : 3.19e-04 95.49%
+.... Error for all data (Tr)        : 7.54e-04 89.35%
 ....
-.... Error for observed data (Tr)  : 2.70e-03 61.91%
+.... Error for observed data (Tr)  : 3.05e-03 56.91%
 ....
-.... Error for masked data (Tr)  : 2.88e-04 95.93%
+.... Error for masked data (Tr)  : 7.23e-04 89.77%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter001.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter001.mod
 Epoc 0/20
 ..... Training step
-Training complete in 13m 50s
-Best val loss: 0.352172
+Training complete in 28m 49s
+Best val loss: 0.196049
 Epoc 1/20
 ..... Training step
-Training complete in 14m 9s
-Best val loss: 0.351332
+Training complete in 29m 29s
+Best val loss: 0.196049
 Epoc 2/20
 ..... Training step
-Training complete in 14m 28s
-Best val loss: 0.351164
+Training complete in 30m 8s
+Best val loss: 0.194933
 Epoc 3/20
 ..... Training step
-Training complete in 14m 47s
-Best val loss: 0.351164
+Training complete in 30m 47s
+Best val loss: 0.194699
 Epoc 4/20
 ..... Training step
-Training complete in 15m 6s
-Best val loss: 0.349458
+Training complete in 31m 26s
+Best val loss: 0.194699
 Epoc 5/20
 ..... Training step
-Training complete in 15m 25s
-Best val loss: 0.348667
+Training complete in 32m 5s
+Best val loss: 0.187704
 Epoc 6/20
 ..... Training step
-Training complete in 15m 44s
-Best val loss: 0.348667
+Training complete in 32m 44s
+Best val loss: 0.187704
 Epoc 7/20
 ..... Training step
-Training complete in 16m 2s
-Best val loss: 0.347964
+Training complete in 33m 23s
+Best val loss: 0.183593
 Epoc 8/20
 ..... Training step
-Training complete in 16m 21s
-Best val loss: 0.347845
+Training complete in 34m 2s
+Best val loss: 0.183593
 Epoc 9/20
 ..... Training step
-Training complete in 16m 40s
-Best val loss: 0.346709
+Training complete in 34m 41s
+Best val loss: 0.183593
 Epoc 10/20
 ..... Training step
-Training complete in 16m 59s
-Best val loss: 0.346203
+Training complete in 35m 20s
+Best val loss: 0.183593
 Epoc 11/20
 ..... Training step
-Training complete in 17m 18s
-Best val loss: 0.345631
+Training complete in 35m 59s
+Best val loss: 0.183593
 Epoc 12/20
 ..... Training step
-Training complete in 17m 37s
-Best val loss: 0.345631
+Training complete in 36m 39s
+Best val loss: 0.183593
 Epoc 13/20
 ..... Training step
-Training complete in 17m 55s
-Best val loss: 0.345208
+Training complete in 37m 18s
+Best val loss: 0.183593
 Epoc 14/20
 ..... Training step
-Training complete in 18m 14s
-Best val loss: 0.344273
+Training complete in 37m 57s
+Best val loss: 0.183593
 Epoc 15/20
 ..... Training step
-Training complete in 18m 33s
-Best val loss: 0.344158
+Training complete in 38m 36s
+Best val loss: 0.183593
 Epoc 16/20
 ..... Training step
-Training complete in 18m 52s
-Best val loss: 0.343867
+Training complete in 39m 15s
+Best val loss: 0.183593
 Epoc 17/20
 ..... Training step
-Training complete in 19m 11s
-Best val loss: 0.343373
+Training complete in 39m 54s
+Best val loss: 0.180776
 Epoc 18/20
 ..... Training step
-Training complete in 19m 29s
-Best val loss: 0.342487
+Training complete in 40m 33s
+Best val loss: 0.180776
 Epoc 19/20
 ..... Training step
-Training complete in 19m 48s
-Best val loss: 0.342390
+Training complete in 41m 12s
+Best val loss: 0.180776
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -1343,11 +1413,11 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 2
-.... Error for all data (Tr)        : 2.91e-04 95.89%
+.... Error for all data (Tr)        : 7.22e-04 89.79%
 ....
-.... Error for observed data (Tr)  : 2.65e-03 62.53%
+.... Error for observed data (Tr)  : 3.05e-03 56.89%
 ....
-.... Error for masked data (Tr)  : 2.60e-04 96.32%
+.... Error for masked data (Tr)  : 6.92e-04 90.23%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter002.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter002.mod
 ..... Update/initialize number of projections/Graditer in GradCOnvAE model # 2/0
@@ -1356,84 +1426,84 @@ Optim type 1
 ... Number of GPUs: 1
 Epoc 0/20
 ..... Training step
-Training complete in 20m 38s
-Best val loss: 0.341086
+Training complete in 42m 23s
+Best val loss: 0.180776
 Epoc 1/20
 ..... Training step
-Training complete in 20m 57s
-Best val loss: 0.340635
+Training complete in 43m 2s
+Best val loss: 0.180776
 Epoc 2/20
 ..... Training step
-Training complete in 21m 15s
-Best val loss: 0.340635
+Training complete in 43m 41s
+Best val loss: 0.178950
 Epoc 3/20
 ..... Training step
-Training complete in 21m 34s
-Best val loss: 0.340635
+Training complete in 44m 20s
+Best val loss: 0.178950
 Epoc 4/20
 ..... Training step
-Training complete in 21m 53s
-Best val loss: 0.340526
+Training complete in 44m 59s
+Best val loss: 0.178950
 Epoc 5/20
 ..... Training step
-Training complete in 22m 11s
-Best val loss: 0.340526
+Training complete in 45m 38s
+Best val loss: 0.178950
 Epoc 6/20
 ..... Training step
-Training complete in 22m 30s
-Best val loss: 0.340313
+Training complete in 46m 17s
+Best val loss: 0.178950
 Epoc 7/20
 ..... Training step
-Training complete in 22m 49s
-Best val loss: 0.340313
+Training complete in 46m 56s
+Best val loss: 0.178950
 Epoc 8/20
 ..... Training step
-Training complete in 23m 8s
-Best val loss: 0.340230
+Training complete in 47m 35s
+Best val loss: 0.178950
 Epoc 9/20
 ..... Training step
-Training complete in 23m 26s
-Best val loss: 0.340230
+Training complete in 48m 14s
+Best val loss: 0.178950
 Epoc 10/20
 ..... Training step
-Training complete in 23m 45s
-Best val loss: 0.340230
+Training complete in 48m 53s
+Best val loss: 0.178950
 Epoc 11/20
 ..... Training step
-Training complete in 24m 4s
-Best val loss: 0.340230
+Training complete in 49m 32s
+Best val loss: 0.175657
 Epoc 12/20
 ..... Training step
-Training complete in 24m 23s
-Best val loss: 0.339983
+Training complete in 50m 11s
+Best val loss: 0.175657
 Epoc 13/20
 ..... Training step
-Training complete in 24m 41s
-Best val loss: 0.339983
+Training complete in 50m 50s
+Best val loss: 0.175657
 Epoc 14/20
 ..... Training step
-Training complete in 25m 0s
-Best val loss: 0.339983
+Training complete in 51m 29s
+Best val loss: 0.175657
 Epoc 15/20
 ..... Training step
-Training complete in 25m 19s
-Best val loss: 0.339943
+Training complete in 52m 9s
+Best val loss: 0.175657
 Epoc 16/20
 ..... Training step
-Training complete in 25m 39s
-Best val loss: 0.339683
+Training complete in 52m 48s
+Best val loss: 0.175657
 Epoc 17/20
 ..... Training step
-Training complete in 25m 58s
-Best val loss: 0.339683
+Training complete in 53m 27s
+Best val loss: 0.175657
 Epoc 18/20
 ..... Training step
-Training complete in 26m 17s
-Best val loss: 0.339683
+Training complete in 54m 6s
+Best val loss: 0.175657
 Epoc 19/20
 ..... Training step
-Training complete in 26m 36s
-Best val loss: 0.339683
+Training complete in 54m 45s
+Best val loss: 0.175657
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -1619,93 +1689,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 3
-.... Error for all data (Tr)        : 3.04e-04 95.70%
+.... Error for all data (Tr)        : 7.38e-04 89.57%
 ....
-.... Error for observed data (Tr)  : 2.68e-03 62.08%
+.... Error for observed data (Tr)  : 3.06e-03 56.77%
 ....
-.... Error for masked data (Tr)  : 2.73e-04 96.14%
+.... Error for masked data (Tr)  : 7.07e-04 90.00%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter003.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter003.mod
 Epoc 0/20
 ..... Training step
-Training complete in 27m 25s
-Best val loss: 0.339683
+Training complete in 55m 56s
+Best val loss: 0.175657
 Epoc 1/20
 ..... Training step
-Training complete in 27m 44s
-Best val loss: 0.339549
+Training complete in 56m 35s
+Best val loss: 0.175657
 Epoc 2/20
 ..... Training step
-Training complete in 28m 3s
-Best val loss: 0.339549
+Training complete in 57m 14s
+Best val loss: 0.175657
 Epoc 3/20
 ..... Training step
-Training complete in 28m 21s
-Best val loss: 0.339549
+Training complete in 57m 54s
+Best val loss: 0.175398
 Epoc 4/20
 ..... Training step
-Training complete in 28m 40s
-Best val loss: 0.339549
+Training complete in 58m 33s
+Best val loss: 0.175398
 Epoc 5/20
 ..... Training step
-Training complete in 28m 59s
-Best val loss: 0.339549
+Training complete in 59m 12s
+Best val loss: 0.175398
 Epoc 6/20
 ..... Training step
-Training complete in 29m 17s
-Best val loss: 0.339549
+Training complete in 59m 51s
+Best val loss: 0.175398
 Epoc 7/20
 ..... Training step
-Training complete in 29m 36s
-Best val loss: 0.339549
+Training complete in 60m 31s
+Best val loss: 0.175240
 Epoc 8/20
 ..... Training step
-Training complete in 29m 55s
-Best val loss: 0.339489
+Training complete in 61m 10s
+Best val loss: 0.173765
 Epoc 9/20
 ..... Training step
-Training complete in 30m 14s
-Best val loss: 0.339489
+Training complete in 61m 49s
+Best val loss: 0.173765
 Epoc 10/20
 ..... Training step
-Training complete in 30m 32s
-Best val loss: 0.339001
+Training complete in 62m 29s
+Best val loss: 0.173765
 Epoc 11/20
 ..... Training step
-Training complete in 30m 51s
-Best val loss: 0.339001
+Training complete in 63m 8s
+Best val loss: 0.173765
 Epoc 12/20
 ..... Training step
-Training complete in 31m 10s
-Best val loss: 0.338859
+Training complete in 63m 47s
+Best val loss: 0.173765
 Epoc 13/20
 ..... Training step
-Training complete in 31m 29s
-Best val loss: 0.338859
+Training complete in 64m 27s
+Best val loss: 0.173765
 Epoc 14/20
 ..... Training step
-Training complete in 31m 47s
-Best val loss: 0.338859
+Training complete in 65m 6s
+Best val loss: 0.173765
 Epoc 15/20
 ..... Training step
-Training complete in 32m 6s
-Best val loss: 0.338859
+Training complete in 65m 45s
+Best val loss: 0.173765
 Epoc 16/20
 ..... Training step
-Training complete in 32m 25s
-Best val loss: 0.338859
+Training complete in 66m 24s
+Best val loss: 0.173765
 Epoc 17/20
 ..... Training step
-Training complete in 32m 43s
-Best val loss: 0.338859
+Training complete in 67m 4s
+Best val loss: 0.173765
 Epoc 18/20
 ..... Training step
-Training complete in 33m 2s
-Best val loss: 0.338859
+Training complete in 67m 43s
+Best val loss: 0.173765
 Epoc 19/20
 ..... Training step
-Training complete in 33m 21s
-Best val loss: 0.338859
+Training complete in 68m 22s
+Best val loss: 0.173027
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -1891,93 +1961,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 4
-.... Error for all data (Tr)        : 2.94e-04 95.85%
+.... Error for all data (Tr)        : 7.22e-04 89.80%
 ....
-.... Error for observed data (Tr)  : 2.68e-03 62.17%
+.... Error for observed data (Tr)  : 3.05e-03 56.93%
 ....
-.... Error for masked data (Tr)  : 2.63e-04 96.29%
+.... Error for masked data (Tr)  : 6.91e-04 90.23%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter004.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter004.mod
 Epoc 0/20
 ..... Training step
-Training complete in 34m 10s
-Best val loss: 0.338859
+Training complete in 69m 33s
+Best val loss: 0.173027
 Epoc 1/20
 ..... Training step
-Training complete in 34m 29s
-Best val loss: 0.338859
+Training complete in 70m 12s
+Best val loss: 0.173027
 Epoc 2/20
 ..... Training step
-Training complete in 34m 47s
-Best val loss: 0.338859
+Training complete in 70m 51s
+Best val loss: 0.173027
 Epoc 3/20
 ..... Training step
-Training complete in 35m 6s
-Best val loss: 0.338859
+Training complete in 71m 30s
+Best val loss: 0.173027
 Epoc 4/20
 ..... Training step
-Training complete in 35m 25s
-Best val loss: 0.338859
+Training complete in 72m 10s
+Best val loss: 0.173027
 Epoc 5/20
 ..... Training step
-Training complete in 35m 44s
-Best val loss: 0.338799
+Training complete in 72m 49s
+Best val loss: 0.173027
 Epoc 6/20
 ..... Training step
-Training complete in 36m 2s
-Best val loss: 0.338761
+Training complete in 73m 28s
+Best val loss: 0.173027
 Epoc 7/20
 ..... Training step
-Training complete in 36m 21s
-Best val loss: 0.338761
+Training complete in 74m 7s
+Best val loss: 0.173027
 Epoc 8/20
 ..... Training step
-Training complete in 36m 40s
-Best val loss: 0.338579
+Training complete in 74m 46s
+Best val loss: 0.173027
 Epoc 9/20
 ..... Training step
-Training complete in 36m 59s
-Best val loss: 0.338579
+Training complete in 75m 25s
+Best val loss: 0.173027
 Epoc 10/20
 ..... Training step
-Training complete in 37m 17s
-Best val loss: 0.338579
+Training complete in 76m 5s
+Best val loss: 0.173027
 Epoc 11/20
 ..... Training step
-Training complete in 37m 36s
-Best val loss: 0.338579
+Training complete in 76m 44s
+Best val loss: 0.173027
 Epoc 12/20
 ..... Training step
-Training complete in 37m 55s
-Best val loss: 0.338484
+Training complete in 77m 23s
+Best val loss: 0.173027
 Epoc 13/20
 ..... Training step
-Training complete in 38m 14s
-Best val loss: 0.338484
+Training complete in 78m 2s
+Best val loss: 0.173027
 Epoc 14/20
 ..... Training step
-Training complete in 38m 32s
-Best val loss: 0.338484
+Training complete in 78m 41s
+Best val loss: 0.169314
 Epoc 15/20
 ..... Training step
-Training complete in 38m 51s
-Best val loss: 0.338484
+Training complete in 79m 21s
+Best val loss: 0.169314
 Epoc 16/20
 ..... Training step
-Training complete in 39m 10s
-Best val loss: 0.338484
+Training complete in 79m 60s
+Best val loss: 0.169314
 Epoc 17/20
 ..... Training step
-Training complete in 39m 29s
-Best val loss: 0.338279
+Training complete in 80m 39s
+Best val loss: 0.169314
 Epoc 18/20
 ..... Training step
-Training complete in 39m 47s
-Best val loss: 0.338198
+Training complete in 81m 18s
+Best val loss: 0.169314
 Epoc 19/20
 ..... Training step
-Training complete in 40m 6s
-Best val loss: 0.338198
+Training complete in 81m 57s
+Best val loss: 0.169314
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -2163,93 +2233,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 5
-.... Error for all data (Tr)        : 2.97e-04 95.81%
+.... Error for all data (Tr)        : 7.23e-04 89.78%
 ....
-.... Error for observed data (Tr)  : 2.68e-03 62.14%
+.... Error for observed data (Tr)  : 3.05e-03 56.91%
 ....
-.... Error for masked data (Tr)  : 2.66e-04 96.25%
+.... Error for masked data (Tr)  : 6.92e-04 90.22%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter005.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter005.mod
 Epoc 0/20
 ..... Training step
-Training complete in 40m 55s
-Best val loss: 0.338198
+Training complete in 83m 8s
+Best val loss: 0.169314
 Epoc 1/20
 ..... Training step
-Training complete in 41m 14s
-Best val loss: 0.338198
+Training complete in 83m 47s
+Best val loss: 0.169314
 Epoc 2/20
 ..... Training step
-Training complete in 41m 33s
-Best val loss: 0.338198
+Training complete in 84m 26s
+Best val loss: 0.169314
 Epoc 3/20
 ..... Training step
-Training complete in 41m 51s
-Best val loss: 0.338167
+Training complete in 85m 5s
+Best val loss: 0.169314
 Epoc 4/20
 ..... Training step
-Training complete in 42m 10s
-Best val loss: 0.337981
+Training complete in 85m 44s
+Best val loss: 0.169314
 Epoc 5/20
 ..... Training step
-Training complete in 42m 29s
-Best val loss: 0.337981
+Training complete in 86m 23s
+Best val loss: 0.169314
 Epoc 6/20
 ..... Training step
-Training complete in 42m 48s
-Best val loss: 0.337771
+Training complete in 87m 3s
+Best val loss: 0.169314
 Epoc 7/20
 ..... Training step
-Training complete in 43m 6s
-Best val loss: 0.337771
+Training complete in 87m 42s
+Best val loss: 0.169314
 Epoc 8/20
 ..... Training step
-Training complete in 43m 25s
-Best val loss: 0.337771
+Training complete in 88m 21s
+Best val loss: 0.169314
 Epoc 9/20
 ..... Training step
-Training complete in 43m 44s
-Best val loss: 0.337771
+Training complete in 88m 60s
+Best val loss: 0.169314
 Epoc 10/20
 ..... Training step
-Training complete in 44m 2s
-Best val loss: 0.337771
+Training complete in 89m 39s
+Best val loss: 0.169314
 Epoc 11/20
 ..... Training step
-Training complete in 44m 21s
-Best val loss: 0.337771
+Training complete in 90m 19s
+Best val loss: 0.169314
 Epoc 12/20
 ..... Training step
-Training complete in 44m 40s
-Best val loss: 0.337771
+Training complete in 91m 2s
+Best val loss: 0.169314
 Epoc 13/20
 ..... Training step
-Training complete in 44m 59s
-Best val loss: 0.337239
+Training complete in 91m 44s
+Best val loss: 0.169314
 Epoc 14/20
 ..... Training step
-Training complete in 45m 17s
-Best val loss: 0.337239
+Training complete in 92m 26s
+Best val loss: 0.169314
 Epoc 15/20
 ..... Training step
-Training complete in 45m 36s
-Best val loss: 0.337239
+Training complete in 93m 8s
+Best val loss: 0.169314
 Epoc 16/20
 ..... Training step
-Training complete in 45m 55s
-Best val loss: 0.337239
+Training complete in 93m 51s
+Best val loss: 0.169314
 Epoc 17/20
 ..... Training step
-Training complete in 46m 14s
-Best val loss: 0.337239
+Training complete in 94m 33s
+Best val loss: 0.169314
 Epoc 18/20
 ..... Training step
-Training complete in 46m 32s
-Best val loss: 0.337239
+Training complete in 95m 13s
+Best val loss: 0.169314
 Epoc 19/20
 ..... Training step
-Training complete in 46m 51s
-Best val loss: 0.337227
+Training complete in 95m 53s
+Best val loss: 0.169314
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -2435,93 +2505,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 6
-.... Error for all data (Tr)        : 2.99e-04 95.78%
+.... Error for all data (Tr)        : 7.22e-04 89.79%
 ....
-.... Error for observed data (Tr)  : 2.68e-03 62.06%
+.... Error for observed data (Tr)  : 3.01e-03 57.39%
 ....
-.... Error for masked data (Tr)  : 2.67e-04 96.22%
+.... Error for masked data (Tr)  : 6.92e-04 90.22%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter006.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter006.mod
 Epoc 0/20
 ..... Training step
-Training complete in 47m 40s
-Best val loss: 0.337227
+Training complete in 97m 9s
+Best val loss: 0.169314
 Epoc 1/20
 ..... Training step
-Training complete in 47m 59s
-Best val loss: 0.336877
+Training complete in 97m 48s
+Best val loss: 0.169314
 Epoc 2/20
 ..... Training step
-Training complete in 48m 18s
-Best val loss: 0.336877
+Training complete in 98m 27s
+Best val loss: 0.169314
 Epoc 3/20
 ..... Training step
-Training complete in 48m 36s
-Best val loss: 0.336877
+Training complete in 99m 7s
+Best val loss: 0.169314
 Epoc 4/20
 ..... Training step
-Training complete in 48m 55s
-Best val loss: 0.336877
+Training complete in 99m 46s
+Best val loss: 0.167632
 Epoc 5/20
 ..... Training step
-Training complete in 49m 14s
-Best val loss: 0.336877
+Training complete in 100m 25s
+Best val loss: 0.167632
 Epoc 6/20
 ..... Training step
-Training complete in 49m 33s
-Best val loss: 0.336877
+Training complete in 101m 4s
+Best val loss: 0.167632
 Epoc 7/20
 ..... Training step
-Training complete in 49m 51s
-Best val loss: 0.336877
+Training complete in 101m 44s
+Best val loss: 0.167632
 Epoc 8/20
 ..... Training step
-Training complete in 50m 10s
-Best val loss: 0.336877
+Training complete in 102m 23s
+Best val loss: 0.167632
 Epoc 9/20
 ..... Training step
-Training complete in 50m 29s
-Best val loss: 0.336877
+Training complete in 103m 2s
+Best val loss: 0.167632
 Epoc 10/20
 ..... Training step
-Training complete in 50m 47s
-Best val loss: 0.336838
+Training complete in 103m 41s
+Best val loss: 0.167632
 Epoc 11/20
 ..... Training step
-Training complete in 51m 6s
-Best val loss: 0.336838
+Training complete in 104m 21s
+Best val loss: 0.167632
 Epoc 12/20
 ..... Training step
-Training complete in 51m 25s
-Best val loss: 0.336838
+Training complete in 104m 60s
+Best val loss: 0.167632
 Epoc 13/20
 ..... Training step
-Training complete in 51m 44s
-Best val loss: 0.336838
+Training complete in 105m 39s
+Best val loss: 0.167632
 Epoc 14/20
 ..... Training step
-Training complete in 52m 3s
-Best val loss: 0.336830
+Training complete in 106m 18s
+Best val loss: 0.167632
 Epoc 15/20
 ..... Training step
-Training complete in 52m 21s
-Best val loss: 0.336548
+Training complete in 106m 58s
+Best val loss: 0.167632
 Epoc 16/20
 ..... Training step
-Training complete in 52m 40s
-Best val loss: 0.336548
+Training complete in 107m 37s
+Best val loss: 0.167632
 Epoc 17/20
 ..... Training step
-Training complete in 52m 59s
-Best val loss: 0.336548
+Training complete in 108m 16s
+Best val loss: 0.167632
 Epoc 18/20
 ..... Training step
-Training complete in 53m 18s
-Best val loss: 0.336548
+Training complete in 108m 55s
+Best val loss: 0.167632
 Epoc 19/20
 ..... Training step
-Training complete in 53m 36s
-Best val loss: 0.336548
+Training complete in 109m 35s
+Best val loss: 0.167632
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -2707,93 +2777,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 7
-.... Error for all data (Tr)        : 2.75e-04 96.11%
+.... Error for all data (Tr)        : 7.34e-04 89.63%
 ....
-.... Error for observed data (Tr)  : 2.66e-03 62.47%
+.... Error for observed data (Tr)  : 3.08e-03 56.50%
 ....
-.... Error for masked data (Tr)  : 2.44e-04 96.55%
+.... Error for masked data (Tr)  : 7.03e-04 90.07%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter007.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter007.mod
 Epoc 0/20
 ..... Training step
-Training complete in 54m 26s
-Best val loss: 0.336548
+Training complete in 110m 45s
+Best val loss: 0.167632
 Epoc 1/20
 ..... Training step
-Training complete in 54m 44s
-Best val loss: 0.336548
+Training complete in 111m 24s
+Best val loss: 0.167632
 Epoc 2/20
 ..... Training step
-Training complete in 55m 3s
-Best val loss: 0.336548
+Training complete in 112m 3s
+Best val loss: 0.167632
 Epoc 3/20
 ..... Training step
-Training complete in 55m 22s
-Best val loss: 0.336441
+Training complete in 112m 42s
+Best val loss: 0.167632
 Epoc 4/20
 ..... Training step
-Training complete in 55m 40s
-Best val loss: 0.336441
+Training complete in 113m 21s
+Best val loss: 0.167632
 Epoc 5/20
 ..... Training step
-Training complete in 55m 59s
-Best val loss: 0.336441
+Training complete in 113m 60s
+Best val loss: 0.167632
 Epoc 6/20
 ..... Training step
-Training complete in 56m 18s
-Best val loss: 0.336441
+Training complete in 114m 39s
+Best val loss: 0.167632
 Epoc 7/20
 ..... Training step
-Training complete in 56m 36s
-Best val loss: 0.336441
+Training complete in 115m 18s
+Best val loss: 0.167632
 Epoc 8/20
 ..... Training step
-Training complete in 56m 55s
-Best val loss: 0.336441
+Training complete in 115m 57s
+Best val loss: 0.167500
 Epoc 9/20
 ..... Training step
-Training complete in 57m 14s
-Best val loss: 0.336379
+Training complete in 116m 35s
+Best val loss: 0.167500
 Epoc 10/20
 ..... Training step
-Training complete in 57m 33s
-Best val loss: 0.336379
+Training complete in 117m 14s
+Best val loss: 0.167500
 Epoc 11/20
 ..... Training step
-Training complete in 57m 51s
-Best val loss: 0.335882
+Training complete in 117m 53s
+Best val loss: 0.167500
 Epoc 12/20
 ..... Training step
-Training complete in 58m 10s
-Best val loss: 0.335882
+Training complete in 118m 32s
+Best val loss: 0.167500
 Epoc 13/20
 ..... Training step
-Training complete in 58m 29s
-Best val loss: 0.335882
+Training complete in 119m 11s
+Best val loss: 0.167500
 Epoc 14/20
 ..... Training step
-Training complete in 58m 47s
-Best val loss: 0.335882
+Training complete in 119m 50s
+Best val loss: 0.167500
 Epoc 15/20
 ..... Training step
-Training complete in 59m 6s
-Best val loss: 0.335882
+Training complete in 120m 29s
+Best val loss: 0.167500
 Epoc 16/20
 ..... Training step
-Training complete in 59m 25s
-Best val loss: 0.335882
+Training complete in 121m 7s
+Best val loss: 0.167500
 Epoc 17/20
 ..... Training step
-Training complete in 59m 43s
-Best val loss: 0.335882
+Training complete in 121m 46s
+Best val loss: 0.167500
 Epoc 18/20
 ..... Training step
-Training complete in 60m 2s
-Best val loss: 0.335882
+Training complete in 122m 25s
+Best val loss: 0.167500
 Epoc 19/20
 ..... Training step
-Training complete in 60m 22s
-Best val loss: 0.335882
+Training complete in 123m 4s
+Best val loss: 0.167500
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -2979,93 +3049,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 8
-.... Error for all data (Tr)        : 2.91e-04 95.89%
+.... Error for all data (Tr)        : 7.23e-04 89.78%
 ....
-.... Error for observed data (Tr)  : 2.68e-03 62.20%
+.... Error for observed data (Tr)  : 3.03e-03 57.14%
 ....
-.... Error for masked data (Tr)  : 2.60e-04 96.33%
+.... Error for masked data (Tr)  : 6.92e-04 90.21%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter008.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter008.mod
 Epoc 0/20
 ..... Training step
-Training complete in 61m 13s
-Best val loss: 0.335882
+Training complete in 124m 14s
+Best val loss: 0.167500
 Epoc 1/20
 ..... Training step
-Training complete in 61m 33s
-Best val loss: 0.335882
+Training complete in 124m 53s
+Best val loss: 0.167500
 Epoc 2/20
 ..... Training step
-Training complete in 61m 52s
-Best val loss: 0.335882
+Training complete in 125m 33s
+Best val loss: 0.167500
 Epoc 3/20
 ..... Training step
-Training complete in 62m 12s
-Best val loss: 0.335882
+Training complete in 126m 12s
+Best val loss: 0.167500
 Epoc 4/20
 ..... Training step
-Training complete in 62m 33s
-Best val loss: 0.335882
+Training complete in 126m 51s
+Best val loss: 0.167500
 Epoc 5/20
 ..... Training step
-Training complete in 62m 53s
-Best val loss: 0.335882
+Training complete in 127m 30s
+Best val loss: 0.167500
 Epoc 6/20
 ..... Training step
-Training complete in 63m 12s
-Best val loss: 0.335578
+Training complete in 128m 9s
+Best val loss: 0.167500
 Epoc 7/20
 ..... Training step
-Training complete in 63m 32s
-Best val loss: 0.335578
+Training complete in 128m 49s
+Best val loss: 0.167500
 Epoc 8/20
 ..... Training step
-Training complete in 63m 52s
-Best val loss: 0.335578
+Training complete in 129m 28s
+Best val loss: 0.167500
 Epoc 9/20
 ..... Training step
-Training complete in 64m 12s
-Best val loss: 0.335578
+Training complete in 130m 7s
+Best val loss: 0.167500
 Epoc 10/20
 ..... Training step
-Training complete in 64m 32s
-Best val loss: 0.335578
+Training complete in 130m 46s
+Best val loss: 0.167500
 Epoc 11/20
 ..... Training step
-Training complete in 64m 52s
-Best val loss: 0.335578
+Training complete in 131m 25s
+Best val loss: 0.167500
 Epoc 12/20
 ..... Training step
-Training complete in 65m 12s
-Best val loss: 0.335578
+Training complete in 132m 5s
+Best val loss: 0.167500
 Epoc 13/20
 ..... Training step
-Training complete in 65m 31s
-Best val loss: 0.335535
+Training complete in 132m 44s
+Best val loss: 0.167500
 Epoc 14/20
 ..... Training step
-Training complete in 65m 51s
-Best val loss: 0.335535
+Training complete in 133m 23s
+Best val loss: 0.167500
 Epoc 15/20
 ..... Training step
-Training complete in 66m 11s
-Best val loss: 0.335522
+Training complete in 134m 2s
+Best val loss: 0.167500
 Epoc 16/20
 ..... Training step
-Training complete in 66m 30s
-Best val loss: 0.335499
+Training complete in 134m 41s
+Best val loss: 0.167500
 Epoc 17/20
 ..... Training step
-Training complete in 66m 50s
-Best val loss: 0.335452
+Training complete in 135m 20s
+Best val loss: 0.167500
 Epoc 18/20
 ..... Training step
-Training complete in 67m 10s
-Best val loss: 0.335452
+Training complete in 135m 60s
+Best val loss: 0.167500
 Epoc 19/20
 ..... Training step
-Training complete in 67m 30s
-Best val loss: 0.335448
+Training complete in 136m 39s
+Best val loss: 0.167500
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -3251,11 +3321,11 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 9
-.... Error for all data (Tr)        : 2.88e-04 95.93%
+.... Error for all data (Tr)        : 7.23e-04 89.78%
 ....
-.... Error for observed data (Tr)  : 2.68e-03 62.07%
+.... Error for observed data (Tr)  : 3.06e-03 56.78%
 ....
-.... Error for masked data (Tr)  : 2.56e-04 96.38%
+.... Error for masked data (Tr)  : 6.92e-04 90.21%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAE_iter009.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj02_Grad_01_01_00_modelAEGradFP_iter009.mod
 ..... Update/initialize number of projections/Graditer in GradCOnvAE model # 5/0
@@ -3264,84 +3334,84 @@ Optim type 1
 ... Number of GPUs: 1
 Epoc 0/20
 ..... Training step
-Training complete in 68m 30s
-Best val loss: 0.335448
+Training complete in 137m 58s
+Best val loss: 0.167500
 Epoc 1/20
 ..... Training step
-Training complete in 69m 0s
-Best val loss: 0.335448
+Training complete in 138m 46s
+Best val loss: 0.167500
 Epoc 2/20
 ..... Training step
-Training complete in 69m 30s
-Best val loss: 0.335448
+Training complete in 139m 34s
+Best val loss: 0.167500
 Epoc 3/20
 ..... Training step
-Training complete in 69m 59s
-Best val loss: 0.335448
+Training complete in 140m 22s
+Best val loss: 0.167500
 Epoc 4/20
 ..... Training step
-Training complete in 70m 29s
-Best val loss: 0.335448
+Training complete in 141m 10s
+Best val loss: 0.167500
 Epoc 5/20
 ..... Training step
-Training complete in 70m 58s
-Best val loss: 0.335448
+Training complete in 141m 58s
+Best val loss: 0.167500
 Epoc 6/20
 ..... Training step
-Training complete in 71m 28s
-Best val loss: 0.335448
+Training complete in 142m 46s
+Best val loss: 0.167500
 Epoc 7/20
 ..... Training step
-Training complete in 71m 57s
-Best val loss: 0.335448
+Training complete in 143m 34s
+Best val loss: 0.167500
 Epoc 8/20
 ..... Training step
-Training complete in 72m 27s
-Best val loss: 0.335448
+Training complete in 144m 22s
+Best val loss: 0.167500
 Epoc 9/20
 ..... Training step
-Training complete in 72m 56s
-Best val loss: 0.335448
+Training complete in 145m 9s
+Best val loss: 0.167500
 Epoc 10/20
 ..... Training step
-Training complete in 73m 25s
-Best val loss: 0.335448
+Training complete in 145m 57s
+Best val loss: 0.167500
 Epoc 11/20
 ..... Training step
-Training complete in 73m 54s
-Best val loss: 0.335448
+Training complete in 146m 45s
+Best val loss: 0.167500
 Epoc 12/20
 ..... Training step
-Training complete in 74m 23s
-Best val loss: 0.335448
+Training complete in 147m 33s
+Best val loss: 0.167500
 Epoc 13/20
 ..... Training step
-Training complete in 74m 52s
-Best val loss: 0.335448
+Training complete in 148m 21s
+Best val loss: 0.167500
 Epoc 14/20
 ..... Training step
-Training complete in 75m 20s
-Best val loss: 0.335448
+Training complete in 149m 9s
+Best val loss: 0.167500
 Epoc 15/20
 ..... Training step
-Training complete in 75m 48s
-Best val loss: 0.335448
+Training complete in 149m 57s
+Best val loss: 0.167500
 Epoc 16/20
 ..... Training step
-Training complete in 76m 16s
-Best val loss: 0.335448
+Training complete in 150m 45s
+Best val loss: 0.167500
 Epoc 17/20
 ..... Training step
-Training complete in 76m 44s
-Best val loss: 0.335448
+Training complete in 151m 33s
+Best val loss: 0.167500
 Epoc 18/20
 ..... Training step
-Training complete in 77m 12s
-Best val loss: 0.335448
+Training complete in 152m 21s
+Best val loss: 0.167500
 Epoc 19/20
 ..... Training step
-Training complete in 77m 40s
-Best val loss: 0.335448
+Training complete in 153m 9s
+Best val loss: 0.167500
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -3527,93 +3597,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 10
-.... Error for all data (Tr)        : 4.18e-02 -490.84%
+.... Error for all data (Tr)        : 2.34e-02 -230.53%
 ....
-.... Error for observed data (Tr)  : 5.67e-02 -701.00%
+.... Error for observed data (Tr)  : 2.78e-02 -292.45%
 ....
-.... Error for masked data (Tr)  : 4.16e-02 -488.09%
+.... Error for masked data (Tr)  : 2.33e-02 -229.71%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAE_iter010.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAEGradFP_iter010.mod
 Epoc 0/20
 ..... Training step
-Training complete in 78m 40s
-Best val loss: 0.335448
+Training complete in 154m 29s
+Best val loss: 0.167500
 Epoc 1/20
 ..... Training step
-Training complete in 79m 8s
-Best val loss: 0.335448
+Training complete in 155m 17s
+Best val loss: 0.167500
 Epoc 2/20
 ..... Training step
-Training complete in 79m 36s
-Best val loss: 0.335448
+Training complete in 156m 5s
+Best val loss: 0.167500
 Epoc 3/20
 ..... Training step
-Training complete in 80m 4s
-Best val loss: 0.335448
+Training complete in 156m 53s
+Best val loss: 0.167500
 Epoc 4/20
 ..... Training step
-Training complete in 80m 33s
-Best val loss: 0.335448
+Training complete in 157m 41s
+Best val loss: 0.167500
 Epoc 5/20
 ..... Training step
-Training complete in 81m 1s
-Best val loss: 0.335448
+Training complete in 158m 29s
+Best val loss: 0.167500
 Epoc 6/20
 ..... Training step
-Training complete in 81m 29s
-Best val loss: 0.335448
+Training complete in 159m 17s
+Best val loss: 0.167500
 Epoc 7/20
 ..... Training step
-Training complete in 81m 57s
-Best val loss: 0.335448
+Training complete in 160m 5s
+Best val loss: 0.167500
 Epoc 8/20
 ..... Training step
-Training complete in 82m 25s
-Best val loss: 0.335448
+Training complete in 160m 53s
+Best val loss: 0.167500
 Epoc 9/20
 ..... Training step
-Training complete in 82m 53s
-Best val loss: 0.335448
+Training complete in 161m 41s
+Best val loss: 0.167500
 Epoc 10/20
 ..... Training step
-Training complete in 83m 21s
-Best val loss: 0.335448
+Training complete in 162m 29s
+Best val loss: 0.167500
 Epoc 11/20
 ..... Training step
-Training complete in 83m 49s
-Best val loss: 0.335448
+Training complete in 163m 17s
+Best val loss: 0.167500
 Epoc 12/20
 ..... Training step
-Training complete in 84m 17s
-Best val loss: 0.335448
+Training complete in 164m 5s
+Best val loss: 0.167500
 Epoc 13/20
 ..... Training step
-Training complete in 84m 46s
-Best val loss: 0.335448
+Training complete in 164m 53s
+Best val loss: 0.167500
 Epoc 14/20
 ..... Training step
-Training complete in 85m 14s
-Best val loss: 0.335448
+Training complete in 165m 41s
+Best val loss: 0.167500
 Epoc 15/20
 ..... Training step
-Training complete in 85m 42s
-Best val loss: 0.335448
+Training complete in 166m 29s
+Best val loss: 0.167500
 Epoc 16/20
 ..... Training step
-Training complete in 86m 10s
-Best val loss: 0.335448
+Training complete in 167m 17s
+Best val loss: 0.167500
 Epoc 17/20
 ..... Training step
-Training complete in 86m 38s
-Best val loss: 0.335448
+Training complete in 168m 6s
+Best val loss: 0.167500
 Epoc 18/20
 ..... Training step
-Training complete in 87m 6s
-Best val loss: 0.335448
+Training complete in 168m 53s
+Best val loss: 0.167500
 Epoc 19/20
 ..... Training step
-Training complete in 87m 34s
-Best val loss: 0.335448
+Training complete in 169m 41s
+Best val loss: 0.167500
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -3799,93 +3869,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 11
-.... Error for all data (Tr)        : 4.18e-02 -490.86%
+.... Error for all data (Tr)        : 2.34e-02 -230.49%
 ....
-.... Error for observed data (Tr)  : 5.66e-02 -699.47%
+.... Error for observed data (Tr)  : 2.78e-02 -292.31%
 ....
-.... Error for masked data (Tr)  : 4.16e-02 -488.13%
+.... Error for masked data (Tr)  : 2.33e-02 -229.68%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAE_iter011.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAEGradFP_iter011.mod
 Epoc 0/20
 ..... Training step
-Training complete in 88m 34s
-Best val loss: 0.335448
+Training complete in 171m 2s
+Best val loss: 0.167500
 Epoc 1/20
 ..... Training step
-Training complete in 89m 2s
-Best val loss: 0.335448
+Training complete in 171m 51s
+Best val loss: 0.167500
 Epoc 2/20
 ..... Training step
-Training complete in 89m 30s
-Best val loss: 0.335448
+Training complete in 172m 39s
+Best val loss: 0.167500
 Epoc 3/20
 ..... Training step
-Training complete in 89m 58s
-Best val loss: 0.335448
+Training complete in 173m 27s
+Best val loss: 0.167500
 Epoc 4/20
 ..... Training step
-Training complete in 90m 26s
-Best val loss: 0.335448
+Training complete in 174m 15s
+Best val loss: 0.167500
 Epoc 5/20
 ..... Training step
-Training complete in 90m 54s
-Best val loss: 0.335448
+Training complete in 175m 3s
+Best val loss: 0.167500
 Epoc 6/20
 ..... Training step
-Training complete in 91m 22s
-Best val loss: 0.335448
+Training complete in 175m 51s
+Best val loss: 0.167500
 Epoc 7/20
 ..... Training step
-Training complete in 91m 50s
-Best val loss: 0.335448
+Training complete in 176m 39s
+Best val loss: 0.167500
 Epoc 8/20
 ..... Training step
-Training complete in 92m 18s
-Best val loss: 0.335448
+Training complete in 177m 28s
+Best val loss: 0.167500
 Epoc 9/20
 ..... Training step
-Training complete in 92m 46s
-Best val loss: 0.335448
+Training complete in 178m 16s
+Best val loss: 0.167500
 Epoc 10/20
 ..... Training step
-Training complete in 93m 14s
-Best val loss: 0.335448
+Training complete in 179m 4s
+Best val loss: 0.167500
 Epoc 11/20
 ..... Training step
-Training complete in 93m 42s
-Best val loss: 0.335448
+Training complete in 179m 53s
+Best val loss: 0.167500
 Epoc 12/20
 ..... Training step
-Training complete in 94m 10s
-Best val loss: 0.335448
+Training complete in 180m 42s
+Best val loss: 0.167500
 Epoc 13/20
 ..... Training step
-Training complete in 94m 39s
-Best val loss: 0.335448
+Training complete in 181m 30s
+Best val loss: 0.167500
 Epoc 14/20
 ..... Training step
-Training complete in 95m 7s
-Best val loss: 0.335448
+Training complete in 182m 18s
+Best val loss: 0.167500
 Epoc 15/20
 ..... Training step
-Training complete in 95m 35s
-Best val loss: 0.335448
+Training complete in 183m 7s
+Best val loss: 0.167500
 Epoc 16/20
 ..... Training step
-Training complete in 96m 3s
-Best val loss: 0.335448
+Training complete in 183m 57s
+Best val loss: 0.167500
 Epoc 17/20
 ..... Training step
-Training complete in 96m 31s
-Best val loss: 0.335448
+Training complete in 184m 46s
+Best val loss: 0.167500
 Epoc 18/20
 ..... Training step
-Training complete in 96m 59s
-Best val loss: 0.335448
+Training complete in 185m 35s
+Best val loss: 0.167500
 Epoc 19/20
 ..... Training step
-Training complete in 97m 28s
-Best val loss: 0.335448
+Training complete in 186m 24s
+Best val loss: 0.167500
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -4071,93 +4141,93 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 12
-.... Error for all data (Tr)        : 4.18e-02 -490.86%
+.... Error for all data (Tr)        : 2.34e-02 -230.52%
 ....
-.... Error for observed data (Tr)  : 5.75e-02 -712.49%
+.... Error for observed data (Tr)  : 2.77e-02 -291.91%
 ....
-.... Error for masked data (Tr)  : 4.16e-02 -487.95%
+.... Error for masked data (Tr)  : 2.33e-02 -229.72%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAE_iter012.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAEGradFP_iter012.mod
 Epoc 0/20
 ..... Training step
-Training complete in 98m 29s
-Best val loss: 0.335448
+Training complete in 187m 46s
+Best val loss: 0.167500
 Epoc 1/20
 ..... Training step
-Training complete in 98m 59s
-Best val loss: 0.335448
+Training complete in 188m 35s
+Best val loss: 0.167500
 Epoc 2/20
 ..... Training step
-Training complete in 99m 30s
-Best val loss: 0.335448
+Training complete in 189m 24s
+Best val loss: 0.167500
 Epoc 3/20
 ..... Training step
-Training complete in 99m 60s
-Best val loss: 0.335448
+Training complete in 190m 13s
+Best val loss: 0.167500
 Epoc 4/20
 ..... Training step
-Training complete in 100m 30s
-Best val loss: 0.335448
+Training complete in 191m 2s
+Best val loss: 0.167500
 Epoc 5/20
 ..... Training step
-Training complete in 100m 60s
-Best val loss: 0.335448
+Training complete in 191m 50s
+Best val loss: 0.167500
 Epoc 6/20
 ..... Training step
-Training complete in 101m 30s
-Best val loss: 0.335448
+Training complete in 192m 39s
+Best val loss: 0.167500
 Epoc 7/20
 ..... Training step
-Training complete in 102m 0s
-Best val loss: 0.335448
+Training complete in 193m 28s
+Best val loss: 0.167500
 Epoc 8/20
 ..... Training step
-Training complete in 102m 30s
-Best val loss: 0.335448
+Training complete in 194m 17s
+Best val loss: 0.167500
 Epoc 9/20
 ..... Training step
-Training complete in 103m 0s
-Best val loss: 0.335448
+Training complete in 195m 6s
+Best val loss: 0.167500
 Epoc 10/20
 ..... Training step
-Training complete in 103m 30s
-Best val loss: 0.335448
+Training complete in 195m 54s
+Best val loss: 0.167500
 Epoc 11/20
 ..... Training step
-Training complete in 104m 0s
-Best val loss: 0.335448
+Training complete in 196m 43s
+Best val loss: 0.167500
 Epoc 12/20
 ..... Training step
-Training complete in 104m 31s
-Best val loss: 0.335448
+Training complete in 197m 32s
+Best val loss: 0.167500
 Epoc 13/20
 ..... Training step
-Training complete in 105m 1s
-Best val loss: 0.335448
+Training complete in 198m 21s
+Best val loss: 0.167500
 Epoc 14/20
 ..... Training step
-Training complete in 105m 31s
-Best val loss: 0.335448
+Training complete in 199m 10s
+Best val loss: 0.167500
 Epoc 15/20
 ..... Training step
-Training complete in 106m 1s
-Best val loss: 0.335448
+Training complete in 199m 59s
+Best val loss: 0.167500
 Epoc 16/20
 ..... Training step
-Training complete in 106m 31s
-Best val loss: 0.335448
+Training complete in 200m 47s
+Best val loss: 0.167500
 Epoc 17/20
 ..... Training step
-Training complete in 107m 1s
-Best val loss: 0.335448
+Training complete in 201m 36s
+Best val loss: 0.167500
 Epoc 18/20
 ..... Training step
-Training complete in 107m 31s
-Best val loss: 0.335448
+Training complete in 202m 25s
+Best val loss: 0.167500
 Epoc 19/20
 ..... Training step
-Training complete in 108m 1s
-Best val loss: 0.335448
+Training complete in 203m 14s
+Best val loss: 0.167500
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
 torch.Size([4, 11, 200, 200])
@@ -4343,32 +4413,592 @@ torch.Size([4, 11, 200, 200])
 torch.Size([1, 11, 200, 200])
 (365, 11, 200, 200)
 .......... iter 13
-.... Error for all data (Tr)        : 4.18e-02 -490.86%
+.... Error for all data (Tr)        : 2.34e-02 -230.53%
 ....
-.... Error for observed data (Tr)  : 5.67e-02 -701.76%
+.... Error for observed data (Tr)  : 2.80e-02 -296.26%
 ....
-.... Error for masked data (Tr)  : 4.16e-02 -488.09%
+.... Error for masked data (Tr)  : 2.33e-02 -229.67%
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAE_iter013.mod
 .................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAEGradFP_iter013.mod
 Epoc 0/20
 ..... Training step
-Training complete in 109m 4s
-Best val loss: 0.335448
+Training complete in 204m 35s
+Best val loss: 0.167500
 Epoc 1/20
 ..... Training step
-Training complete in 109m 34s
-Best val loss: 0.335448
+Training complete in 205m 24s
+Best val loss: 0.167500
 Epoc 2/20
 ..... Training step
-Training complete in 110m 4s
-Best val loss: 0.335448
+Training complete in 206m 13s
+Best val loss: 0.167500
 Epoc 3/20
 ..... Training step
-Training complete in 110m 34s
-Best val loss: 0.335448
+Training complete in 207m 2s
+Best val loss: 0.167500
 Epoc 4/20
 ..... Training step
-Training complete in 111m 4s
-Best val loss: 0.335448
+Training complete in 207m 51s
+Best val loss: 0.167500
 Epoc 5/20
+..... Training step
+Training complete in 208m 40s
+Best val loss: 0.167500
+Epoc 6/20
+..... Training step
+Training complete in 209m 29s
+Best val loss: 0.167500
+Epoc 7/20
+..... Training step
+Training complete in 210m 17s
+Best val loss: 0.167500
+Epoc 8/20
+..... Training step
+Training complete in 211m 6s
+Best val loss: 0.167500
+Epoc 9/20
+..... Training step
+Training complete in 211m 55s
+Best val loss: 0.167500
+Epoc 10/20
+..... Training step
+Training complete in 212m 44s
+Best val loss: 0.167500
+Epoc 11/20
+..... Training step
+Training complete in 213m 33s
+Best val loss: 0.167500
+Epoc 12/20
+..... Training step
+Training complete in 214m 22s
+Best val loss: 0.167500
+Epoc 13/20
+..... Training step
+Training complete in 215m 10s
+Best val loss: 0.167500
+Epoc 14/20
+..... Training step
+Training complete in 215m 59s
+Best val loss: 0.167500
+Epoc 15/20
+..... Training step
+Training complete in 216m 48s
+Best val loss: 0.167500
+Epoc 16/20
+..... Training step
+Training complete in 217m 37s
+Best val loss: 0.167500
+Epoc 17/20
+..... Training step
+Training complete in 218m 26s
+Best val loss: 0.167500
+Epoc 18/20
+..... Training step
+Training complete in 219m 15s
+Best val loss: 0.167500
+Epoc 19/20
+..... Training step
+Training complete in 220m 4s
+Best val loss: 0.167500
+torch.Size([4, 11, 200, 200])
+torch.Size([4, 11, 200, 200])
+torch.Size([4, 11, 200, 200])
+(8, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(12, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(16, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(20, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(24, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(28, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(32, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(36, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(40, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(44, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(48, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(52, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(56, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(60, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(64, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(68, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(72, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(76, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(80, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(84, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(88, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(92, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(96, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(100, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(104, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(108, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(112, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(116, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(120, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(124, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(128, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(132, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(136, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(140, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(144, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(148, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(152, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(156, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(160, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(164, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(168, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(172, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(176, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(180, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(184, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(188, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(192, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(196, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(200, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(204, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(208, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(212, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(216, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(220, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(224, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(228, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(232, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(236, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(240, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(244, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(248, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(252, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(256, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(260, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(264, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(268, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(272, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(276, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(280, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(284, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(288, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(292, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(296, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(300, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(304, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(308, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(312, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(316, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(320, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(324, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(328, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(332, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(336, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(340, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(344, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(348, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(352, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(356, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(360, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(364, 11, 200, 200)
+torch.Size([1, 11, 200, 200])
+(365, 11, 200, 200)
+.......... iter 14
+.... Error for all data (Tr)        : 2.34e-02 -230.56%
+....
+.... Error for observed data (Tr)  : 2.81e-02 -297.77%
+....
+.... Error for masked data (Tr)  : 2.33e-02 -229.68%
+.................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAE_iter014.mod
+.................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAEGradFP_iter014.mod
+..... Update/initialize number of projections/Graditer in GradCOnvAE model # 5/0
+..... Update model architecture
+Optim type 1
+... Number of GPUs: 1
+Epoc 0/20
+..... Training step
+Training complete in 221m 25s
+Best val loss: 0.167500
+Epoc 1/20
+..... Training step
+Training complete in 222m 14s
+Best val loss: 0.167500
+Epoc 2/20
+..... Training step
+Training complete in 223m 3s
+Best val loss: 0.167500
+Epoc 3/20
+..... Training step
+Training complete in 223m 51s
+Best val loss: 0.167500
+Epoc 4/20
+..... Training step
+Training complete in 224m 40s
+Best val loss: 0.167500
+Epoc 5/20
+..... Training step
+Training complete in 225m 29s
+Best val loss: 0.167500
+Epoc 6/20
+..... Training step
+Training complete in 226m 18s
+Best val loss: 0.167500
+Epoc 7/20
+..... Training step
+Training complete in 227m 7s
+Best val loss: 0.167500
+Epoc 8/20
+..... Training step
+Training complete in 227m 55s
+Best val loss: 0.167500
+Epoc 9/20
+..... Training step
+Training complete in 228m 44s
+Best val loss: 0.167500
+Epoc 10/20
+..... Training step
+Training complete in 229m 33s
+Best val loss: 0.167500
+Epoc 11/20
+..... Training step
+Training complete in 230m 22s
+Best val loss: 0.167500
+Epoc 12/20
+..... Training step
+Training complete in 231m 11s
+Best val loss: 0.167500
+Epoc 13/20
+..... Training step
+Training complete in 231m 59s
+Best val loss: 0.167500
+Epoc 14/20
+..... Training step
+Training complete in 232m 48s
+Best val loss: 0.167500
+Epoc 15/20
+..... Training step
+Training complete in 233m 37s
+Best val loss: 0.167500
+Epoc 16/20
+..... Training step
+Training complete in 234m 26s
+Best val loss: 0.167500
+Epoc 17/20
+..... Training step
+Training complete in 235m 14s
+Best val loss: 0.167500
+Epoc 18/20
+..... Training step
+Training complete in 236m 3s
+Best val loss: 0.167500
+Epoc 19/20
+..... Training step
+Training complete in 236m 52s
+Best val loss: 0.167500
+torch.Size([4, 11, 200, 200])
+torch.Size([4, 11, 200, 200])
+torch.Size([4, 11, 200, 200])
+(8, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(12, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(16, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(20, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(24, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(28, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(32, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(36, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(40, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(44, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(48, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(52, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(56, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(60, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(64, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(68, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(72, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(76, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(80, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(84, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(88, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(92, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(96, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(100, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(104, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(108, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(112, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(116, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(120, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(124, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(128, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(132, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(136, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(140, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(144, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(148, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(152, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(156, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(160, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(164, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(168, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(172, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(176, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(180, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(184, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(188, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(192, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(196, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(200, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(204, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(208, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(212, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(216, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(220, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(224, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(228, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(232, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(236, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(240, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(244, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(248, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(252, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(256, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(260, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(264, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(268, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(272, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(276, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(280, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(284, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(288, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(292, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(296, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(300, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(304, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(308, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(312, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(316, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(320, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(324, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(328, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(332, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(336, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(340, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(344, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(348, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(352, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(356, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(360, 11, 200, 200)
+torch.Size([4, 11, 200, 200])
+(364, 11, 200, 200)
+torch.Size([1, 11, 200, 200])
+(365, 11, 200, 200)
+.......... iter 15
+.... Error for all data (Tr)        : 2.34e-02 -230.53%
+....
+.... Error for observed data (Tr)  : 2.79e-02 -293.75%
+....
+.... Error for masked data (Tr)  : 2.33e-02 -229.70%
+.................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAE_iter015.mod
+.................. Auto-Encoder /gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/GULFSTREAM/resIA_nadir_nadlag_0_obs/GB1_GENN_wwmissing_wOI_wtrain_wregul/modelNATL60_SSH_365_200_200Torch_Alpha010_AETRwithTrueData02D40N03W04_Nproj05_Grad_01_01_00_modelAEGradFP_iter015.mod
+Epoc 0/20
+..... Training step
+Training complete in 238m 14s
+Best val loss: 0.167500
+Epoc 1/20
+..... Training step
+Training complete in 239m 3s
+Best val loss: 0.167500
+Epoc 2/20
+..... Training step
+Training complete in 239m 51s
+Best val loss: 0.167500
+Epoc 3/20
+..... Training step
+Training complete in 240m 38s
+Best val loss: 0.167500
+Epoc 4/20
+..... Training step
+Training complete in 241m 26s
+Best val loss: 0.167500
+Epoc 5/20
+..... Training step
+Training complete in 242m 14s
+Best val loss: 0.167500
+Epoc 6/20
+..... Training step
+Training complete in 382m 20s
+Best val loss: 0.167500
+Epoc 7/20
+..... Training step
+Training complete in 383m 8s
+Best val loss: 0.167500
+Epoc 8/20
 ..... Training step

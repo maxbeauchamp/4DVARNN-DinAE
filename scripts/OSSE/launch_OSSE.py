@@ -34,9 +34,9 @@ if __name__ == '__main__':
         conf = yaml.load(f.read())  
 
     # list of global parameters (comments to add)
-    fileMod             	= datapath+domain+conf['path_files']['fileMod']
-    fileOI              	= [ datapath+domain+x for x in conf['path_files']['fileOI'] ]
-    fileObs             	= [ datapath+domain+x for x in conf['path_files']['fileObs'] ]
+    fileMod             	= datapath+'DATA/'+domain+conf['path_files']['fileMod']
+    fileOI              	= [ datapath+'DATA/'+domain+x for x in conf['path_files']['fileOI'] ]
+    fileObs             	= [ datapath+'DATA/'+domain+x for x in conf['path_files']['fileObs'] ]
     if opt=="nadir":
         fileObs         	= fileObs[0]
         fileOI          	= fileOI[0]
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     flagTrWMissingData  	= conf['data_options']['flagTrWMissingData'] 
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
-    lfile_cov                   = [ datapath+domain+x for x in conf['data_options']['lfile_cov'] ]
+    lfile_cov                   = [ datapath+'DATA/'+domain+x for x in conf['data_options']['lfile_cov'] ]
     lname_cov                   = conf['data_options']['lname_cov']
     lid_cov                     = conf['data_options']['lid_cov'] 
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
