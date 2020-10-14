@@ -2,8 +2,8 @@
 #SBATCH -A yrf@gpu                  # nom du compte
 #SBATCH --job-name=gpu_mono         # nom du job
 #SBATCH --ntasks=1                  # nombre de tâche (un unique processus ici)
-#SBATCH --gres=gpu:4                # nombre de GPU à réserver (un unique GPU ici)
-#SBATCH --cpus-per-task=40          # nombre de coeurs à réserver (un quart du noeud)
+#SBATCH --gres=gpu:1                # nombre de GPU à réserver (un unique GPU ici)
+#SBATCH --cpus-per-task=10          # nombre de coeurs à réserver (un quart du noeud)
 #SBATCH --partition=gpu_p1          # change de partition (preprost: test; gpu_p1: runs)
 # /!\ Attention, la ligne suivante est trompeuse mais dans le vocabulaire
 # de Slurm "multithread" fait bien référence à l'hyperthreading.
@@ -16,8 +16,8 @@
 module purge
  
 # chargement des modules
-module load pytorch-gpu/py3/1.4.0
-module load geos/3.7.3
+module load python/3.7.6
+conda activate ossept
 export PYTHONPATH=${HOME}/4DVARNN-DinAE:${PYTHONPATH}
  
 # echo des commandes lancées
@@ -34,7 +34,7 @@ sed -i -e 's|_WCOV_|'"${6}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/conf
 sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py
 
 # exécution du code
-python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}
+PYTHONPATH=${WORK}/4DVARNN-DinAE_${JobID} python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}
 
 # remove copy
 rm -rf ${WORK}/4DVARNN-DinAE_${JobID}
