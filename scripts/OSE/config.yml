@@ -28,7 +28,6 @@ data_options:
     sigNoise: 1e-1
     flagTrOuputWOMissingData: 1
     stdMask: 0.
-    flagDataWindowing: 2
     dropout: 0.0
     wl2: 0.0000
 
@@ -56,7 +55,7 @@ loss_weighting:
         - 1.
     regul: !1darray
       - - 1.
-        - 0.2
+        - 0.001
 
 # solver parameters
 solver_options: 

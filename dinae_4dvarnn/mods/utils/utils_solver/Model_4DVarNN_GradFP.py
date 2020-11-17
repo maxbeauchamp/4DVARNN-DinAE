@@ -62,8 +62,10 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
         with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
             target_x     = x[:,index,:,:]
             target_obs   = xobs[:,index,:,:] 
-            target_mask  = mask[:,index,:,:]
-            target_mask_ = mask_[:,index,:,:]
+            #target_mask  = mask[:,index,:,:]
+            #target_mask_ = mask_[:,index,:,:]
+            target_mask  = mask
+            target_mask_ = mask_
 
         # fixed-point iterations
         if self.NProjFP > 0:

@@ -39,13 +39,19 @@ data_options:
     flagDataWindowing: 2
     dropout: 0.0
     wl2: 0.0000
+#   Index evaluation dates
+    start_eval_index: 52
+    end_eval_index: 94
+#   Index trainig dates
+    start_train_index: 122
+    end_train_index: 365
 
 # NN model options
 NN_options:
 #   Dimension of the latent space
     DimAE: 40    
 #   model type, 1: ConvAE or 2: GENN 3: PINN
-    flagAEType: 3     
+    flagAEType: 2     
 #   multiscale model
     flag_MultiScaleAEModel: 0 
 

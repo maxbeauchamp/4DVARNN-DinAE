@@ -116,7 +116,7 @@ def plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
         plt.close()                # close the figure
 
     ## Test dataset
-    lfig=[15,30,45]
+    lfig=[5,10,15]
     for ifig in lfig:
         # Rough variables
         figName = figpathTt+'/'+genFilename+genSuffixModel+'_examplesTt_%03d'%(ifig)+'_'+lday_test[ifig]+'.png'
@@ -177,15 +177,18 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
     ## keep only the information on the target variable (remove covariates)
     if include_covariates == True:
         index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
-        mask_train      = mask_train[:,index,:,:]
+        mask_train      = mask_train
         x_train_missing = x_train_missing[:,index,:,:]
+        mask_input      = np.where(x_train_missing.squeeze()==0)
 
     ## reshape and rescale variables
-    mask_train      = np.moveaxis(mask_train,1,3)
-    x_train         = meanTr+ np.moveaxis(x_train,1,3)*stdTr
-    x_train_missing = meanTr+ np.moveaxis(x_train_missing,1,3)*stdTr
-    x_train_pred    = meanTr+ np.moveaxis(x_train_pred,1,3)*stdTr
-    rec_AE_Tr       = meanTr+ np.moveaxis(rec_AE_Tr,1,3)*stdTr
+    mask_target      = np.moveaxis(mask_train,1,3)
+    x_train          = meanTr+ np.moveaxis(x_train,1,3)*stdTr
+    x_train_missing  = np.moveaxis(x_train_missing,1,3)
+    x_train_missing_ = x_train_missing
+    x_train_missing  = meanTr+ x_train_missing*stdTr
+    x_train_pred     = meanTr+ np.moveaxis(x_train_pred,1,3)*stdTr
+    rec_AE_Tr        = meanTr+ np.moveaxis(rec_AE_Tr,1,3)*stdTr
 
     ## add OI (large-scale) to state if required
     if flagloadOIData == 1:
@@ -221,8 +224,9 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
         vmin = np.quantile(x_train[ifig,:,:,idT].flatten() , 0.05 )
         vmax = np.quantile(x_train[ifig,:,:,idT].flatten() , 0.95 )
         cmap="coolwarm"
-        GT   = x_train[ifig,:,:,idT].squeeze()
-        OBS  = np.where(mask_train[ifig,:,:,idT].squeeze()==0,\
+        GT   = np.where(mask_target[ifig,:,:,idT].squeeze()==0,
+                 np.nan,x_train[ifig,:,:,idT].squeeze())
+        OBS  = np.where(x_train_missing_[ifig,:,:,idT].squeeze()==0,\
                  np.nan, x_train_missing[ifig,:,:,idT].squeeze())
         PRED = x_train_pred[ifig,:,:,idT].squeeze()
         REC  = rec_AE_Tr[ifig,:,:,idT].squeeze()
@@ -244,9 +248,10 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
         vmin = np.quantile(Gradient(x_train[ifig,:,:,idT],2).flatten() , 0.05 )
         vmax = np.quantile(Gradient(x_train[ifig,:,:,idT],2).flatten() , 0.95 )
         cmap="viridis"
-        GT   = Gradient(x_train[ifig,:,:,idT].squeeze(),2)
-        OBS  = Gradient(np.where(mask_train[ifig,:,:,idT].squeeze()==0,\
-                 np.nan,x_train_missing[ifig,:,:,idT].squeeze()),2)
+        GT   = Gradient(np.where(mask_target[ifig,:,:,idT].squeeze()==0,
+                 np.nan,x_train[ifig,:,:,idT].squeeze()),2)
+        OBS  = Gradient(np.where(x_train_missing_[ifig,:,:,idT].squeeze()==0,\
+                 np.nan, x_train_missing[ifig,:,:,idT].squeeze()),2)
         PRED = Gradient(x_train_pred[ifig,:,:,idT].squeeze(),2)
         REC  = Gradient(rec_AE_Tr[ifig,:,:,idT].squeeze(),2)
         plot(ax,0,0,lon,lat,GT,r"$\nabla_{GT}$",\
@@ -260,5 +265,6 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
         plt.subplots_adjust(hspace=0.5,wspace=0.25)
         plt.savefig(figName)       # save the figure
         plt.close()                # close the figure
+
 
 

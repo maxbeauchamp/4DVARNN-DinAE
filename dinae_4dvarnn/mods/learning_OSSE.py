@@ -208,7 +208,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
     
                     # forward
                     # need to evaluate grad/backward during the evaluation and training phase for model_AE
-                    with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True): 
+                    with torch.set_grad_enabled(True): 
                         inputs_init    = torch.autograd.Variable(inputs_init, requires_grad=True)
                         if model.OptimType == 1:
                             outputs,grad_new,normgrad = model(inputs_init,inputs_missing,masks,None)
@@ -252,38 +252,38 @@ def learning_OSSE(dict_global_Params,genFilename,\
                             loss.backward()
                             optimizer.step()
     
-                    # statistics
-                    running_loss             += loss.item() * inputs_missing.size(0)
-                    running_loss_I           += loss_I.item() * inputs_missing.size(0)
-                    running_loss_R           += loss_R.item() * inputs_missing.size(0)
-                    running_loss_All         += loss_All.item() * inputs_missing.size(0)
-                    running_loss_AE          += loss_AE_GT.item() * inputs_missing.size(0)
-                    num_loss                 += inputs_missing.size(0)
+                        # statistics
+                        running_loss             += loss.item() * inputs_missing.size(0)
+                        running_loss_I           += loss_I.item() * inputs_missing.size(0)
+                        running_loss_R           += loss_R.item() * inputs_missing.size(0)
+                        running_loss_All         += loss_All.item() * inputs_missing.size(0)
+                        running_loss_AE          += loss_AE_GT.item() * inputs_missing.size(0)
+                        num_loss                 += inputs_missing.size(0)
     
-                epoch_loss       = running_loss / num_loss
-                epoch_loss_All   = running_loss_All / num_loss
-                epoch_loss_AE    = running_loss_AE / num_loss
-                epoch_loss_I     = running_loss_I / num_loss
-                epoch_loss_R     = running_loss_R / num_loss
+                    epoch_loss       = running_loss / num_loss
+                    epoch_loss_All   = running_loss_All / num_loss
+                    epoch_loss_AE    = running_loss_AE / num_loss
+                    epoch_loss_I     = running_loss_I / num_loss
+                    epoch_loss_R     = running_loss_R / num_loss
                         
-                if not isinstance(stdTr, list) :
-                    meanTr=[meanTr]
-                    stdTr=[stdTr]
+                    if not isinstance(stdTr, list) :
+                        meanTr=[meanTr]
+                        stdTr=[stdTr]
 
-                epoch_nloss_All = epoch_loss_All / stdTr[0]**2
-                epoch_nloss_I   = epoch_loss_I / stdTr[0]**2
-                epoch_nloss_R   = epoch_loss_R / stdTr[0]**2
-                epoch_nloss_AE  = loss_AE / stdTr[0]**2
+                    epoch_nloss_All = epoch_loss_All / stdTr[0]**2
+                    epoch_nloss_I   = epoch_loss_I / stdTr[0]**2
+                    epoch_nloss_R   = epoch_loss_R / stdTr[0]**2
+                    epoch_nloss_AE  = loss_AE / stdTr[0]**2
             
-                # deep copy the model
-                if phase == 'val' and epoch_loss < best_loss:
-                    best_loss = epoch_loss
-                    best_model_wts = copy.deepcopy(model.state_dict())
+                    # deep copy the model
+                    if phase == 'val' and epoch_loss < best_loss:
+                        best_loss = epoch_loss
+                        best_model_wts = copy.deepcopy(model.state_dict())
                 
-            time_elapsed = time.time() - since
-            print('Training complete in {:.0f}m {:.0f}s'.format(
+                time_elapsed = time.time() - since
+                print('Training complete in {:.0f}m {:.0f}s'.format(
                   time_elapsed // 60, time_elapsed % 60))
-            print('Best val loss: {:4f}'.format(best_loss))
+                print('Best val loss: {:4f}'.format(best_loss))
 
 
         # ********************************** #

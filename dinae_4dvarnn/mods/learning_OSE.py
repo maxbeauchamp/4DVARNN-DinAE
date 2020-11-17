@@ -10,6 +10,7 @@ from save_Models           import save_Models
 from Model_4DVarNN_FP      import Model_4DVarNN_FP
 from Model_4DVarNN_Grad    import Model_4DVarNN_Grad
 from Model_4DVarNN_GradFP  import Model_4DVarNN_GradFP
+from MultiSat_Loss         import MultiSat_Loss
 
 def add_covariates_to_tensor(tensor1,tensor2,N_cov):
     new_tensor = np.zeros(tensor2.shape)
@@ -78,7 +79,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
 
     print("... Training datashape    : "+str(x_train.shape))
     pre = preprocessing.LabelEncoder()
-    pre.fit(np.asarray(['','alg','h2g','j2g','j2n','j3','s3a','c2']))
+    pre.fit(np.asarray(['','alg','h2g','j2g','j2n','j3','s3a']))
+    list_Sat = torch.Tensor(pre.transform(sat_train.flatten()))
     ## define dataloaders with randomised batches (no random shuffling for validation/test data)
     training_dataset = torch.utils.data.TensorDataset(\
                             torch.Tensor(x_train_init),\
@@ -100,12 +102,15 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
               model_AE,shapeData,NBProjCurrent,NBGradCurrent,\
               flagGradModel,flagOptimMethod,N_cov=N_cov)    
     model =  model_to_MultiGPU(model)
+    ## Model for loss function
+    msloss = MultiSat_Loss(7)
     ## create an optimizer object (Adam with lr 1e-3)
     lrCurrent   = lrUpdate[0]
     lambda_LRAE = 0.5
     optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},\
                               {'params': model.model_AE.encoder.parameters(),\
-                               'lr': lambda_LRAE*lrCurrent}
+                               'lr': lambda_LRAE*lrCurrent},\
+                              {'params': msloss.parameters(), 'lr': 0.1}\
                               ], lr=lrCurrent)
 
     ## adapt loss function parameters if learning only with observations
@@ -147,7 +152,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
             model =  model_to_MultiGPU(model)
             # update optimizer
             optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
-                                    {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
+                                    {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent},\
+                                    {'params': msloss.parameters(), 'lr': 0.1}\
                                     ], lr=lrCurrent)
 
             # copy model parameters from current model
@@ -155,146 +161,150 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
             # update comptUpdate
             if comptUpdate < len(NbProjection)-1:
                 comptUpdate += 1
-        ## daloader for the training phase                
-        dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
-                                 batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)}
+        ## daloader for the training phase      
+        train_set, val_set = torch.utils.data.random_split(training_dataset,
+                                     [len(training_dataset)-int(len(training_dataset)*val_split),
+                                     int(len(training_dataset)*val_split)])
+        dataloaders = { 'train': torch.utils.data.DataLoader(train_set,\
+                                 batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True),\
+                        'val':   torch.utils.data.DataLoader(val_set,\
+                                 batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)}
 
         ## run NbEpoc training epochs
         for epoch in range(NbEpoc):
             print('Epoc %d/%d'%(epoch,NbEpoc))
             # Each epoch has only a training phasein OSE setup
-            model.train()  # Set model to training mode
-            print('..... Training step')
-            running_loss         = 0.0
-            running_loss_All     = 0.
-            running_loss_R       = 0.
-            running_loss_I       = 0.
-            running_loss_AE      = 0.
-            num_loss     = 0
-            # Iterate over data.
-            compt = 0
-            for inputs_init,inputs_missing,masks,targets_GT,sat,Time in dataloaders['train']:
-                compt = compt+1
-                inputs_init    = inputs_init.to(device)
-                inputs_missing = inputs_missing.to(device)
-                masks          = masks.to(device)
-                index = np.arange(0,masks.shape[1],N_cov+1)
-                masks_GT       = masks[:,index,:,:]
-                targets_GT     = targets_GT.to(device)
-                sat            = sat.to(device)
-                Time           = Time.to(device)
+            for phase in ['train', 'val']:
+                if phase == 'train':
+                    model.train()  # Set model to training mode
+                    print('..... Training step')
+                else:
+                    model.eval()   # Set model to evaluate mode
+                    print('..... Test step')
+                running_loss         = 0.0
+                running_loss_All     = 0.
+                running_loss_R       = 0.
+                running_loss_I       = 0.
+                running_loss_AE      = 0.
+                num_loss     = 0
+                # Iterate over data.
+                compt = 0
+                for inputs_init,inputs_missing,masks,targets_GT,sat,Time in dataloaders[phase]:
+                    compt = compt+1
+                    inputs_init    = inputs_init.to(device)
+                    inputs_missing = inputs_missing.to(device)
+                    masks          = masks.to(device)
+                    index          = np.arange(0,masks.shape[1],N_cov+1)
+                    index_OI       = np.arange(1,inputs_missing.shape[1],N_cov+1)
+                    OI             = inputs_init[:,index_OI,:,:]
+                    masks_GT       = masks
+                    targets_GT     = targets_GT.to(device)
+                    sat            = sat.to(device)
+                    Time           = Time.to(device)
 
-                # zero the parameter gradients
-                optimizer.zero_grad()
+                    # zero the parameter gradients
+                    optimizer.zero_grad()
     
-                # forward
-                # need to evaluate grad/backward during the evaluation and training phase for model_AE
-                with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True): 
-                    inputs_init    = torch.autograd.Variable(inputs_init, requires_grad=True)
-                    if model.OptimType == 1:
-                        outputs,grad_new,normgrad = model(inputs_init,inputs_missing,masks,None)
-                    elif model.OptimType == 2:
-                        outputs,hidden_new,cell_new,normgrad = model(inputs_init,inputs_missing,masks,None,None)
-                    else:
-                        outputs,normgrad = model(inputs_init,inputs_missing,masks)
-                    # compute Gradient of the outputs
-                    Grad_pred = gradient_imageTS(outputs)
-                    Grad_true = gradient_imageTS(targets_GT)
-                    loss_Grad = torch.mean((Grad_pred-Grad_true)**2)
-                    # compute losses
-                    loss_R      = torch.sum((outputs - targets_GT)**2 * masks_GT )
-                    loss_R      = torch.mul(1.0 / torch.sum(masks_GT),loss_R)
-                    loss_I      = torch.sum((outputs - targets_GT)**2 * (1. - masks_GT) )
-                    loss_I      = torch.mul(1.0 / torch.sum(1.-masks_GT),loss_I)
-                    loss_All    = torch.mean((outputs - targets_GT)**2 )
-                    if N_cov>0:
-                        outputs_wcov = add_covariates_to_tensor(outputs,inputs_missing,N_cov).to(device) 
-                        targets_GT_wcov = add_covariates_to_tensor(targets_GT,inputs_missing,N_cov).to(device)
-                    else:
-                        outputs_wcov = outputs
-                        targets_GT_wcov = targets_GT
-                    loss_AE     = torch.mean((model.model_AE(outputs_wcov) - outputs)**2 )
-                    loss_AE_GT  = torch.mean((model.model_AE(targets_GT_wcov) - targets_GT)**2 )
-                    index      = np.arange(0,inputs_missing.shape[1],N_cov+1)
-                    loss_Obs    = torch.sum( (outputs - inputs_missing[:,index,:,:])**2 * masks_GT )
-                    loss_Obs    = loss_Obs / torch.sum( masks_GT )
+                    # forward
+                    # need to evaluate grad/backward during the evaluation and training phase for model_AE
+                    with torch.set_grad_enabled(True): 
+                        inputs_init    = torch.autograd.Variable(inputs_init, requires_grad=True)
+                        if model.OptimType == 1:
+                            outputs,grad_new,normgrad = model(inputs_init,inputs_missing,masks,None)
+                        elif model.OptimType == 2:
+                            outputs,hidden_new,cell_new,normgrad = model(inputs_init,inputs_missing,masks,None,None)
+                        else:
+                            outputs,normgrad = model(inputs_init,inputs_missing,masks)
+                        # compute Gradient of the outputs
+                        Grad_pred = gradient_imageTS(outputs)
+                        Grad_true = gradient_imageTS(targets_GT)
+                        loss_Grad = torch.mean((Grad_pred-Grad_true)**2)
+                        # compute losses
+                        loss_R      = torch.sum((outputs - targets_GT)**2 * masks_GT )
+                        loss_R      = torch.mul(1.0 / torch.sum(masks_GT),loss_R)
+                        loss_OI     = torch.sum((outputs - OI)**2 * masks_GT )
+                        loss_OI     = torch.mul(1.0 / torch.sum(masks_GT),loss_OI)
+                        loss_I      = torch.sum((outputs - targets_GT)**2 * (1. - masks_GT) )
+                        loss_I      = torch.mul(1.0 / torch.sum(1.-masks_GT),loss_I)
+                        loss_All    = torch.mean((outputs - targets_GT)**2 )
+                        if N_cov>0:
+                            outputs_wcov = add_covariates_to_tensor(outputs,inputs_missing,N_cov).to(device) 
+                            targets_GT_wcov = add_covariates_to_tensor(targets_GT,inputs_missing,N_cov).to(device)
+                        else:
+                            outputs_wcov = outputs
+                            targets_GT_wcov = targets_GT
+                        loss_AE     = torch.mean((model.model_AE(outputs_wcov) - outputs)**2 )
+                        loss_AE_GT  = torch.mean((model.model_AE(targets_GT_wcov) - targets_GT)**2 )
+                        index      = np.arange(0,inputs_missing.shape[1],N_cov+1)
+                        loss_Obs    = torch.sum( (outputs - inputs_missing[:,index,:,:])**2 * masks_GT )
+                        loss_Obs    = loss_Obs / torch.sum( masks_GT )
 
-                    if flagTrWMissingData == 2:
+                        # final loss
                         loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE
                         loss        = torch.add(loss_R,torch.mul(1.0,loss_AE))
-                        loss        = loss_R
+                        loss        = loss_R + 0.01*loss_OI
                         if wregul==True:
-                            #print('loss_R={:4f}'.format(loss))
-                            #loss_alt_Grad = torch.tensor(0., requires_grad=True)
-                            loss_alt_Grad = along_track_gradient_loss(
-                                                          inputs_missing[:,index[6],:,:].cpu().detach(),
-                                                          masks_GT[:,6,:,:].cpu().detach(),
-                                                          outputs[:,6,:,:].cpu().detach(),
-                                                          Time[:,6,:,:].cpu().detach(),
-                                                          sat[:,6,:,:].cpu().detach())
-                            #print('loss_alt_Grad={:4f}'.format(loss_alt_Grad))
+                            print('loss_R={:4f}'.format(loss))
+                            loss_G   = msloss(inputs_missing[:,index[6],:,:],
+                                            masks_GT[:,6,:,:],
+                                            outputs[:,6,:,:],
+                                            Time[:,6,:,:],
+                                            sat[:,6,:,:])
+                            print('loss_G={:4f}'.format(loss_G[0]))
                             loss    = torch.add(regul[0]*loss,\
-                                                regul[1]*loss_alt_Grad)
+                                                regul[1]*loss_G)
                             # Grad regularization
                             '''loss_Grad = torch.mean(Grad_pred**2)
                             print('loss_Grad={:4f}'.format(loss_Grad))
                             loss    = torch.add(regul[0]*loss,\
                                                 regul[1]*loss_Grad)'''
-                            # Lp weight regularization
-                            '''Lp_reg = torch.tensor(0., requires_grad=True)
-                            Lp_reg = Lp_reg.to(device)
-                            for name, param in model.model_AE.encoder.named_parameters():
-                                if 'weight' in name:
-                                    Lp_reg = Lp_reg + torch.norm(param, 2)
-                            for name, param in model.model_Grad.named_parameters():
-                                if 'weight' in name:
-                                    Lp_reg = Lp_reg + torch.norm(param, 2)
-                            loss = loss + 10e-3 * Lp_reg'''
-                    else:
-                        loss        = alpha_Grad * loss_All + 0.5 * alpha_AE * ( loss_AE + loss_AE_GT )
-                        #loss        = loss_All + torch.mean(Grad_pred**2) 
+
 
                     # backward + optimize only if in training phase
-                    loss.backward()
-                    optimizer.step()
+                    if phase == 'train':
+                        loss.backward()
+                        optimizer.step()
     
-                # statistics
-                running_loss             += loss.item() * inputs_missing.size(0)
-                running_loss_I           += loss_I.item() * inputs_missing.size(0)
-                running_loss_R           += loss_R.item() * inputs_missing.size(0)
-                running_loss_All         += loss_All.item() * inputs_missing.size(0)
-                running_loss_AE          += loss_AE_GT.item() * inputs_missing.size(0)
-                num_loss                 += inputs_missing.size(0)
+                    # statistics
+                    running_loss             += loss.item() * inputs_missing.size(0)
+                    running_loss_I           += loss_I.item() * inputs_missing.size(0)
+                    running_loss_R           += loss_R.item() * inputs_missing.size(0)
+                    running_loss_All         += loss_All.item() * inputs_missing.size(0)
+                    running_loss_AE          += loss_AE_GT.item() * inputs_missing.size(0)
+                    num_loss                 += inputs_missing.size(0)
     
-            epoch_loss       = running_loss / num_loss
-            epoch_loss_All   = running_loss_All / num_loss
-            epoch_loss_AE    = running_loss_AE / num_loss
-            epoch_loss_I     = running_loss_I / num_loss
-            epoch_loss_R     = running_loss_R / num_loss
+                epoch_loss       = running_loss / num_loss
+                epoch_loss_All   = running_loss_All / num_loss
+                epoch_loss_AE    = running_loss_AE / num_loss
+                epoch_loss_I     = running_loss_I / num_loss
+                epoch_loss_R     = running_loss_R / num_loss
                         
-            if not isinstance(stdTr, list) :
-                meanTr=[meanTr]
-                stdTr=[stdTr]
+                if not isinstance(stdTr, list) :
+                    meanTr=[meanTr]
+                    stdTr=[stdTr]
 
-            epoch_nloss_All = epoch_loss_All / stdTr[0]**2
-            epoch_nloss_I   = epoch_loss_I / stdTr[0]**2
-            epoch_nloss_R   = epoch_loss_R / stdTr[0]**2
-            epoch_nloss_AE  = loss_AE / stdTr[0]**2
+                epoch_nloss_All = epoch_loss_All / stdTr[0]**2
+                epoch_nloss_I   = epoch_loss_I / stdTr[0]**2
+                epoch_nloss_R   = epoch_loss_R / stdTr[0]**2
+                epoch_nloss_AE  = loss_AE / stdTr[0]**2
             
-            # deep copy the model
-            if epoch_loss < best_loss:
-                best_loss = epoch_loss
-                best_model_wts = copy.deepcopy(model.state_dict())
+                # deep copy the model
+                if epoch_loss < best_loss:
+                    best_loss = epoch_loss
+                    best_model_wts = copy.deepcopy(model.state_dict())
                 
-            time_elapsed = time.time() - since
-            print('Training complete in {:.0f}m {:.0f}s'.format(
+                time_elapsed = time.time() - since
+                print('Training complete in {:.0f}m {:.0f}s'.format(
                   time_elapsed // 60, time_elapsed % 60))
-            print('Best val loss: {:4f}'.format(best_loss))
+                print('Best val loss: {:4f}'.format(best_loss))
 
 
         # ********************************** #
         # Prediction on training & test data #
         # ********************************** #
+
+        dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
+                                 batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True) }
 
         ## load best model weights
         model.load_state_dict(best_model_wts)
@@ -341,8 +351,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         index = np.arange(0,x_train.shape[1],N_cov+1)
         mse_train,exp_var_train,\
         mse_train_interp,exp_var_train_interp=\
-        eval_InterpPerformance(mask_train[:,index,:,:],x_train[:,index,:,:],x_train_missing[:,index,:,:],x_train_pred)
-        exp_var_AE_Tr = eval_AEPerformance(x_train[:,index,:,:],rec_AE_Tr)
+        eval_InterpPerformance(mask_train,gt_train,x_train_pred)
+        exp_var_AE_Tr = eval_AEPerformance(gt_train,rec_AE_Tr)
         
         if not isinstance(stdTr, list) :
             meanTr=[meanTr]

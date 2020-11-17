@@ -12,6 +12,7 @@ import torch
 import itertools
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 
 from BsCNN import BsCNN
 
@@ -40,16 +41,13 @@ def AD_filter_3x3(alpha,
     # Compute H diffusion tensor
     gamma = torch.sum(bXYT[:,-1]*alpha[1])
     vx    = torch.sum(bXYT[:,-1]*alpha[2])
-    print(vx)
-    print(torch.cat([vx,vy]))
-    print(torch.transpose(torch.cat([vx,vy]),0,1))
-    print('toto2')
     vy    = torch.sum(bXYT[:,-1]*alpha[3])
-    H     = gamma*torch.eye(2)+torch.mul(torch.cat([vx,vy]),torch.transpose(torch.cat([vx,vy]),0,1))
+    vxy   = torch.reshape(torch.stack([vx,vy]),(2,1))
+    H     = torch.mul(torch.eye(2).to(device),gamma)+torch.mul(vxy,torch.transpose(vxy,0,1))
     # Compute m advection vector
     m1    = torch.sum(bXYT[:,-1]*alpha[4])
     m2    = torch.sum(bXYT[:,-1]*alpha[5])
-    m     = torch.cat([m1,m2])
+    m     = torch.stack([m1,m2])
 
     # Define w_G stencil
     weights = torch.empty(3,3)       
@@ -71,11 +69,13 @@ def convolve_kernels(k1, k2):
 # returns: A tensor of shape ``(out2, in1, s1+s2-1, s1+s2-1)``
 #          so that convolving with it equals convolving with k1 and
 #          then with k2.
+    k1.unsqueeze_(0).unsqueeze_(0)
+    k2.unsqueeze_(0).unsqueeze_(0)
     padding = k2.shape[-1] - 1
     # Flip because this is actually correlation, and permute to adapt to BHCW
     k3 = torch.conv2d(k1.permute(1, 0, 2, 3), k2.flip(-1, -2),
                       padding=padding).permute(1, 0, 2, 3)
-    return k3
+    return k3[0,0,:,:]
 
 # Physics informed Conv2D Layer deriving from spatial advection-diffusion equation
 def Space_Time_ADConv2d(dict_global_Params,genFilename,shapeData,shapeBsBasis):
@@ -132,29 +132,34 @@ def Space_Time_ADConv2d(dict_global_Params,genFilename,shapeData,shapeBsBasis):
 
         def forward(self, x):
         # Necessary forward computations
-        # x has shape (#time,#x,#y)
+        # x has shape (#batch_size,#time,#x,#y)
             target = torch.empty(x.shape)
             # compute the coefficients alpha of size (N_coeff*6)
             alpha = self.model_Alpha(x)
-            # loop over space
-            for Ix,Iy in list(itertools.product(range(x.shape[2]),range(x.shape[1]))):
-            # loop over time
-                for j in range(x.shape[0]):
-                    for i in range(x.shape[0]):
-                        # compute kernel weights
-                        cpt=0. 
-                        if ( (j>i) and (i!=j) ):
-                            weights =  self.kernel_ij(alpha,i,j,s=[Ix,Iy])
-                            # define inputs (see edge effect)
-                            inputs = torch.zeros(filter.shape)
-                            ix_min = max(0,Ix-filter.shape[0])
-                            ix_max = min(self.Nx,Ix+filter.shape[0]+1)
-                            iy_min = max(0,Iy-filter.shape[1])
-                            iy_max = min(self.Ny,Iy+filter.shape[1]+1)
-                            inputs = x[i,ix_min:ix_max,iy_min:iy_max]
-                            target[j,Ix,Iy]+=torch.nn.functional.conv2d(inputs,weights,bias=None,stride=2,padding=0)
-                        cpt+=1
-                    target[j,Ix,Iy]/=cpt		  
+            # loop over batch_size
+            for ibatch in range(x.shape[0]):
+                # loop over space
+                for Ix,Iy in list(itertools.product(range(x.shape[3]),range(x.shape[2]))):
+                    # loop over time
+                    for j in range(x.shape[1]):
+                        for i in range(x.shape[1]):
+                            # compute kernel weights
+                            cpt=0. 
+                            if ( (j>i) and (i!=j) ):
+                                weights =  self.kernel_ij(alpha[ibatch],i,j,s=[Ix,Iy])
+                                #weights = weights.reshape((weights.shape[0],weights.shape[1],1))
+                                # define inputs (see edge effect)
+                                ix_range = torch.from_numpy(np.arange(Ix-int(weights.shape[0]/2),Ix+int(weights.shape[0]/2)+1)).to(device)
+                                iy_range = torch.from_numpy(np.arange(Iy-int(weights.shape[1]/2),Iy+int(weights.shape[1]/2)+1)).to(device)
+                                idx      = torch.where( (ix_range>=0) & (ix_range<self.Nx) )[0]
+                                idy      = torch.where( (iy_range>=0) & (iy_range<self.Ny) )[0]
+                                inputs = torch.zeros(weights.shape[0],weights.shape[1]).to(device)
+                                # inputs[0,0,0:(iy_max-iy_min),0:(ix_max-ix_min)] = x[ibatch,i,iy_min:iy_max,ix_min:ix_max]
+                                inputs[idx,idy] = x[ibatch,i,ix_range[idx],iy_range[idy]]
+                                target[ibatch,j,Ix,Iy]+=torch.sum(torch.mul(inputs,weights)).to(device)
+                                #target[ibatch,j,Ix,Iy]+=torch.nn.functional.conv2d(inputs,weights,bias=None,stride=2,padding=0)
+                            cpt+=1
+                        target[ibatch,j,Ix,Iy]/=cpt		  
             return target
 
     class Decoder(torch.nn.Module):

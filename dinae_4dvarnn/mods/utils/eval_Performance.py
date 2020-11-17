@@ -34,21 +34,21 @@ def eval_InterpPerformance(mask_train,x_train,x_train_missing,x_train_pred,
     return mse_train,exp_var_train,mse_test,exp_var_test,mse_train_interp,exp_var_train_interp,mse_test_interp,exp_var_test_interp
 
 # functions for the evaluation of interpolation and auto-encoding performance
-def eval_AEPerformance2(x_train,rec_AE_Tr):
+def eval_AEPerformance2(target,rec_AE):
 
-    mse_AE_Tr        = np.mean( (rec_AE_Tr - x_train)**2 )
-    var_Tr           = np.mean( (x_train-np.mean(x_train,axis=0)) ** 2 )
+    mse_AE_Tr        = np.mean( (rec_AE - target)**2 )
+    var_Tr           = np.mean( (target-np.mean(target,axis=0)) ** 2 )
     exp_var_AE_Tr    = 1. - mse_AE_Tr / var_Tr
      
     return exp_var_AE_Tr
 
-def eval_InterpPerformance2(mask_train,x_train,x_train_missing,x_train_pred):
+def eval_InterpPerformance2(mask,target,pred):
     mse_train      = np.zeros((2))
-    mse_train[0]   = np.sum( mask_train * (x_train_pred - x_train_missing)**2 ) / np.sum( mask_train )
-    mse_train[1]   = np.mean( (x_train_pred - x_train)**2 )
+    mse_train[0]   = np.sum( mask * (pred - target)**2 ) / np.sum( mask )
+    mse_train[1]   = np.mean( (pred - target)**2 )
     exp_var_train  = 1. - mse_train #/ var_Tr
 
-    mse_train_interp        = np.sum( (1.-mask_train) * (x_train_pred - x_train)**2 ) / np.sum( 1. - mask_train )
+    mse_train_interp        = np.sum( (1.-mask) * (pred - target)**2 ) / np.sum( 1. - mask )
     exp_var_train_interp    = 1. - mse_train_interp 
 
     return mse_train,exp_var_train,mse_train_interp,exp_var_train_interp

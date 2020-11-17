@@ -56,6 +56,10 @@ if __name__ == '__main__':
     size_tw             	= conf['data_options']['size_tw'] 
     Wsquare     		= conf['data_options']['Wsquare']
     Nsquare     		= conf['data_options']['Nsquare']
+    start_eval_index            = conf['data_options']['start_eval_index']
+    end_eval_index              = conf['data_options']['end_eval_index']
+    start_train_index           = conf['data_options']['start_train_index']
+    end_train_index             = conf['data_options']['end_train_index']
     DimAE       		= conf['NN_options']['DimAE']
     flagAEType  		= conf['NN_options']['flagAEType']
     flag_MultiScaleAEModel      = conf['NN_options']['flag_MultiScaleAEModel']
@@ -110,8 +114,10 @@ if __name__ == '__main__':
     'flagloadOIData','size_tw','Wsquare',\
     'Nsquare','DimAE','flagAEType','flagLoadModel',\
     'flagOptimMethod','flagGradModel','alpha','alpha4DVar','sigNoise',\
-    'stdMask','flagDataWindowing','dropout','wl2','batch_size',\
-    'NbEpoc','Niter','flag_MultiScaleAEModel',\
+    'stdMask','flagDataWindowing','dropout','wl2',\
+    'start_eval_index','end_eval_index',\
+    'start_train_index','end_train_index',\
+    'batch_size','NbEpoc','Niter','flag_MultiScaleAEModel',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   
 

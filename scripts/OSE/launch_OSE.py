@@ -54,7 +54,6 @@ if __name__ == '__main__':
     sigNoise        		= conf['data_options']['sigNoise']
     flagTrOuputWOMissingData    = conf['data_options']['flagTrOuputWOMissingData']
     stdMask              	= conf['data_options']['stdMask']
-    flagDataWindowing 		= conf['data_options']['flagDataWindowing']
     dropout           		= conf['data_options']['dropout']
     wl2               		= conf['data_options']['wl2']
     batch_size        		= conf['training_params']['batch_size']
@@ -98,14 +97,16 @@ if __name__ == '__main__':
     'flagloadOIData','size_tw','Wsquare',\
     'Nsquare','DimAE','flagAEType',\
     'flagOptimMethod','flagGradModel','alpha','alpha4DVar','regul',\
-    'sigNoise','stdMask','flagDataWindowing','dropout','wl2','batch_size',\
+    'sigNoise','stdMask','dropout','wl2','batch_size',\
     'NbEpoc','Niter','flag_MultiScaleAEModel',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   
 
     #1) *** Read the data ***
     genFilename, meanTr, stdTr,\
-    x_train, y_train, mask_train, gt_train, x_train_missing,\
+    x_train, mask_inputs_train,\
+    target_train, mask_targets_train,\
+    x_train_missing,\
     sat_train, time_train, lday_train, x_train_OI = import_Data_OSE(globParams)
 
     #2) *** Define AE architecture ***
@@ -114,5 +115,5 @@ if __name__ == '__main__':
 
     #5) *** Train ConvAE ***      
     learning_OSE(globParams,genFilename,meanTr,stdTr,\
-                  x_train,x_train_missing,mask_train,gt_train,sat_train,time_train,\
+                  x_train,x_train_missing,mask_targets_train,target_train,sat_train,time_train,\
                   x_train_OI,lday_train,model_AE,DIMCAE)

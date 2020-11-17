@@ -63,6 +63,7 @@ import cartopy.feature as cfeature
 from cartopy.io import shapereader
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 import numpy as np
+from random import sample
 from sklearn import decomposition
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -89,6 +90,7 @@ sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/m
 sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils')
 sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_nn')
 sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_solver')
+sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_loss')
 from .mods.import_Datasets_OSSE  import *
 from .mods.import_Datasets_OSE   import *
 from .mods.define_Models         import *
