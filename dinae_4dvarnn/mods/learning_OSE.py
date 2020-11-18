@@ -220,9 +220,11 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                         Grad_true = gradient_imageTS(targets_GT)
                         loss_Grad = torch.mean((Grad_pred-Grad_true)**2)
                         # compute losses
-                        loss_R      = torch.sum((outputs - targets_GT)**2 * masks_GT )
+                        #loss_R      = torch.sum((outputs - targets_GT)**2 * masks_GT )
+                        loss_R      = torch.sum( torch.abs(outputs - targets_GT) * masks_GT )
                         loss_R      = torch.mul(1.0 / torch.sum(masks_GT),loss_R)
-                        loss_OI     = torch.sum((outputs - OI)**2 * masks_GT )
+                        #loss_OI     = torch.sum((outputs - OI)**2 * masks_GT )
+                        loss_OI     = torch.sum( torch.abs(outputs - OI) * masks_GT )
                         loss_OI     = torch.mul(1.0 / torch.sum(masks_GT),loss_OI)
                         loss_I      = torch.sum((outputs - targets_GT)**2 * (1. - masks_GT) )
                         loss_I      = torch.mul(1.0 / torch.sum(1.-masks_GT),loss_I)
@@ -242,7 +244,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                         # final loss
                         loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE
                         loss        = torch.add(loss_R,torch.mul(1.0,loss_AE))
-                        loss        = loss_R + 0.01*loss_OI
+                        loss        = loss_R + 0.1*loss_OI
                         if wregul==True:
                             print('loss_R={:4f}'.format(loss))
                             loss_G   = msloss(inputs_missing[:,index[6],:,:],
