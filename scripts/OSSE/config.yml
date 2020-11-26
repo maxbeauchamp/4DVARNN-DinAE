@@ -1,8 +1,7 @@
 # path files
 path_files:
-    domain: _DOMAIN_
 #   Model file
-    fileMod: /ref/NATL60-CJM165__DOMAIN__ssh_y2013.1y.nc
+    fileMod: /ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc
 #   OI file (list of 3 files: nadir, swot, nadir+swot)
     fileOI: 
     - /oi/ssh_NATL60_4nadir.nc
@@ -10,17 +9,21 @@ path_files:
     - /oi/ssh_NATL60_swot_4nadir.nc
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
     fileObs:
-    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_5d.nc
     - /data/gridded_data_swot_wocorr/dataset_swot.nc
-    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d_swot.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_5d_swot.nc
 
 # data options
 data_options:
-    flagTrWMissingData: _WMIS_
+    domain: GULFSTREAM
+    opt: nadirswot
+    lag: 5
+    type_obs: obs
+    flagTrWMissingData: 2
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
-    include_covariates: _WCOV_  
+    include_covariates: True  
     lfile_cov:
     - /oi/ssh_NATL60_4nadir.nc
     lname_cov:

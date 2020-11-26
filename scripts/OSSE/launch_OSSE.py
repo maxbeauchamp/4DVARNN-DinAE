@@ -18,25 +18,22 @@ def ifelse(cond1,val1,val2):
 def str2bool(v):
   return v.lower() in ("yes", "true", "t", "1")
 
-# description of the parameters
-opt      = sys.argv[1]            # nadir/swot/nadirswot
-lag      = sys.argv[2]            # 0...5
-type_obs = sys.argv[3]            # mod/obs
-domain   = sys.argv[4]            # OSMOSIS/GULFSTREAM
-wMis     = int(sys.argv[5])       # 0/1/2
-wCov     = str2bool(sys.argv[6])  # False/True
-
 # main code
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    with open('_PATH_/config.yml', 'rb') as f:
-        conf = yaml.load(f.read())  
+    with open('config.yml', 'rb') as f:
+        conf = yaml.load(f.read())
+
+    opt        = conf['data_options']['opt']
+    lag        = str(conf['data_options']['lag'])
+    domain     = conf['data_options']['domain']
+    type_obs   = conf['data_options']['type_obs']
 
     # list of global parameters (comments to add)
-    fileMod             	= datapath+'DATA/'+domain+conf['path_files']['fileMod']
-    fileOI              	= [ datapath+'DATA/'+domain+x for x in conf['path_files']['fileOI'] ]
-    fileObs             	= [ datapath+'DATA/'+domain+x for x in conf['path_files']['fileObs'] ]
+    fileMod             	= datapath+'DATA/domain='+domain+conf['path_files']['fileMod']
+    fileOI              	= [ datapath+'DATA/domain='+domain+x for x in conf['path_files']['fileOI'] ]
+    fileObs             	= [ datapath+'DATA/domain='+domain+x for x in conf['path_files']['fileObs'] ]
     if opt=="nadir":
         fileObs         	= fileObs[0]
         fileOI          	= fileOI[0]
@@ -49,7 +46,7 @@ if __name__ == '__main__':
     flagTrWMissingData  	= conf['data_options']['flagTrWMissingData'] 
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
-    lfile_cov                   = [ datapath+'DATA/'+domain+x for x in conf['data_options']['lfile_cov'] ]
+    lfile_cov                   = [ datapath+'DATA/domain='+domain+x for x in conf['data_options']['lfile_cov'] ]
     lname_cov                   = conf['data_options']['lname_cov']
     lid_cov                     = conf['data_options']['lid_cov'] 
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
@@ -97,8 +94,8 @@ if __name__ == '__main__':
     suf3 = "GB"+str(flagOptimMethod)
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
     dirSAVE = ifelse(opt!='swot',\
-              '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/'+domain+'/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
-              '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/'+domain+'/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
+              scratchpath+domain+'/OSSE/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
+              scratchpath+domain+'/OSSE/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
     if not os.path.exists(dirSAVE):
         mk_dir_recursive(dirSAVE)
     else:

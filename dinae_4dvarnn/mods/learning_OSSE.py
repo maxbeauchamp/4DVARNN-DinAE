@@ -56,7 +56,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
     ## model parameters
     NbProjection   = [2,2,5,5,10,12,15]
-    NbGradIter     = [2,5,7,9,10,12,15]
+    NbGradIter     = [0,5,7,9,10,12,15]
     if flagTrWMissingData==2:
         lrUpdate       = [1e-4,1e-5,1e-6,1e-7]
     else:

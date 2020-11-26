@@ -22,7 +22,7 @@ def str2bool(v):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    with open('_PATH_/config.yml', 'rb') as f:
+    with open('config.yml', 'rb') as f:
         conf = yaml.load(f.read())  
 
     lag        = str(conf['data_options']['lag'])
@@ -31,14 +31,19 @@ if __name__ == '__main__':
     wregul     = conf['NN_options']['with_regul']
 
     # list of global parameters (comments to add)
-    fileOI              	= datapath+'NADIR/'+domain+conf['path_files']['fileOI']
-    fileObs             	= datapath+'NADIR/'+domain+conf['path_files']['fileObs']
+    fileOI              	= datapath+'DATA/OSE/'+domain+conf['path_files']['fileOI']
+    fileObs             	= datapath+'DATA/OSE/'+domain+conf['path_files']['fileObs']
+    fileMod                     = datapath+'DATA/domain='+domain+conf['path_files']['fileMod']
+    fileOI_Mod                  = datapath+'DATA/domain='+domain+conf['path_files']['fileOI_Mod']
     flagTrWMissingData  	= 2
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
-    lfile_cov                   = [ datapath+'NADIR/'+domain+x for x in conf['data_options']['lfile_cov'] ]
+    lfile_cov                   = [ datapath+'DATA/OSE/'+domain+x for x in conf['data_options']['lfile_cov'] ]
     lname_cov                   = conf['data_options']['lname_cov']
     lid_cov                     = conf['data_options']['lid_cov']
+    lfile_cov_mod               = [ datapath+'DATA/domain='+domain+x for x in conf['data_options']['lfile_cov_mod'] ]
+    lname_cov_mod               = conf['data_options']['lname_cov_mod']
+    lid_cov_mod                 = conf['data_options']['lid_cov_mod']
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
     size_tw             	= conf['data_options']['size_tw'] 
     Wsquare     		= conf['data_options']['Wsquare']
@@ -79,7 +84,7 @@ if __name__ == '__main__':
     suf3 = "GB"+str(flagOptimMethod)
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
     suf5 = ifelse(load_Model==True,"wotrain","wtrain")
-    dirSAVE = '/gpfsscratch/rech/yrf/uba22to/4DVARNN-DINAE/OSE/'+domain+'/resIA_nadir_nadlag_'+lag+"_obs/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'_'+suf5+'/'
+    dirSAVE = scratchpath+domain+'/resIA_nadir_nadlag_'+lag+"_obs/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'_'+suf5+'/'
     if wregul == True:
         dirSAVE = dirSAVE[:-1]+'_wregul/'
     if not os.path.exists(dirSAVE):
@@ -91,8 +96,11 @@ if __name__ == '__main__':
     # push all global parameters in a list
     def createGlobParams(params):
         return dict(((k, eval(k)) for k in params))
-    list_globParams=['lag','domain','load_Model','wregul','fileObs','fileOI',\
-    'include_covariates','N_cov','lfile_cov','lid_cov','lname_cov',\
+    list_globParams=['lag','domain','load_Model','wregul',
+    'fileObs','fileOI','fileMod','fileOI_Mod',\
+    'include_covariates','N_cov',
+    'lfile_cov','lid_cov','lname_cov',\
+    'lfile_cov_mod','lid_cov_mod','lname_cov_mod',\
     'flagTrOuputWOMissingData','flagTrWMissingData',\
     'flagloadOIData','size_tw','Wsquare',\
     'Nsquare','DimAE','flagAEType',\
@@ -107,7 +115,8 @@ if __name__ == '__main__':
     x_train, mask_inputs_train,\
     target_train, mask_targets_train,\
     x_train_missing,\
-    sat_train, time_train, lday_train, x_train_OI = import_Data_OSE(globParams)
+    sat_train, time_train, lday_train, x_train_OI,\
+    x_mod = import_Data_OSE(globParams)
 
     #2) *** Define AE architecture ***
     shapeData=(x_train.shape[3],x_train.shape[1],x_train.shape[2])
@@ -116,4 +125,4 @@ if __name__ == '__main__':
     #5) *** Train ConvAE ***      
     learning_OSE(globParams,genFilename,meanTr,stdTr,\
                   x_train,x_train_missing,mask_targets_train,target_train,sat_train,time_train,\
-                  x_train_OI,lday_train,model_AE,DIMCAE)
+                  x_train_OI,x_mod, lday_train,model_AE,DIMCAE)

@@ -1,23 +1,35 @@
 # path files
 path_files:
-#   OI file (list of 3 files: nadir, swot, nadir+swot)
+#   OI file 
     fileOI: "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
-#   Obs file (list of 3 files: nadir, swot, nadir+swot)
-    fileObs: "/training/dataset_nadir__LAG_d.nc"
+#   Obs file 
+    fileObs: "/training/dataset_nadir_0d.nc"
+#   Model file
+    fileMod: "/ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc"
+#   OI file 
+    fileOI_Mod: "/oi/ssh_NATL60_4nadir.nc"
+
+
 
 # data options
 data_options:
-    lag: _LAG_
-    domain: _DOMAIN_
+    lag: 0
+    domain: GULFSTREAM
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
-    include_covariates: True  
+    include_covariates: True
     lfile_cov:
     - "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
     lname_cov:
     - ssh
     lid_cov:
+    - OI
+    lfile_cov_mod:
+    - "/oi/ssh_NATL60_4nadir.nc"
+    lname_cov_mod:
+    - ssh_mod
+    lid_cov_mod:
     - OI
 #   Length of the 4th dimension 
     size_tw: 11
@@ -40,9 +52,9 @@ NN_options:
 #   multiscale model
     flag_MultiScaleAEModel: 0 
 # load model from NATL60 or not
-    load_model: _LMOD_
+    load_model: False
 # add regularization in loss function or not 
-    with_regul: _WREGUL_
+    with_regul: False
 
 
 # loss function weighting
@@ -55,7 +67,7 @@ loss_weighting:
         - 1.
     regul: !1darray
       - - 1.
-        - 0.001
+        - 0.1
 
 # solver parameters
 solver_options: 

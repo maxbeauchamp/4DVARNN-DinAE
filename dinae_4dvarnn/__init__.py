@@ -43,8 +43,9 @@ assert sys.version_info >= (3,5), "Need Python>=3.6"
 dirs = {}
 
 # Define paths
-datapath="/gpfswork/rech/yrf/uba22to/"
-basepath="/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/"
+datapath="/users/local/"
+basepath="/users/local/m19beauc/"
+scratchpath=basepath+"4DVARNN-DinAE_xp/"
 
 print("Initializing 4DVARNN-DinAE libraries...",flush=True)
 
@@ -86,11 +87,11 @@ import torch.optim as optim
 import torchvision
 from torch.optim import lr_scheduler
 import torch.nn.functional as F
-sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods')
-sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils')
-sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_nn')
-sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_solver')
-sys.path.insert(0,'/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_loss')
+sys.path.insert(0,basepath+'/4DVARNN-DinAE/dinae_4dvarnn/mods')
+sys.path.insert(0,basepath+'/4DVARNN-DinAE/dinae_4dvarnn/mods/utils')
+sys.path.insert(0,basepath+'/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_nn')
+sys.path.insert(0,basepath+'/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_solver')
+sys.path.insert(0,basepath+'/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_loss')
 from .mods.import_Datasets_OSSE  import *
 from .mods.import_Datasets_OSE   import *
 from .mods.define_Models         import *
