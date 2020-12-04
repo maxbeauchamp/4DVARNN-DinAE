@@ -9,14 +9,12 @@ path_files:
 #   OI file 
     fileOI_Mod: "/oi/ssh_NATL60_4nadir.nc"
 
-
-
 # data options
 data_options:
     lag: 0
     domain: GULFSTREAM
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
-    flagloadOIData: 1 
+    flagloadOIData: 0
 #   use additional covariates in initial layer
     include_covariates: True
     lfile_cov:
@@ -33,6 +31,8 @@ data_options:
     - OI
 #   Length of the 4th dimension 
     size_tw: 11
+#   Dowscaling parameter
+    dwscale: 2
 #   half-width of holes
     Wsquare: 4 
 #   number of holes
@@ -63,8 +63,8 @@ loss_weighting:
       - - 1.
         - 0.1
     alpha4DVar: !1darray
-      - - 0.
-        - 1.
+      - - 0.5
+        - 0.5
     regul: !1darray
       - - 1.
         - 0.1

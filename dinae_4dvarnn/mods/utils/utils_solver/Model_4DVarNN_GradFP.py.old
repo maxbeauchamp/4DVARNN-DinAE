@@ -50,10 +50,10 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
         elif OptimType == 3:
             self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,30)
 
-    def forward(self, x_inp, mask,g1=None,g2=None,normgrad=0.0):
+    def forward(self, x_inp,xobs,mask,g1=None,g2=None,normgrad=0.0):
         mask_  = torch.add(1.0,torch.mul(mask,-1.0)) #1. - mask
         with torch.enable_grad():
-            x = torch.mul(x_inp,1.0)
+            x      = torch.mul(x_inp,1.0)
 
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)
@@ -61,9 +61,11 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
         torch_index = torch.LongTensor(np.float64(index)).to(device)
         with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
             target_x     = x[:,index,:,:]
-            target_obs   = x[:,index,:,:] 
-            target_mask  = mask[:,index,:,:]
-            target_mask_ = mask_[:,index,:,:]
+            target_obs   = xobs[:,index,:,:] 
+            #target_mask  = mask[:,index,:,:]
+            #target_mask_ = mask_[:,index,:,:]
+            target_mask  = mask
+            target_mask_ = mask_
 
         # fixed-point iterations
         if self.NProjFP > 0:

@@ -45,6 +45,8 @@ def import_Data_OSE(dict_global_Params):
     inputs      = np.copy(nc_data_obs['ssh'][:,indLat,indLon])
     lags        = np.copy(nc_data_obs['lag'][:,indLat,indLon])
     targets = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon)))
+    sat          = np.copy(nc_data_obs['sat'][:,indLat,indLon])
+    time         = np.copy(nc_data_obs.variables.get('Time')[:,indLat,indLon]%86400)
     nc_data_obs.close()
 
     # upsample original datasets
@@ -62,8 +64,8 @@ def import_Data_OSE(dict_global_Params):
         # remove distribution tail (x_OI-x) 
         anomaly = x_OI-inputs
         anomaly_masked = anomaly[np.asarray(~np.isnan(anomaly))]
-        index = np.where( (anomaly<=np.quantile(anomaly_masked,.01)) | 
-              (anomaly>=np.quantile(anomaly_masked,.99)) )
+        index = np.where( (anomaly<=np.quantile(anomaly_masked,.0001)) | 
+              (anomaly>=np.quantile(anomaly_masked,.9999)) )
         inputs[index] = np.nan
     nc_data_OI.close()
 
@@ -71,11 +73,13 @@ def import_Data_OSE(dict_global_Params):
     print(".... Load NATL60 SSH dataset (training data): "+fileMod)
     nc_data_mod = Dataset(fileMod,'r')
     x_mod       = Imputing_NaN_3d(np.copy(nc_data_mod['ssh'][:,indLat,indLon]))
-    print(".... Load NATL60 OI SSH dataset (training data): "+fileOI_Mod)
-    nc_data_OI_mod    = Dataset(fileOI_Mod,'r')
-    x_OI_mod = Imputing_NaN_3d(np.copy(nc_data_OI_mod['ssh_mod'][:,indLat,indLon]))
-    nc_data_OI_mod.close()
+    if flagloadOIData == 1:
+        print(".... Load NATL60 OI SSH dataset (training data): "+fileOI_Mod)
+        nc_data_OI_mod    = Dataset(fileOI_Mod,'r')
+        x_OI_mod = Imputing_NaN_3d(np.copy(nc_data_OI_mod['ssh_mod'][:,indLat,indLon]))
+        nc_data_OI_mod.close()
     nc_data_mod.close()
+
 
     # Remove data from input
     NPATCH     = 30
@@ -125,6 +129,9 @@ def import_Data_OSE(dict_global_Params):
         x_OI      = einops.reduce(x_OI,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
         x_mod     = einops.reduce(x_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
         x_OI_mod  = einops.reduce(x_OI_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
+        import functools, operator
+        sat       = einops.reduce(time,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
+        time      = einops.reduce(time,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
         for icov in range(N_cov):
             cov[icov]     = einops.reduce(cov[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
             cov_mod[icov] = einops.reduce(cov_mod[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
@@ -141,21 +148,15 @@ def import_Data_OSE(dict_global_Params):
     mask_targets = np.copy(targets)
     mask_targets = np.asarray(~np.isnan(mask_targets))
 
-
-    # upsample original datasets
-    print(np.nanstd(inputs.flatten()-x_OI.flatten()))
-    '''index_nan = np.where(~np.isnan(inputs))
-    plt.scatter(inputs[index_nan[0],index_nan[1],index_nan[2]].flatten(),
-                x_OI[index_nan[0],index_nan[1],index_nan[2]].flatten())
-    plt.show()
-    '''
-
     ## Build time series for training (Ntime * Nchannel * Nlat * Nlon)
     inputs_train       = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     mask_inputs_train  = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
     targets_train       = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw)) 
     mask_targets_train = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
     target_mod         = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
+    sat_train          = np.empty((len(indN_Tt),len(indLat),len(indLon),size_tw),dtype=object)
+    sat_train.fill('')
+    time_train        = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     inputs_train_OI   = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     if include_covariates==True:
         cov_train      = []
@@ -178,6 +179,8 @@ def import_Data_OSE(dict_global_Params):
             inputs_train[k,:,:,idt2]     = inputs[idt,:,:]
             targets_train[k,:,:,idt2]    = targets[idt,:,:]
             target_mod[k,:,:,idt2]       = x_mod[idt,:,:]
+        sat_train[k,:,:,idt2]    = sat[idt,:,:]
+        time_train[k,:,:,idt2]   = time[idt,:,:]
 
         # import covariates
         if include_covariates==True:
@@ -240,13 +243,15 @@ def import_Data_OSE(dict_global_Params):
                                    'mask_inputs'  : (('time','nc','lat','lon'),mask_inputs_train[:,:,:,index[0]].transpose(0,3,1,2)),\
                                    'target'   : (('time','nc','lat','lon'),targets_train.transpose(0,3,1,2)),\
                                    'mask_targets' : (('time','nc','lat','lon'),mask_targets_train.transpose(0,3,1,2)),\
-                                   'NATL60'   : (('time','nc','lat','lon'),target_mod[:,:,:,index[0]].transpose(0,3,1,2))},\
+                                   'NATL60'   : (('time','nc','lat','lon'),target_mod[:,:,:,index[0]].transpose(0,3,1,2)),\
+                                   'sat'      : (('time','nc','lat','lon'),sat_train.transpose(0,3,1,2)),\
+                                   'nadir_time'     : (('time','nc','lat','lon'),time_train.transpose(0,3,1,2))},\
                         coords={'lon': indLon,\
                                 'lat': indLat,\
                                 'time': range(0,len(time_u))})
         data.to_netcdf(dirSAVE+"data_train.nc")
 
     return genFilename, meanTt, stdTt, inputs_train, mask_inputs_train, targets_train, mask_targets_train,\
-           lday_train, inputs_train_OI, target_mod
+           sat_train, time_train, lday_train, inputs_train_OI, target_mod
 
 

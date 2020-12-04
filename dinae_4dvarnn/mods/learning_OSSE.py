@@ -43,8 +43,8 @@ def model_to_MultiGPU(model):
     return model
 
 def learning_OSSE(dict_global_Params,genFilename,\
-                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_pred,meanTr,stdTr,\
-                  x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,model_AE,DIMCAE):
+                  input_train,mask_train,target_train,input_train_OI,lday_pred,meanTr,stdTr,\
+                  input_test,mask_test,target_test,input_test_OI,lday_test,model_AE,DIMCAE):
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
@@ -56,7 +56,8 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
     ## model parameters
     NbProjection   = [2,2,5,5,10,12,15]
-    NbGradIter     = [0,5,7,9,10,12,15]
+    #NbGradIter     = [2,5,7,9,10,12,15]
+    NbGradIter     = [0,0,0,0,0,0,0]
     if flagTrWMissingData==2:
         lrUpdate       = [1e-4,1e-5,1e-6,1e-7]
     else:
@@ -66,38 +67,40 @@ def learning_OSSE(dict_global_Params,genFilename,\
     iterInit       = 0
     comptUpdate    = 0  
     ## modify/check data format
-    x_train         = np.moveaxis(x_train, -1, 1)
-    x_train_missing = np.moveaxis(x_train_missing, -1, 1)
+    input_train     = np.moveaxis(input_train, -1, 1)
     mask_train      = np.moveaxis(mask_train, -1, 1)
-    gt_train        = np.moveaxis(gt_train, -1, 1)
-    x_test          = np.moveaxis(x_test, -1, 1)
+    target_train    = np.moveaxis(target_train, -1, 1)
+    input_test      = np.moveaxis(input_test, -1, 1)
     mask_test       = np.moveaxis(mask_test, -1, 1)
-    x_test_missing  = np.moveaxis(x_test_missing, -1, 1)
-    gt_test         = np.moveaxis(gt_test, -1, 1)
+    target_test     = np.moveaxis(target_test, -1, 1)
+
+    # Replace NaN value with zeros
+    input_train  = np.nan_to_num(input_train)
+    target_train = np.nan_to_num(target_train)
+    input_test   = np.nan_to_num(input_test)
+    target_test  = np.nan_to_num(target_test)
 
     # first initialize the solution
-    x_train_init    = x_train_missing
-    x_test_init     = x_test_missing
+    input_train_init    = input_train
+    input_test_init     = input_test
  
-    print("... Training datashape: "+str(x_train.shape))
-    print("... Test datashape    : "+str(x_test.shape))
+    print("... Training datashape: "+str(input_train.shape))
+    print("... Test datashape    : "+str(input_test.shape))
     ## define dataloaders with randomised batches (no random shuffling for validation/test data)
     training_dataset = torch.utils.data.TensorDataset(\
-                            torch.Tensor(x_train_init),\
-                            torch.Tensor(x_train_missing),\
+                            torch.Tensor(input_train_init),\
                             torch.Tensor(mask_train),\
-                            torch.Tensor(gt_train)) 
+                            torch.Tensor(target_train)) 
     test_dataset     = torch.utils.data.TensorDataset(\
-                            torch.Tensor(x_test_init),\
-                            torch.Tensor(x_test_missing),\
+                            torch.Tensor(input_test_init),\
                             torch.Tensor(mask_test),\
-                            torch.Tensor(gt_test))       
+                            torch.Tensor(target_test))       
     dataset_sizes = {'train': len(training_dataset), 'val': len(test_dataset)} 
     ## instantiate model for GPU implementation
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(".... Device GPU: "+str(torch.cuda.is_available()))
     ## initialize or load the model (bug for number of FP iterations = 0) 
-    shapeData       = x_train.shape[1:]  
+    shapeData       = input_train.shape[1:]  
     NBProjCurrent = NbProjection[0]
     NBGradCurrent = NbGradIter[0]
     print('..... DinAE learning (initialisation): NBProj = %d -- NGrad = %d'%(NBProjCurrent,NBGradCurrent))
@@ -188,21 +191,14 @@ def learning_OSSE(dict_global_Params,genFilename,\
                 num_loss     = 0
                 # Iterate over data.
                 compt = 0
-                for inputs_init,inputs_missing,masks,targets_GT in dataloaders[phase]:
+                for inputs_init, masks, targets in dataloaders[phase]:
                     compt = compt+1
                     inputs_init    = inputs_init.to(device)
-                    inputs_missing = inputs_missing.to(device)
                     masks          = masks.to(device)
-                    index = np.arange(0,masks.shape[1],N_cov+1)
-                    masks_GT       = masks[:,index,:,:]
-                    targets_GT     = targets_GT.to(device)
+                    index          = np.arange(0,masks.shape[1],N_cov+1)
+                    masks_inputs   = masks[:,index,:,:]
+                    targets        = targets.to(device)
 
-                    # reshaping tensors
-                    '''inputs_init    = inputs_init.view(-1,1,inputs_init.size(1),inputs_init.size(2))
-                    inputs_missing = inputs_missing.view(-1,1,inputs_init.size(2),inputs_init.size(3))
-                    masks          = masks.view(-1,1,inputs_init.size(2),inputs_init.size(3))
-                    targets_GT      = targets_GT.view(-1,1,inputs_init.size(2),inputs_init.size(3))'''
-                                                
                     # zero the parameter gradients
                     optimizer.zero_grad()
     
@@ -211,41 +207,34 @@ def learning_OSSE(dict_global_Params,genFilename,\
                     with torch.set_grad_enabled(True): 
                         inputs_init    = torch.autograd.Variable(inputs_init, requires_grad=True)
                         if model.OptimType == 1:
-                            outputs,grad_new,normgrad = model(inputs_init,inputs_missing,masks,None)
+                            outputs,grad_new,normgrad = model(inputs_init,masks,None)
                         elif model.OptimType == 2:
-                            outputs,hidden_new,cell_new,normgrad = model(inputs_init,inputs_missing,masks,None,None)
+                            outputs,hidden_new,cell_new,normgrad = model(inputs_init,masks,None,None)
                         else:
-                            outputs,normgrad = model(inputs_init,inputs_missing,masks)
-                        # compute Gradient of the outputs
-                        Grad_pred = gradient_imageTS(outputs)
-                        Grad_true = gradient_imageTS(targets_GT)
-                        loss_Grad = torch.mean((Grad_pred-Grad_true)**2)
+                            outputs,normgrad = model(inputs_init,masks)
                         # compute losses
-                        loss_R      = torch.sum((outputs - targets_GT)**2 * masks_GT )
-                        loss_R      = torch.mul(1.0 / torch.sum(masks_GT),loss_R)
-                        loss_I      = torch.sum((outputs - targets_GT)**2 * (1. - masks_GT) )
-                        loss_I      = torch.mul(1.0 / torch.sum(1.-masks_GT),loss_I)
-                        loss_All    = torch.mean((outputs - targets_GT)**2 )
+                        loss_R      = torch.sum((outputs - targets)**2 * masks_inputs )
+                        loss_R      = torch.mul(1.0 / torch.sum(masks_inputs),loss_R)
+                        loss_I      = torch.sum((outputs - targets)**2 * (1. - masks_inputs) )
+                        loss_I      = torch.mul(1.0 / torch.sum(1.-masks_inputs),loss_I)
+                        loss_All    = torch.mean((outputs - targets)**2 )
                         if N_cov>0:
-                            outputs_wcov = add_covariates_to_tensor(outputs,inputs_missing,N_cov).to(device) 
-                            targets_GT_wcov = add_covariates_to_tensor(targets_GT,inputs_missing,N_cov).to(device)
+                            outputs_wcov = add_covariates_to_tensor(outputs,inputs_init,N_cov).to(device) 
+                            targets_wcov = add_covariates_to_tensor(targets,inputs_init,N_cov).to(device)
                         else:
                             outputs_wcov = outputs
-                            targets_GT_wcov = targets_GT
+                            targets_wcov = targets
                         loss_AE     = torch.mean((model.model_AE(outputs_wcov) - outputs)**2 )
-                        loss_AE_GT  = torch.mean((model.model_AE(targets_GT_wcov) - targets_GT)**2 )
-                        index      = np.arange(0,inputs_missing.shape[1],N_cov+1)
-                        loss_Obs    = torch.sum( (outputs - inputs_missing[:,index,:,:])**2 * masks_GT )
-                        loss_Obs    = loss_Obs / torch.sum( masks_GT )
+                        loss_AE_GT  = torch.mean((model.model_AE(targets_wcov) - targets)**2 )
+                        index      = np.arange(0,inputs_init.shape[1],N_cov+1)
+                        loss_Obs    = torch.sum( (outputs - inputs_init[:,index,:,:])**2 * masks_inputs )
+                        loss_Obs    = loss_Obs / torch.sum( masks_inputs )
+                        spatial_gradients_avg = einops.reduce(sobel(outputs), 'b t lat lon -> 1', 'mean')
 
                         if flagTrWMissingData == 2:
-                            loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE
-                            loss        = torch.add(loss_R,torch.mul(1.0,loss_AE))
-                            loss        = loss_R
-                            #loss        = loss + torch.mean(Grad_pred**2)
+                            loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE + spatial_gradients_avg
                         else:
-                            #loss        = alpha_Grad * loss_All + 0.5 * alpha_AE * ( loss_AE + loss_AE_GT )
-                            loss        = loss_All + torch.mean(Grad_pred**2) 
+                            loss        = loss_All + spatial_gradients_avg
 
                         # backward + optimize only if in training phase
                         if phase == 'train':
@@ -253,12 +242,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
                             optimizer.step()
     
                         # statistics
-                        running_loss             += loss.item() * inputs_missing.size(0)
-                        running_loss_I           += loss_I.item() * inputs_missing.size(0)
-                        running_loss_R           += loss_R.item() * inputs_missing.size(0)
-                        running_loss_All         += loss_All.item() * inputs_missing.size(0)
-                        running_loss_AE          += loss_AE_GT.item() * inputs_missing.size(0)
-                        num_loss                 += inputs_missing.size(0)
+                        running_loss             += loss.item() * inputs_init.size(0)
+                        running_loss_I           += loss_I.item() * inputs_init.size(0)
+                        running_loss_R           += loss_R.item() * inputs_init.size(0)
+                        running_loss_All         += loss_All.item() * inputs_init.size(0)
+                        running_loss_AE          += loss_AE_GT.item() * inputs_init.size(0)
+                        num_loss                 += inputs_init.size(0)
     
                     epoch_loss       = running_loss / num_loss
                     epoch_loss_All   = running_loss_All / num_loss
@@ -296,13 +285,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
         ## AE performance on training and validation datasets
         # outputs for training data
         x_train_pred = []
-        for inputs_init,inputs_missing,masks,targets_GT in dataloaders['train']:
+        for inputs_init,masks,targets in dataloaders['train']:
             inputs_init    = inputs_init.to(device)
-            inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
-            targets_GT     = targets_GT.to(device)
+            targets     = targets.to(device)
             with torch.set_grad_enabled(True): 
-                outputs_ = model(inputs_init,inputs_missing,masks)[0]
+                outputs_ = model(inputs_init,masks)[0]
             if len(x_train_pred) == 0:
                 x_train_pred  = torch.mul(1.0,outputs_).cpu().detach()
             else:
@@ -310,13 +298,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
                                    torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
         # outputs for test data
         x_test_pred = []
-        for inputs_init,inputs_missing,masks,targets_GT in dataloaders['val']:
+        for inputs_init, masks,targets in dataloaders['val']:
             inputs_init    = inputs_init.to(device)
-            inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
-            targets_GT      = targets_GT.to(device)
+            targets     = targets.to(device)
             with torch.set_grad_enabled(True): 
-                outputs_ = model(inputs_init,inputs_missing,masks)[0]
+                outputs_ = model(inputs_init,masks)[0]
             if len(x_test_pred) == 0:
                 x_test_pred  = torch.mul(1.0,outputs_).cpu().detach().numpy()
             else:
@@ -326,18 +313,17 @@ def learning_OSSE(dict_global_Params,genFilename,\
         ## AE performance of the trained AE applied to gap-free data
         # ouputs for training data
         rec_AE_Tr = []
-        for inputs_init,inputs_missing,masks,targets_GT in dataloaders['train']:
+        for inputs_init,masks,targets in dataloaders['train']:
             inputs_init    = inputs_init.to(device)
-            inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
-            targets_GT      = targets_GT.to(device)
+            targets      = targets.to(device)
             if N_cov>0:
-                targets_GT_wcov = add_covariates_to_tensor(targets_GT,\
-                                inputs_missing,N_cov).to(device)
+                targets_wcov = add_covariates_to_tensor(targets,\
+                                inputs_init,N_cov).to(device)
             else:
-                targets_GT_wcov = targets_GT
+                targets_wcov = targets
             with torch.set_grad_enabled(True): 
-                outputs_ = model.model_AE(targets_GT_wcov)
+                outputs_ = model.model_AE(targets_wcov)
             print(outputs_.shape)
             if len(rec_AE_Tr) == 0:
                 rec_AE_Tr  = torch.mul(1.0,outputs_).cpu().detach()
@@ -348,31 +334,30 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
         # ouputs for test data
         rec_AE_Tt = []
-        for inputs_init,inputs_missing,masks,targets_GT in dataloaders['val']:
+        for inputs_init,masks,targets in dataloaders['val']:
             inputs_init    = inputs_init.to(device)
-            inputs_missing = inputs_missing.to(device)
             masks          = masks.to(device)
-            targets_GT      = targets_GT.to(device)
+            targets      = targets.to(device)
             if N_cov>0:
-                targets_GT_wcov = add_covariates_to_tensor(targets_GT,\
-                                inputs_missing,N_cov).to(device)
+                targets_wcov = add_covariates_to_tensor(targets,\
+                                inputs_init,N_cov).to(device)
             else:
-                targets_GT_wcov = targets_GT
+                targets_wcov = targets
             with torch.set_grad_enabled(True): 
-                outputs_ = model.model_AE(targets_GT_wcov)
+                outputs_ = model.model_AE(targets_wcov)
             if len(rec_AE_Tt) == 0:
                 rec_AE_Tt  = torch.mul(1.0,outputs_).cpu().detach().numpy()
             else:
                 rec_AE_Tt  = np.concatenate((rec_AE_Tt,torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
 
-        index = np.arange(0,x_train.shape[1],N_cov+1)
+        index = np.arange(0,input_train.shape[1],N_cov+1)
         mse_train,exp_var_train,\
         mse_test,exp_var_test,\
         mse_train_interp,exp_var_train_interp,\
         mse_test_interp,exp_var_test_interp =\
-        eval_InterpPerformance(mask_train[:,index,:,:],x_train[:,index,:,:],x_train_missing[:,index,:,:],x_train_pred,\
-                               mask_test[:,index,:,:],x_test[:,index,:,:],x_test_missing[:,index,:,:],x_test_pred)
-        exp_var_AE_Tr,exp_var_AE_Tt = eval_AEPerformance(x_train[:,index,:,:],rec_AE_Tr,x_test[:,index,:,:],rec_AE_Tt)
+        eval_InterpPerformance(mask_train[:,index,:,:],target_train,x_train_pred,\
+                               mask_test[:,index,:,:],target_test,x_test_pred)
+        exp_var_AE_Tr,exp_var_AE_Tt = eval_AEPerformance(input_train[:,index,:,:],rec_AE_Tr,input_test[:,index,:,:],rec_AE_Tt)
         
         if not isinstance(stdTr, list) :
             meanTr=[meanTr]
@@ -397,12 +382,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
         ## generate some plots
         plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
-                  gt_train,x_train_missing,mask_train,x_train_pred,rec_AE_Tr,x_train_OI,meanTr[0],stdTr[0],\
-                  gt_test,x_test_missing,mask_test,x_test_pred,rec_AE_Tt,x_test_OI,\
+                  target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],\
+                  target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,\
                   lday_pred,lday_test,iter)
 
         ## save results in a pickle file
         save_Pickle(dict_global_Params,\
-                    gt_train,x_train_missing,x_train_pred,rec_AE_Tr,x_train_OI,meanTr[0],stdTr[0],\
-                    gt_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,\
+                    target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],\
+                    target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,\
                     iter)

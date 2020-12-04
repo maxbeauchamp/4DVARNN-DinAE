@@ -9,17 +9,17 @@ path_files:
     - /oi/ssh_NATL60_swot_4nadir.nc
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
     fileObs:
-    - /data/gridded_data_swot_wocorr/dataset_nadir_5d.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_0d.nc
     - /data/gridded_data_swot_wocorr/dataset_swot.nc
-    - /data/gridded_data_swot_wocorr/dataset_nadir_5d_swot.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_0d_swot.nc
 
 # data options
 data_options:
     domain: GULFSTREAM
     opt: nadirswot
-    lag: 5
-    type_obs: obs
-    flagTrWMissingData: 2
+    lag: 0
+    type_obs: mod
+    flagTrWMissingData: 1
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
@@ -32,6 +32,8 @@ data_options:
     - OI
 #   Length of the 4th dimension 
     size_tw: 11
+#   Dowscaling parameter
+    dwscale: 2
 #   half-width of holes
     Wsquare: 4 
 #   number of holes

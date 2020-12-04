@@ -77,6 +77,8 @@ import skill_metrics as sm
 import xarray as xr
 from netCDF4 import Dataset
 from pyflann import *
+from kornia.filters import sobel
+import einops
 
 ##################################
 # Tools

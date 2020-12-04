@@ -50,7 +50,8 @@ if __name__ == '__main__':
     lname_cov                   = conf['data_options']['lname_cov']
     lid_cov                     = conf['data_options']['lid_cov'] 
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
-    size_tw             	= conf['data_options']['size_tw'] 
+    size_tw             	= conf['data_options']['size_tw']
+    dwscale                     = conf['data_options']['dwscale']
     Wsquare     		= conf['data_options']['Wsquare']
     Nsquare     		= conf['data_options']['Nsquare']
     start_eval_index            = conf['data_options']['start_eval_index']
@@ -108,7 +109,7 @@ if __name__ == '__main__':
     list_globParams=['domain','fileMod','fileObs','fileOI',\
     'include_covariates','N_cov','lfile_cov','lid_cov','lname_cov',\
     'flagTrOuputWOMissingData','flagTrWMissingData',\
-    'flagloadOIData','size_tw','Wsquare',\
+    'flagloadOIData','size_tw','dwscale','Wsquare',\
     'Nsquare','DimAE','flagAEType','flagLoadModel',\
     'flagOptimMethod','flagGradModel','alpha','alpha4DVar','sigNoise',\
     'stdMask','flagDataWindowing','dropout','wl2',\
@@ -120,14 +121,14 @@ if __name__ == '__main__':
 
     #1) *** Read the data ***
     genFilename, \
-    x_train,y_train,mask_train,gt_train,x_train_missing,x_train_OI,lday_pred,meanTr, stdTr,\
-    x_test,y_test,mask_test,gt_test,x_test_missing,x_test_OI,lday_test = import_Data_OSSE(globParams,type_obs)
+    input_train,mask_train,target_train,x_train_OI,lday_pred,meanTr, stdTr,\
+    input_test,mask_test,target_test,x_test_OI,lday_test = import_Data_OSSE(globParams,type_obs)
 
     #2) *** Define AE architecture ***
-    shapeData=(x_train.shape[3],x_train.shape[1],x_train.shape[2])
+    shapeData=(input_train.shape[3],input_train.shape[1],input_train.shape[2])
     genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,shapeData)
 
     #5) *** Train ConvAE ***      
     learning_OSSE(globParams,genFilename,\
-                  x_train,x_train_missing,mask_train,gt_train,x_train_OI,lday_pred,meanTr,stdTr,\
-                  x_test,x_test_missing,mask_test,gt_test,x_test_OI,lday_test,model_AE,DIMCAE)
+                  input_train,mask_train,target_train,x_train_OI,lday_pred,meanTr,stdTr,\
+                  input_test,mask_test,target_test,x_test_OI,lday_test,model_AE,DIMCAE)

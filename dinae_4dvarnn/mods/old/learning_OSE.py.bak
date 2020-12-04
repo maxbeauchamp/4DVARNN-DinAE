@@ -9,7 +9,7 @@ from save_Pickle           import save_Pickle2 as save_Pickle
 from save_Models           import save_Models
 from Model_4DVarNN_FP      import Model_4DVarNN_FP
 from Model_4DVarNN_Grad    import Model_4DVarNN_Grad
-from Model_4DVarNN_GradFP  import Model_4DVarNN_GradFP
+from Model_4DVarNN_GradFP_OSE  import Model_4DVarNN_GradFP
 from MultiSat_Loss         import MultiSat_Loss
 
 def add_covariates_to_tensor(tensor1,tensor2,N_cov):
@@ -47,6 +47,7 @@ def model_to_MultiGPU(model):
 def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                   x_inputs_train,mask_inputs_train,
                   x_targets_train,mask_targets_train,
+                  sat_train,time_train,
                   x_train_OI,x_mod,lday_train,model_AE,DIMCAE):
 
     # import Global Parameters
@@ -77,19 +78,27 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
     mask_inputs_train      = np.moveaxis(mask_inputs_train, -1, 1)
     x_targets_train        = np.moveaxis(x_targets_train, -1, 1)
     mask_targets_train     = np.moveaxis(mask_targets_train, -1, 1)
+    sat_train              = np.moveaxis(sat_train, -1, 1)
+    time_train             = np.moveaxis(time_train, -1, 1)
     x_mod                  = np.moveaxis(x_mod, -1, 1)
 
     # Replace NaN value with zeros
     x_inputs_train[np.isnan(x_inputs_train)]   = 0.
     x_targets_train[np.isnan(x_targets_train)] = 0.
+    time_train[np.isnan(time_train)]           = 0.
 
     print("... Training datashape    : "+str(x_inputs_train.shape))
+    pre = preprocessing.LabelEncoder()
+    pre.fit(np.asarray(['','alg','h2g','j2g','j2n','j3','s3a']))
+    list_Sat = torch.Tensor(pre.transform(sat_train.flatten()))
     ## define dataloaders with randomised batches (no random shuffling for validation/test data)
     training_dataset = torch.utils.data.TensorDataset(\
                             torch.Tensor(x_inputs_train),\
                             torch.Tensor(mask_inputs_train),\
                             torch.Tensor(x_targets_train),\
                             torch.Tensor(mask_targets_train),\
+                            torch.Tensor(pre.transform(sat_train.flatten()).reshape(sat_train.shape)),\
+                            torch.Tensor(time_train),
                             torch.Tensor(x_mod))
     dataset_sizes = {'train': len(training_dataset)} 
     ## instantiate model for GPU implementation
@@ -104,12 +113,15 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
               model_AE,shapeData,NBProjCurrent,NBGradCurrent,\
               flagGradModel,flagOptimMethod,N_cov=N_cov)    
     model =  model_to_MultiGPU(model)
+    ## Model for loss function
+    msloss = MultiSat_Loss(7)
     ## create an optimizer object (Adam with lr 1e-3)
     lrCurrent   = lrUpdate[0]
     lambda_LRAE = 0.5
     optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},\
                               {'params': model.model_AE.encoder.parameters(),\
-                               'lr': lambda_LRAE*lrCurrent}\
+                               'lr': lambda_LRAE*lrCurrent},\
+                              {'params': msloss.parameters(), 'lr': 0.1}\
                               ], lr=lrCurrent)
 
     ## adapt loss function parameters if learning only with observations
@@ -145,7 +157,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
             model =  model_to_MultiGPU(model)
             # update optimizer
             optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
-                                    {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}\
+                                    {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent},\
+                                    {'params': msloss.parameters(), 'lr': 0.1}\
                                     ], lr=lrCurrent)
 
             # copy model parameters from current model
@@ -181,7 +194,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                 num_loss     = 0
                 # Iterate over data.
                 compt = 0
-                for inputs,mask_inputs,targets,mask_targets,NATL60 in dataloaders[phase]:
+                for inputs,mask_inputs,targets,mask_targets,sat,Time,NATL60 in dataloaders[phase]:
                     compt = compt+1
                     inputs         = inputs.to(device)
                     mask_inputs    = mask_inputs.to(device)
@@ -190,6 +203,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                     index          = np.arange(0,inputs.shape[1],N_cov+1)
                     index_OI       = np.arange(1,inputs.shape[1],N_cov+1)
                     OI             = inputs[:,index_OI,:,:]
+                    sat            = sat.to(device)
+                    Time           = Time.to(device)
                     NATL60         = NATL60.to(device)
 
                     # zero the parameter gradients
@@ -206,44 +221,51 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                         else:
                             outputs,normgrad = model(inputs,mask_inputs)
 
-                        ## Losses 
-                        # on center image of the DAW
+                        ## Losses (to clean up...)
                         idT1 = int(np.floor(inputs.shape[1]/2))
                         idT2 = int(np.floor(targets.shape[1]/2))
-                        # full DAW
-                        idT1 = np.arange(0,inputs.shape[1],N_cov+1)
-                        idT2 = np.arange(0,targets.shape[1],1)
 
                         # compute losses
+                        loss_R      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
+                        loss_R      = torch.mul(1.0 / torch.sum(mask_targets[:,idT2,:,:]),loss_R)
+                        loss_I      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * (1. - mask_targets[:,idT2,:,:]) )
+                        loss_I      = torch.mul(1.0 / torch.sum(1.-mask_targets[:,idT2,:,:]),loss_I)
+                        #loss_OI    = torch.sum((outputs[:,idT2,:,:] - OI[:,idT2,:,:])**2 * masks_targets[:,idT2,:,:] )
+                        #loss_OI    = torch.mul(1.0 / torch.sum(masks_targets[:,idT2,:,:]),loss_OI)
+                        loss_All    = torch.mean((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
                         if N_cov>0:
-                            outputs_wcov = add_covariates_to_tensor(outputs,inputs,N_cov).to(device)
+                            outputs_wcov = add_covariates_to_tensor(outputs,inputs,N_cov).to(device) 
                             targets_wcov = add_covariates_to_tensor(targets,inputs,N_cov).to(device)
                             NATL60_wocov = NATL60[:,index,:,:]
                         else:
                             outputs_wcov = outputs
                             targets_wcov = targets
                             NATL60_wocov = NATL60
-                        loss_R      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
-                        loss_R      = torch.mul(1.0 / torch.sum(mask_targets[:,idT2,:,:]),loss_R)
-                        loss_I      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * (1. - mask_targets[:,idT2,:,:]) )
-                        loss_I      = torch.mul(1.0 / torch.sum(1.-mask_targets[:,idT2,:,:]),loss_I)
-                        loss_All    = torch.mean((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
                         loss_NATL60 = torch.mean((model.model_AE(NATL60)[:,idT2,:,:] - NATL60_wocov[:,idT2,:,:])**2 )
-                        #loss_OI    = torch.sum((outputs[:,idT2,:,:] - OI[:,idT2,:,:])**2 * masks_targets[:,idT2,:,:] )
-                        #loss_OI    = torch.mul(1.0 / torch.sum(masks_targets[:,idT2,:,:]),loss_OI)
+                        index       = np.arange(0,inputs.shape[1],N_cov+1)
+                        loss_Obs    = torch.sum( (outputs[:,idT2,:,:] - inputs[:,idT1,:,:])**2 * mask_inputs[:,idT1,:,:])
+                        loss_Obs    = loss_Obs / torch.sum( mask_inputs[:,idT1,:,:] )
 
-                        #spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
-                        spatial_gradients_avg = einops.reduce(sobel(outputs[:,idT2,:,:]), 'b t lat lon -> 1', 'mean')
-                        loss_Obs1    = torch.sum( (outputs[:,idT2,:,:] - inputs[:,idT1,:,:])**2 * mask_inputs[:,idT1,:,:])
-                        loss_Obs1    = loss_Obs1 / torch.sum( mask_inputs[:,idT1,:,:] )
-                        loss_Obs2    = torch.sum( (outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
-                        loss_Obs2    = loss_Obs2 / torch.sum( mask_targets[:,idT2,:,:] )
+                        spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
+                        loss_Obs    = torch.sum( (outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
+                        loss_Obs    = loss_Obs / torch.sum( mask_targets[:,idT2,:,:] )
                         loss_AE     = torch.mean((model.model_AE(outputs_wcov)[:,idT2,:,:] - outputs[:,idT2,:,:])**2 )
                         loss_AE_GT  = torch.mean((model.model_AE(targets_wcov)[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
 
                         # Loss
-                        loss        = alpha4DVar[0] * (loss_Obs1+loss_Obs2) + alpha4DVar[1] * loss_AE + spatial_gradients_avg
+                        loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE + spatial_gradients_avg
                         #loss        = loss_R #+ loss_NATL60
+
+                        if wregul==True:
+                            '''print('loss_R={:4f}'.format(loss))
+                            loss_G   = msloss(inputs[:,index[6],:,:],
+                                            mask_targets[:,6,:,:],
+                                            outputs[:,6,:,:],
+                                            Time[:,6,:,:],
+                                            sat[:,6,:,:])
+                            print('loss_G={:4f}'.format(loss_G[0]))
+                            loss    = torch.add(regul[0]*loss,\
+                                                regul[1]*loss_G)'''
 
                     # backward + optimize only if in training phase
                     if phase == 'train':
@@ -297,7 +319,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## AE performance on training and validation datasets
         # outputs for training data
         x_train_pred = []
-        for inputs,mask_inputs,targets,mask_targets,NATL60 in dataloaders['train']:
+        for inputs,mask_inputs,targets,mask_targets,sat,Time,NATL60 in dataloaders['train']:
             inputs         = inputs.to(device)
             mask_inputs    = mask_inputs.to(device)
             targets        = targets.to(device)
@@ -313,7 +335,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## AE performance of the trained AE applied to gap-free data
         # ouputs for training data
         rec_AE_Tr = []
-        for inputs,mask_inputs,targets,mask_targets,NATL60 in dataloaders['train']:
+        for inputs,mask_inputs,targets,mask_targets,sat,Time,NATL60 in dataloaders['train']:
             inputs         = inputs.to(device)
             mask_inputs    = mask_inputs.to(device)
             targets        = targets.to(device)
@@ -356,6 +378,11 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## save models
         genSuffixModel=save_Models(dict_global_Params,genFilename,alpha4DVar,\
                                    NBProjCurrent,NBGradCurrent,model_AE,model,iter)
+
+        ## resize according to dwscale
+        if dwscale!=1:
+            x_inputs_train = einops.reduce(inputs,  '(t t1) (c c1) (h h1) (w w1) -> t c h w',\
+                                    t1=1, c1=1, h1=1/dwscale, w1=1/dwscale, reduction=np.nanmean)
 
         ## generate some plots
         plot_Figs(dict_global_Params,genFilename,genSuffixModel,\

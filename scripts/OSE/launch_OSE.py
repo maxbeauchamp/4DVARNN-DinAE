@@ -46,6 +46,7 @@ if __name__ == '__main__':
     lid_cov_mod                 = conf['data_options']['lid_cov_mod']
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
     size_tw             	= conf['data_options']['size_tw'] 
+    dwscale                     = conf['data_options']['dwscale']
     Wsquare     		= conf['data_options']['Wsquare']
     Nsquare     		= conf['data_options']['Nsquare']
     DimAE       		= conf['NN_options']['DimAE']
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     'lfile_cov','lid_cov','lname_cov',\
     'lfile_cov_mod','lid_cov_mod','lname_cov_mod',\
     'flagTrOuputWOMissingData','flagTrWMissingData',\
-    'flagloadOIData','size_tw','Wsquare',\
+    'flagloadOIData','size_tw','dwscale','Wsquare',\
     'Nsquare','DimAE','flagAEType',\
     'flagOptimMethod','flagGradModel','alpha','alpha4DVar','regul',\
     'sigNoise','stdMask','dropout','wl2','batch_size',\
@@ -112,17 +113,15 @@ if __name__ == '__main__':
 
     #1) *** Read the data ***
     genFilename, meanTr, stdTr,\
-    x_train, mask_inputs_train,\
-    target_train, mask_targets_train,\
-    x_train_missing,\
-    sat_train, time_train, lday_train, x_train_OI,\
-    x_mod = import_Data_OSE(globParams)
+    x_inputs_train, mask_inputs_train,\
+    x_targets_train, mask_targets_train,\
+    lday_train, x_train_OI, x_mod = import_Data_OSE(globParams)
 
     #2) *** Define AE architecture ***
-    shapeData=(x_train.shape[3],x_train.shape[1],x_train.shape[2])
+    shapeData=(x_inputs_train.shape[3],x_inputs_train.shape[1],x_inputs_train.shape[2])
     genFilename, encoder, decoder, model_AE, DIMCAE = define_Models(globParams,genFilename,shapeData)
 
     #5) *** Train ConvAE ***      
     learning_OSE(globParams,genFilename,meanTr,stdTr,\
-                  x_train,x_train_missing,mask_targets_train,target_train,sat_train,time_train,\
-                  x_train_OI,x_mod, lday_train,model_AE,DIMCAE)
+                  x_inputs_train,mask_inputs_train,x_targets_train,mask_targets_train,
+                  x_train_OI,x_mod,lday_train,model_AE,DIMCAE)

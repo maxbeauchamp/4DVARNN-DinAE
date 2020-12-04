@@ -13,15 +13,15 @@ def eval_AEPerformance(x_train,rec_AE_Tr,x_test,rec_AE_Tt):
             
     return exp_var_AE_Tr,exp_var_AE_Tt
 
-def eval_InterpPerformance(mask_train,x_train,x_train_missing,x_train_pred,
-                           mask_test,x_test,x_test_missing,x_test_pred):
+def eval_InterpPerformance(mask_train,x_train,x_train_pred,
+                           mask_test,x_test,x_test_pred):
     mse_train      = np.zeros((2))
-    mse_train[0]   = np.sum( mask_train * (x_train_pred - x_train_missing)**2 ) / np.sum( mask_train )
+    mse_train[0]   = np.sum( mask_train * (x_train_pred - x_train)**2 ) / np.sum( mask_train )
     mse_train[1]   = np.mean( (x_train_pred - x_train)**2 )
     exp_var_train  = 1. - mse_train #/ var_Tr
             
     mse_test        = np.zeros((2))
-    mse_test[0]     = np.sum( mask_test * (x_test_pred - x_test_missing)**2 ) / np.sum( mask_test )
+    mse_test[0]     = np.sum( mask_test * (x_test_pred - x_test)**2 ) / np.sum( mask_test )
     mse_test[1]     = np.mean( (x_test_pred - x_test)**2 ) 
     exp_var_test = 1. - mse_test #/ var_Tt
 
