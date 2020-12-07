@@ -42,7 +42,8 @@ def import_Data_OSE(dict_global_Params):
     ## Load datasets
     print(".... Load SSH dataset (training data): "+fileObs)
     nc_data_obs = Dataset(fileObs,'r')  
-    inputs      = np.copy(nc_data_obs['ssh'][:,indLat,indLon])
+    #inputs      = np.copy(nc_data_obs['ssh'][:,indLat,indLon])
+    inputs      = np.copy(nc_data_obs['ssh_filtered_N5'][:,indLat,indLon])
     lags        = np.copy(nc_data_obs['lag'][:,indLat,indLon])
     targets = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon)))
     nc_data_obs.close()

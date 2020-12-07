@@ -63,8 +63,8 @@ loss_weighting:
       - - 1.
         - 0.1
     alpha4DVar: !1darray
-      - - 0.5
-        - 0.5
+      - - 1
+        - 0.1
     regul: !1darray
       - - 1.
         - 0.1

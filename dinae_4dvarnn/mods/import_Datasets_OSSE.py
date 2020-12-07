@@ -120,7 +120,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
             input_train[k,:,:,idt2]  = x_obs[idt,:,:] - x_OI[idt,:,:]
         else:
             target_train[k,:,:,idt2] = x_mod[idt,:,:]
-            input_train             = x_obs[idt,:,:]
+            input_train[k,:,:,idt2]  = x_obs[idt,:,:]
         mask_train[k,:,:,idt2] = mask[idt,:,:]
         # import covariates
         if include_covariates==True:
@@ -176,7 +176,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
             input_test[k,:,:,idt2]  = x_obs[idt,:,:] - x_OI[idt,:,:]
         else:
             target_test[k,:,:,idt2] = x_mod[idt,:,:]
-            input_test             = x_obs[idt,:,:]
+            input_test[k,:,:,idt2]  = x_obs[idt,:,:]
         mask_test[k,:,:,idt2] = mask[idt,:,:]
         # import covariates
         if include_covariates==True:

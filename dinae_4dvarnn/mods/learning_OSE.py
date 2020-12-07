@@ -64,10 +64,10 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
     lrUpdate       = [1e-3,1e-4,1e-5,1e-6]
     IterUpdate     = [0,3,10,15,20,25,30,35,40]
 
-    #NbProjection   = [2,2,2,2,5,5,10,12,15]
-    #NbGradIter     = [2,3,4,5,7,9,10,12,15]
-    #lrUpdate       = [1e-3,1e-3,1e-3,1e-3,1e-3,1e-3,1e-4,1e-5,1e-6]
-    #IterUpdate     = [0,1,2,3,10,15,20,25,30,35,40]
+    NbProjection   = [2,2,2,2,5,5,10,12,15]
+    NbGradIter     = [2,3,4,5,7,9,10,12,15]
+    lrUpdate       = [1e-3,1e-3,1e-3,1e-3,1e-3,1e-3,1e-4,1e-5,1e-6]
+    IterUpdate     = [0,1,2,3,10,15,20,25,30,35,40]
     
     val_split      = 0.1
     iterInit       = 0
