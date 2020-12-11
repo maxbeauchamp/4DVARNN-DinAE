@@ -1,0 +1,9 @@
+#!/bin/bash
+
+export PYTHONPATH=/homes/m20amar/4DVARNN-DinAE/dinae_4dvarnn:${PYTHONPATH}
+export PYTHONPATH=/homes/m20amar/4DVARNN-DinAE/dinae_4dvarnn/mods/utils:${PYTHONPATH}
+export PYTHONPATH=/homes/m20amar/4DVARNN-DinAE:${PYTHONPATH}
+export PYTHONPATH=/homes/m20amar/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_loss:${PYTHONPATH}
+export PYTHONPATH=/homes/m20amar/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_nn:${PYTHONPATH}
+export PYTHONPATH=/homes/m20amar/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_solver:${PYTHONPATH}
+

@@ -1,0 +1,92 @@
+# path files
+path_files:
+#   Model file
+    fileMod: /ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc
+#   OI file (list of 3 files: nadir, swot, nadir+swot)
+    fileOI: 
+    - /oi/ssh_NATL60_4nadir.nc
+    - /oi/ssh_NATL60_swot.nc
+    - /oi/ssh_NATL60_swot_4nadir.nc
+#   Obs file (list of 3 files: nadir, swot, nadir+swot)
+    fileObs:
+    - /data/gridded_data_swot_wocorr/dataset_nadir_5d.nc
+    - /data/gridded_data_swot_wocorr/dataset_swot.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_5d_swot.nc
+
+# data options
+data_options:
+    domain: GULFSTREAM
+    opt: nadirswot
+    lag: 5
+    type_obs: mod
+    flagTrWMissingData: 1
+#   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
+    flagloadOIData: 1 
+#   use additional covariates in initial layer
+    include_covariates: True  
+    lfile_cov:
+    - /oi/ssh_NATL60_4nadir.nc
+    lname_cov:
+    - ssh_mod
+    lid_cov:
+    - OI
+#   Length of the 4th dimension 
+    size_tw: 11
+#   Dowscaling parameter
+    dwscale: 2
+#   half-width of holes
+    Wsquare: 4 
+#   number of holes
+    Nsquare: 3  
+    sigNoise: 1e-1
+    flagTrOuputWOMissingData: 1
+    stdMask: 0.
+    flagDataWindowing: 2
+    dropout: 0.0
+    wl2: 0.0000
+#   Index evaluation dates
+    start_eval_index: 21
+    end_eval_index: 63
+#   Index trainig dates
+    start_train_index: 93
+    end_train_index: 365
+
+# NN model options
+NN_options:
+#   Dimension of the latent space
+    DimAE: 40    
+#   model type, 1: ConvAE or 2: GENN 3: PINN
+    flagAEType: 2     
+#   multiscale model
+    flag_MultiScaleAEModel: 0 
+
+# loss function weighting
+loss_weighting: 
+    alpha: !1darray
+      - - 1.
+        - 0.1
+    alpha4DVar: !1darray
+      - - 0.
+        - 1.
+
+# solver parameters
+solver_options: 
+#   Gradient computation 
+#   0: subgradient
+#   1: true gradient/autograd
+    flagGradModel: 1  
+#   Optimization method 
+#   0: fixed-step gradient descent
+#   1: ConvNet_step gradient descent
+#   2: LSTM-based descent
+    flagOptimMethod: 1     
+
+# training parameters
+training_params:
+#   load pre-defined AE model or not   
+    flagLoadModel: 0
+# batch size for a single GPU  
+    batch_size: 12
+    NbEpoc: 20
+    Niter: 10
+

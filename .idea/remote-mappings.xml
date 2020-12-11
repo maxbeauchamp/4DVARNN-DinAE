@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@85954e8f-cdf1-4ddd-99a2-fde4defa3e4e" />
+        <remote-mappings server-id="python@sftp://m20amar@10.29.208.184:22/bin/python3">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/homes/m20amar/4DVARNN-DinAE" />
+            </list>
+          </settings>
+        </remote-mappings>
+      </list>
+    </list>
+  </component>
+</project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="m20amar@10.29.208.184:22 password" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+    <serverData>
+      <paths name="m20amar@10.29.208.184:22">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/homes/m20amar/4DVARNN-DinAE" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="m20amar@10.29.208.184:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/homes/m20amar/4DVARNN-DinAE" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="m20amar@10.29.208.184:22 password (5)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/homes/m20amar/4DVARNN-DinAE" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
