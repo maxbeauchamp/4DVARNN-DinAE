@@ -1,8 +1,8 @@
 # path files
 path_files:
-    domain: _DOMAIN_
+    domain: GULFSTREAM
 #   Model file
-    fileMod: /ref/NATL60-CJM165__DOMAIN__ssh_y2013.1y.nc
+    fileMod: /ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc
 #   OI file (list of 3 files: nadir, swot, nadir+swot)
     fileOI: 
     - /oi/ssh_NATL60_4nadir.nc
@@ -10,17 +10,17 @@ path_files:
     - /oi/ssh_NATL60_swot_4nadir.nc
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
     fileObs:
-    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_5d.nc
     - /data/gridded_data_swot_wocorr/dataset_swot.nc
-    - /data/gridded_data_swot_wocorr/dataset_nadir__LAG_d_swot.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_5d_swot.nc
 
 # data options
 data_options:
-    flagTrWMissingData: _WMIS_
+    flagTrWMissingData: 1
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
-    include_covariates: _WCOV_  
+    include_covariates: 1
     lfile_cov:
     - /oi/ssh_NATL60_4nadir.nc
     lname_cov:
@@ -45,7 +45,7 @@ NN_options:
 #   Dimension of the latent space
     DimAE: 40    
 #   model type, 1: ConvAE or 2: GENN 3: PINN
-    flagAEType: 3     
+    flagAEType: 2
 #   multiscale model
     flag_MultiScaleAEModel: 0 
 
@@ -63,12 +63,13 @@ solver_options:
 #   Gradient computation 
 #   0: subgradient
 #   1: true gradient/autograd
-    flagGradModel: 1  
-#   Optimization method 
+    flagGradModel: 1
+#   Optimization method
+#  -1: no grad : Fixed point solver
 #   0: fixed-step gradient descent
 #   1: ConvNet_step gradient descent
 #   2: LSTM-based descent
-    flagOptimMethod: 1     
+    flagOptimMethod: 1
 
 # training parameters
 training_params:

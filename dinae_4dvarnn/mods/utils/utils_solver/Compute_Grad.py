@@ -9,7 +9,7 @@ Created on Fri May  1 15:38:05 2020
 import numpy as np
 import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 # Gradient computation: subgradient assuming a prior of the form ||x-f(x)||^2 vs. autograd
 

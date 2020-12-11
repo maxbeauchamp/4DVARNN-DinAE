@@ -7,7 +7,7 @@ Created on Fri May  1 15:38:05 2020
 """
 
 from dinae_4dvarnn import *
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 ## Residual Block architecture (Conv2d)
 class ResidualBlock(torch.nn.Module):

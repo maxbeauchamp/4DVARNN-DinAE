@@ -9,7 +9,7 @@ Created on Fri May  1 15:38:05 2020
 import numpy as np
 import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 # Pytorch ConvLSTM1D
 class ConvLSTM1d(torch.nn.Module):

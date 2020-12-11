@@ -9,7 +9,7 @@ Created on Fri May  1 15:38:05 2020
 import numpy as np
 import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 from model_GradUpdate0    import model_GradUpdate0
 from model_GradUpdate1    import model_GradUpdate1
@@ -62,7 +62,7 @@ class Model_4DVarNN_Grad(torch.nn.Module):
 
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)  
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
         torch_index = torch.LongTensor(np.float64(index)).to(device)
         with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
             target_x     = x[:,index,:,:]

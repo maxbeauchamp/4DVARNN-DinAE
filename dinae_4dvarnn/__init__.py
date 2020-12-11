@@ -26,7 +26,7 @@ import builtins
 import time
 from time import sleep
 import multiprocessing
-import mkl
+# import mkl
 import cv2
 from tqdm import tqdm
 from collections import OrderedDict
@@ -43,8 +43,8 @@ assert sys.version_info >= (3,5), "Need Python>=3.6"
 dirs = {}
 
 # Define paths
-datapath="/gpfswork/rech/yrf/uba22to/DATA/"
-basepath="/linkhome/rech/genimt01/ual82ir/4DVARNN-DinAE/"
+datapath="/users/local/DATA/OSSE/"
+basepath="/users/local/q20febvr/4dnvarnn/"
 
 print("Initializing 4DVARNN-DinAE libraries...",flush=True)
 
@@ -84,10 +84,10 @@ import torch.optim as optim
 import torchvision
 from torch.optim import lr_scheduler
 import torch.nn.functional as F
-sys.path.insert(0,'/linkhome/rech/genimt01/ual82ir/4DVARNN-DinAE/dinae_4dvarnn/mods')
-sys.path.insert(0,'/linkhome/rech/genimt01/ual82ir/4DVARNN-DinAE/dinae_4dvarnn/mods/utils')
-sys.path.insert(0,'/linkhome/rech/genimt01/ual82ir/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_nn')
-sys.path.insert(0,'/linkhome/rech/genimt01/ual82ir/4DVARNN-DinAE/dinae_4dvarnn/mods/utils/utils_solver')
+sys.path.insert(0,f'{basepath}/dinae_4dvarnn/mods')
+sys.path.insert(0,f'{basepath}/dinae_4dvarnn/mods/utils')
+sys.path.insert(0,f'{basepath}/dinae_4dvarnn/mods/utils/utils_nn')
+sys.path.insert(0,f'{basepath}/dinae_4dvarnn/mods/utils/utils_solver')
 from .mods.import_Datasets_OSSE  import *
 from .mods.import_Datasets_OSE   import *
 from .mods.define_Models         import *

@@ -29,7 +29,7 @@ class MyDataParallel(torch.nn.DataParallel):
             return getattr(self.module, name)
 
 def model_to_MultiGPU(model):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     if torch.cuda.is_available():
         print('... Number of GPUs: %d'%torch.cuda.device_count())
         if torch.cuda.device_count() > 1:
@@ -81,7 +81,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                             torch.Tensor(gt_train))
     dataset_sizes = {'train': len(training_dataset)} 
     ## instantiate model for GPU implementation
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
     print(".... Device GPU: "+str(torch.cuda.is_available()))
     ## initialize or load the model (bug for number of FP iterations = 0) 
     shapeData       = x_train.shape[1:]  

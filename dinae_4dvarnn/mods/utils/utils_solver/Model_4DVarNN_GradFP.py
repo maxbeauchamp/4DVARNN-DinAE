@@ -9,7 +9,7 @@ Created on Fri May  1 15:38:05 2020
 import numpy as np
 import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 from model_GradUpdate0    import model_GradUpdate0
 from model_GradUpdate1    import model_GradUpdate1
@@ -49,15 +49,23 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,self.periodicBnd)
         elif OptimType == 3:
             self.model_Grad = model_GradUpdate2(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType,30)
-
+        else:
+            self.model_Grad = model_GradUpdate0(replace_tup_at_idx(self.shape,0,int(self.shape[0]/(self.Ncov+1))),GradType)
     def forward(self, x_inp,xobs,mask,g1=None,g2=None,normgrad=0.0):
+        # self =model
+        # x_inp, xobs, mask = inputs_init, inputs_missing, masks
+        # g1 = None
+        # g2 = None
+        # normgrad = 0.0
+
+
         mask_  = torch.add(1.0,torch.mul(mask,-1.0)) #1. - mask
         with torch.enable_grad():
             x      = torch.mul(x_inp,1.0)
 
         # new index to select appropriate data if covariates are used
         index = np.arange(0,self.shape[0],self.Ncov+1)
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
         torch_index = torch.LongTensor(np.float64(index)).to(device)
         with torch.set_grad_enabled(True), torch.autograd.set_detect_anomaly(True):
             target_x     = x[:,index,:,:]
@@ -75,7 +83,7 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                 x = torch.Tensor.index_add(x,1,torch_index,target_x)
 
         if self.InterpFlag == False:
-            x_proj   = self.model_AE(x)
+            x_proj = self.model_AE(x)
             target_x = x_proj
             x = torch.Tensor.index_fill(x,1,torch_index,0)
             x = torch.Tensor.index_add(x,1,torch_index,target_x)

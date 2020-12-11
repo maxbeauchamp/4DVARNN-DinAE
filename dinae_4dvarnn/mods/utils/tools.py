@@ -1,6 +1,6 @@
 from dinae_4dvarnn import *
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:2" if torch.cuda.is_available() else "cpu")
 
 # function to create recursive paths
 def mk_dir_recursive(dir_path):
