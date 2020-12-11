@@ -22,7 +22,7 @@ def str2bool(v):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    with open('config.yml', 'rb') as f:
+    with open('_PATH_/config_zay.yml', 'rb') as f:
         conf = yaml.load(f.read())
 
     opt        = conf['data_options']['opt']
@@ -31,9 +31,9 @@ if __name__ == '__main__':
     type_obs   = conf['data_options']['type_obs']
 
     # list of global parameters (comments to add)
-    fileMod             	= datapath+'DATA/domain='+domain+conf['path_files']['fileMod']
-    fileOI              	= [ datapath+'DATA/domain='+domain+x for x in conf['path_files']['fileOI'] ]
-    fileObs             	= [ datapath+'DATA/domain='+domain+x for x in conf['path_files']['fileObs'] ]
+    fileMod             	= datapath+'DATA/'+domain+conf['path_files']['fileMod']
+    fileOI              	= [ datapath+'DATA/'+domain+x for x in conf['path_files']['fileOI'] ]
+    fileObs             	= [ datapath+'DATA/'+domain+x for x in conf['path_files']['fileObs'] ]
     if opt=="nadir":
         fileObs         	= fileObs[0]
         fileOI          	= fileOI[0]
@@ -52,25 +52,17 @@ if __name__ == '__main__':
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)
     size_tw             	= conf['data_options']['size_tw']
     dwscale                     = conf['data_options']['dwscale']
-    Wsquare     		= conf['data_options']['Wsquare']
-    Nsquare     		= conf['data_options']['Nsquare']
     start_eval_index            = conf['data_options']['start_eval_index']
     end_eval_index              = conf['data_options']['end_eval_index']
     start_train_index           = conf['data_options']['start_train_index']
     end_train_index             = conf['data_options']['end_train_index']
     DimAE       		= conf['NN_options']['DimAE']
     flagAEType  		= conf['NN_options']['flagAEType']
-    flag_MultiScaleAEModel      = conf['NN_options']['flag_MultiScaleAEModel']
     alpha                       = conf['loss_weighting']['alpha']
     alpha4DVar                  = conf['loss_weighting']['alpha4DVar']
+    solver_type                 = conf['solver_options']['solver_type']
     flagGradModel               = conf['solver_options']['flagGradModel']
     flagOptimMethod             = conf['solver_options']['flagOptimMethod']
-    sigNoise        		= conf['data_options']['sigNoise']
-    flagTrOuputWOMissingData    = conf['data_options']['flagTrOuputWOMissingData']
-    stdMask              	= conf['data_options']['stdMask']
-    flagDataWindowing 		= conf['data_options']['flagDataWindowing']
-    dropout           		= conf['data_options']['dropout']
-    wl2               		= conf['data_options']['wl2']
     flagLoadModel      		= conf['training_params']['flagLoadModel']
     batch_size        		= conf['training_params']['batch_size']
     if ( (torch.cuda.is_available()) and (torch.cuda.device_count()>1) ):
@@ -92,30 +84,30 @@ if __name__ == '__main__':
         suf2 = "wmissing"
     else:
         suf2 = "wwmissing"
-    suf3 = "GB"+str(flagOptimMethod)
+    suf3 = ifelse(solver_type=="GB","GB"+str(flagOptimMethod),"FP")
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
     dirSAVE = ifelse(opt!='swot',\
               scratchpath+domain+'/OSSE/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
               scratchpath+domain+'/OSSE/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
     if not os.path.exists(dirSAVE):
         mk_dir_recursive(dirSAVE)
-    else:
-        shutil.rmtree(dirSAVE)
-        mk_dir_recursive(dirSAVE)
+    #else:
+    #    shutil.rmtree(dirSAVE)
+    #    mk_dir_recursive(dirSAVE)
 
     # push all global parameters in a list
     def createGlobParams(params):
         return dict(((k, eval(k)) for k in params))
     list_globParams=['domain','fileMod','fileObs','fileOI',\
     'include_covariates','N_cov','lfile_cov','lid_cov','lname_cov',\
-    'flagTrOuputWOMissingData','flagTrWMissingData',\
-    'flagloadOIData','size_tw','dwscale','Wsquare',\
-    'Nsquare','DimAE','flagAEType','flagLoadModel',\
-    'flagOptimMethod','flagGradModel','alpha','alpha4DVar','sigNoise',\
-    'stdMask','flagDataWindowing','dropout','wl2',\
+    'flagTrWMissingData','flagloadOIData',\
+    'size_tw','dwscale',\
+    'DimAE','flagAEType','flagLoadModel',\
+    'solver_type','flagOptimMethod','flagGradModel',\
+    'alpha','alpha4DVar',\
     'start_eval_index','end_eval_index',\
     'start_train_index','end_train_index',\
-    'batch_size','NbEpoc','Niter','flag_MultiScaleAEModel',\
+    'batch_size','NbEpoc','Niter',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   
 

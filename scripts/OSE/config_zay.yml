@@ -3,20 +3,21 @@ path_files:
 #   OI file 
     fileOI: "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
 #   Obs file 
-    fileObs: "/training/dataset_nadir_0d.nc"
+    fileObs: "/training/dataset_nadir__LAG_d.nc"
 #   Model file
     fileMod: "/ref/NATL60-CJM165_GULFSTREAM_ssh_y2013.1y.nc"
 #   OI file 
     fileOI_Mod: "/oi/ssh_NATL60_4nadir.nc"
+#   BFN file
+    fileBFN: "/OSE_GULFSTREAM_BFN_daily.nc"
 
-# data options
 data_options:
-    lag: 0
-    domain: GULFSTREAM
+    lag: _LAG_
+    domain: _DOMAIN_
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 0
 #   use additional covariates in initial layer
-    include_covariates: True
+    include_covariates: False
     lfile_cov:
     - "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
     lname_cov:
@@ -32,16 +33,7 @@ data_options:
 #   Length of the 4th dimension 
     size_tw: 11
 #   Dowscaling parameter
-    dwscale: 2
-#   half-width of holes
-    Wsquare: 4 
-#   number of holes
-    Nsquare: 3  
-    sigNoise: 1e-1
-    flagTrOuputWOMissingData: 1
-    stdMask: 0.
-    dropout: 0.0
-    wl2: 0.0000
+    dwscale: 4
 
 # NN model options
 NN_options:
@@ -49,13 +41,8 @@ NN_options:
     DimAE: 40    
 #   model type, 1: ConvAE or 2: GENN 3: PINN
     flagAEType: 2     
-#   multiscale model
-    flag_MultiScaleAEModel: 0 
 # load model from NATL60 or not
-    load_model: False
-# add regularization in loss function or not 
-    with_regul: False
-
+    load_model: _LMOD_
 
 # loss function weighting
 loss_weighting: 
@@ -63,14 +50,13 @@ loss_weighting:
       - - 1.
         - 0.1
     alpha4DVar: !1darray
-      - - 1
-        - 0.1
-    regul: !1darray
-      - - 1.
-        - 0.1
+      - - 0.1
+        - 1.
 
 # solver parameters
-solver_options: 
+solver_options:
+#   FP or Grad
+    solver_type: _SOLVER_
 #   Gradient computation 
 #   0: subgradient
 #   1: true gradient/autograd
@@ -83,8 +69,6 @@ solver_options:
 
 # training parameters
 training_params:
-#   load pre-defined AE model or not   
-    flagLoadModel: 0
 # batch size for a single GPU  
     batch_size: 4
     NbEpoc: 20

@@ -1,6 +1,7 @@
 from dinae_4dvarnn import *
 from ConvAE import ConvAE
-from GENN import GENN
+#from GENN import GENN
+from GENN2S import GENN
 from PINN import Space_Time_ADConv2d as PINN
 
 def define_Models(dict_global_Params,genFilename,shapeData):

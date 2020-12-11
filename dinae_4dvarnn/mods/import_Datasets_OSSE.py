@@ -27,11 +27,11 @@ def import_Data_OSSE(dict_global_Params,type_obs):
         exec("globals()['"+key+"']=val")
 
     #*** Start reading the data ***#
-    #indN_Tt = np.concatenate([np.arange(60,80),np.arange(140,160),\
-    #                         np.arange(220,240),np.arange(300,320)])
-    #indN_Tr = np.delete(range(365),indN_Tt)
-    indN_Tt = np.arange(start_eval_index,end_eval_index)   # index of evaluation period
-    indN_Tr = np.arange(start_train_index,end_train_index) # index of training period
+    indN_Tt = np.concatenate([np.arange(60,80),np.arange(140,160),\
+                             np.arange(220,240),np.arange(300,320)])
+    indN_Tr = np.delete(range(365),indN_Tt)
+    #indN_Tt = np.arange(start_eval_index,end_eval_index)   # index of evaluation period
+    #indN_Tr = np.arange(start_train_index,end_train_index) # index of training period
     lday_pred=[ datetime.strftime(datetime.strptime("2012-10-01",'%Y-%m-%d')\
                           + timedelta(days=np.float64(i)),"%Y-%m-%d") for i in indN_Tr ]
     lday_test=[ datetime.strftime(datetime.strptime("2012-10-01",'%Y-%m-%d')\
@@ -79,11 +79,11 @@ def import_Data_OSSE(dict_global_Params,type_obs):
 
     ## Apply reduction parameter
     if dwscale!=1:
-        x_mod    = einops.reduce(x_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
-        x_obs    = einops.reduce(x_obs,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
-        x_OI     = einops.reduce(x_OI,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
+        x_mod    = einops.reduce(x_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
+        x_obs    = einops.reduce(x_obs,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
+        x_OI     = einops.reduce(x_OI,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
         for icov in range(N_cov):
-            cov[icov]     = einops.reduce(cov[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
+            cov[icov]     = einops.reduce(cov[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
         if domain=="OSMOSIS":
             indLat     = np.arange(0,int(200/dwscale))
             indLon     = np.arange(0,int(160/dwscale))
@@ -204,26 +204,26 @@ def import_Data_OSSE(dict_global_Params,type_obs):
     genFilename = 'modelNATL60_SSH_'+str('%03d'%input_train.shape[0])+str('_%03d'%input_train.shape[1])+str('_%03d'%input_train.shape[2])
         
     if include_covariates==False: 
-        meanTr          = np.mean( target_train )
-        stdTr           = np.sqrt( np.mean( target_train**2 ) )
+        meanTr          = np.nanmean( target_train )
+        stdTr           = np.sqrt( np.nanmean( target_train**2 ) )
         input_train     = (input_train - meanTr)/stdTr
         target_train    = (target_train - meanTr)/stdTr
         input_test      = (input_test - meanTr)/stdTr
         target_test     = (target_test - meanTr)/stdTr
     else:
         index = np.asarray([np.arange(i,(N_cov+1)*size_tw,(N_cov+1)) for i in range(N_cov+1)])
-        meanTr          = [np.mean(input_train[:,:,:,index[i,:]]) for i in range(N_cov+1)]
-        stdTr           = [np.sqrt(np.var(input_train[:,:,:,index[i,:]])) for i in range(N_cov+1)]
-        meanTr[0]       = np.mean( target_train )
-        stdTr[0]        = np.sqrt( np.mean( target_train**2 ) )
+        meanTr          = [np.nanmean(input_train[:,:,:,index[i,:]]) for i in range(N_cov+1)]
+        stdTr           = [np.sqrt(np.nanvar(input_train[:,:,:,index[i,:]])) for i in range(N_cov+1)]
+        meanTr[0]       = np.nanmean( target_train )
+        stdTr[0]        = np.sqrt( np.nanmean( target_train**2 ) )
         for i in range(N_cov+1):
             input_train[:,:,:,index[i]]  = (input_train[:,:,:,index[i]] - meanTr[i])/stdTr[i]
             input_test[:,:,:,index[i]]   = (input_test[:,:,:,index[i]] - meanTr[i])/stdTr[i]
         target_train = (target_train - meanTr[0])/stdTr[0]
         target_test  = (target_test  - meanTr[0])/stdTr[0]
 
-    print("... (after normalization) mean Tr = %f"%(np.mean(target_train)))
-    print("... (after normalization) mean Tt = %f"%(np.mean(target_test)))
+    print("... (after normalization) mean Tr = %f"%(np.nanmean(target_train)))
+    print("... (after normalization) mean Tt = %f"%(np.nanmean(target_test)))
       
     return genFilename,\
            input_train,mask_train,target_train,x_train_OI,lday_pred,meanTr,stdTr,\

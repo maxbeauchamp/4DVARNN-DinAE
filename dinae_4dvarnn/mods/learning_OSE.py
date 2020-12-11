@@ -47,7 +47,7 @@ def model_to_MultiGPU(model):
 def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                   x_inputs_train,mask_inputs_train,
                   x_targets_train,mask_targets_train,
-                  x_train_OI,x_mod,lday_train,model_AE,DIMCAE):
+                  x_train_OI,x_mod,mask_mod,x_BFN,lday_train,model_AE,DIMCAE):
 
     # import Global Parameters
     for key,val in dict_global_Params.items():
@@ -58,17 +58,16 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
     # ***************** #
 
     ## model parameters
-    NbProjection   = [2,2,5,5,10,12,15]
-    NbGradIter     = [2,5,7,9,10,12,15]
-    NbGradIter     = [0,0,0,0,0,0,0]
-    lrUpdate       = [1e-3,1e-4,1e-5,1e-6]
-    IterUpdate     = [0,3,10,15,20,25,30,35,40]
-
-    NbProjection   = [2,2,2,2,5,5,10,12,15]
-    NbGradIter     = [2,3,4,5,7,9,10,12,15]
-    lrUpdate       = [1e-3,1e-3,1e-3,1e-3,1e-3,1e-3,1e-4,1e-5,1e-6]
-    IterUpdate     = [0,1,2,3,10,15,20,25,30,35,40]
-    
+    if solver_type=='FP':
+        NbProjection   = [2,4,5,6,7,9,10]
+        NbGradIter     = [0,0,0,0,0,0,0]
+    else:
+        NbProjection   = [0,0,0,0,0,0,0]
+        #NbProjection  = [2,3,4,5,7,9,10]
+        NbGradIter     = [2,3,4,5,7,9,10]
+        #NbGradIter    = [0,0,0,0,0,0,0]
+    lrUpdate       = [1e-3,1e-4,1e-4,1e-5,1e-5,1e-6,1e-6]
+    IterUpdate     = [0,2,3,4,6,8,10]
     val_split      = 0.1
     iterInit       = 0
     comptUpdate    = 0  
@@ -78,10 +77,13 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
     x_targets_train        = np.moveaxis(x_targets_train, -1, 1)
     mask_targets_train     = np.moveaxis(mask_targets_train, -1, 1)
     x_mod                  = np.moveaxis(x_mod, -1, 1)
+    mask_mod               = np.moveaxis(mask_mod, -1, 1)
+    x_BFN                  = np.moveaxis(x_BFN, -1, 1)
 
     # Replace NaN value with zeros
     x_inputs_train[np.isnan(x_inputs_train)]   = 0.
     x_targets_train[np.isnan(x_targets_train)] = 0.
+    x_mod[np.isnan(x_mod)]                     = 0.
 
     print("... Training datashape    : "+str(x_inputs_train.shape))
     ## define dataloaders with randomised batches (no random shuffling for validation/test data)
@@ -90,7 +92,9 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                             torch.Tensor(mask_inputs_train),\
                             torch.Tensor(x_targets_train),\
                             torch.Tensor(mask_targets_train),\
-                            torch.Tensor(x_mod))
+                            torch.Tensor(x_mod),
+                            torch.Tensor(mask_mod),
+                            torch.Tensor(x_BFN))
     dataset_sizes = {'train': len(training_dataset)} 
     ## instantiate model for GPU implementation
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -181,7 +185,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                 num_loss     = 0
                 # Iterate over data.
                 compt = 0
-                for inputs,mask_inputs,targets,mask_targets,NATL60 in dataloaders[phase]:
+                for inputs,mask_inputs,targets,mask_targets,NATL60,mask_NATL60,BFN in dataloaders[phase]:
                     compt = compt+1
                     inputs         = inputs.to(device)
                     mask_inputs    = mask_inputs.to(device)
@@ -191,6 +195,8 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                     index_OI       = np.arange(1,inputs.shape[1],N_cov+1)
                     OI             = inputs[:,index_OI,:,:]
                     NATL60         = NATL60.to(device)
+                    mask_NATL60    = mask_NATL60.to(device)
+                    BFN            = BFN.to(device)
 
                     # zero the parameter gradients
                     optimizer.zero_grad()
@@ -218,17 +224,16 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                         if N_cov>0:
                             outputs_wcov = add_covariates_to_tensor(outputs,inputs,N_cov).to(device)
                             targets_wcov = add_covariates_to_tensor(targets,inputs,N_cov).to(device)
-                            NATL60_wocov = NATL60[:,index,:,:]
+                            BFN_wcov     = add_covariates_to_tensor(BFN,inputs,N_cov).to(device)
                         else:
                             outputs_wcov = outputs
                             targets_wcov = targets
-                            NATL60_wocov = NATL60
+                            BFN_wcov     = BFN
                         loss_R      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
                         loss_R      = torch.mul(1.0 / torch.sum(mask_targets[:,idT2,:,:]),loss_R)
                         loss_I      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * (1. - mask_targets[:,idT2,:,:]) )
                         loss_I      = torch.mul(1.0 / torch.sum(1.-mask_targets[:,idT2,:,:]),loss_I)
                         loss_All    = torch.mean((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
-                        loss_NATL60 = torch.mean((model.model_AE(NATL60)[:,idT2,:,:] - NATL60_wocov[:,idT2,:,:])**2 )
                         #loss_OI    = torch.sum((outputs[:,idT2,:,:] - OI[:,idT2,:,:])**2 * masks_targets[:,idT2,:,:] )
                         #loss_OI    = torch.mul(1.0 / torch.sum(masks_targets[:,idT2,:,:]),loss_OI)
 
@@ -238,12 +243,32 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
                         loss_Obs1    = loss_Obs1 / torch.sum( mask_inputs[:,idT1,:,:] )
                         loss_Obs2    = torch.sum( (outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
                         loss_Obs2    = loss_Obs2 / torch.sum( mask_targets[:,idT2,:,:] )
-                        loss_AE     = torch.mean((model.model_AE(outputs_wcov)[:,idT2,:,:] - outputs[:,idT2,:,:])**2 )
-                        loss_AE_GT  = torch.mean((model.model_AE(targets_wcov)[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
+                        loss_NATL60  = torch.sum( (model.model_AE(NATL60)[:,idT2,:,:] - NATL60[:,idT1,:,:])**2 * mask_NATL60[:,idT1,:,:] )
+                        loss_NATL60  = loss_NATL60 / torch.sum( mask_NATL60[:,idT1,:,:] )
+                        loss_AE      = torch.mean((model.model_AE(outputs_wcov)[:,idT2,:,:] - outputs[:,idT2,:,:])**2 )
+                        loss_AE_GT   = torch.mean((model.model_AE(targets_wcov)[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
 
                         # Loss
-                        loss        = alpha4DVar[0] * (loss_Obs1+loss_Obs2) + alpha4DVar[1] * loss_AE + spatial_gradients_avg
-                        #loss        = loss_R #+ loss_NATL60
+                        #loss        = alpha4DVar[0] * (loss_Obs1+loss_Obs2) + alpha4DVar[1] * loss_AE + spatial_gradients_avg
+                        loss        = alpha4DVar[0] * loss_Obs2 + alpha4DVar[1] * loss_AE + spatial_gradients_avg
+                        loss        = loss + loss_NATL60
+
+                        # loss BFN
+                        spatial_gradients_avg_BFN = einops.reduce(sobel(BFN[:,idT2,:,:]), 'b t lat lon -> 1', 'mean')
+                        loss_Obs1_BFN    = torch.sum( (BFN[:,idT2,:,:] - inputs[:,idT1,:,:])**2 * mask_inputs[:,idT1,:,:])
+                        loss_Obs1_BFN    = loss_Obs1_BFN / torch.sum( mask_inputs[:,idT1,:,:] )
+                        loss_Obs2_BFN    = torch.sum( (BFN[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
+                        loss_Obs2_BFN    = loss_Obs2_BFN / torch.sum( mask_targets[:,idT2,:,:] )
+                        #loss_Obs2_OI    = torch.sum( (OI[:,idT2,:,:] - targets[:,idT2,:,:])**2 * mask_targets[:,idT2,:,:])
+                        #loss_Obs2_OI    = loss_Obs2_OI / torch.sum( mask_targets[:,idT2,:,:] )
+                        loss_AE_BFN     = torch.mean((model.model_AE(BFN_wcov)[:,idT2,:,:] - BFN[:,idT2,:,:])**2 )
+
+                        # Compare BFN and GB-GENN Losses
+                        loss_BFN       = alpha4DVar[0] * loss_Obs2_BFN #+ alpha4DVar[1] * loss_AE_BFN + spatial_gradients_avg_BFN
+                        #loss_OI       = alpha4DVar[0] * loss_Obs2_OI
+                        loss_GB_GENN   = alpha4DVar[0] * loss_Obs2 #+ alpha4DVar[1] * loss_AE + spatial_gradients_avg
+                        #print('Loss BFN: {:4f}, Loss_GB-GENN: {:4f}'.format(loss_BFN.item(), loss_GB_GENN.item()))
+                        #print('Loss OI: {:4f}, Loss_GB-GENN: {:4f}'.format(loss_OI.item(), loss_GB_GENN.item()))
 
                     # backward + optimize only if in training phase
                     if phase == 'train':
@@ -297,7 +322,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## AE performance on training and validation datasets
         # outputs for training data
         x_train_pred = []
-        for inputs,mask_inputs,targets,mask_targets,NATL60 in dataloaders['train']:
+        for inputs,mask_inputs,targets,mask_targets,NATL60,mask_NATL60,BFN in dataloaders['train']:
             inputs         = inputs.to(device)
             mask_inputs    = mask_inputs.to(device)
             targets        = targets.to(device)
@@ -313,7 +338,7 @@ def learning_OSE(dict_global_Params,genFilename,meanTr,stdTr,\
         ## AE performance of the trained AE applied to gap-free data
         # ouputs for training data
         rec_AE_Tr = []
-        for inputs,mask_inputs,targets,mask_targets,NATL60 in dataloaders['train']:
+        for inputs,mask_inputs,targets,mask_targets,NATL60,mask_NATL60,BFN in dataloaders['train']:
             inputs         = inputs.to(device)
             mask_inputs    = mask_inputs.to(device)
             targets        = targets.to(device)

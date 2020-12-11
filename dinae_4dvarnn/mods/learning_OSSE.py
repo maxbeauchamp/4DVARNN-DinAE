@@ -55,16 +55,20 @@ def learning_OSSE(dict_global_Params,genFilename,\
     # ***************** #
 
     ## model parameters
-    NbProjection   = [2,2,5,5,10,12,15]
-    #NbGradIter     = [2,5,7,9,10,12,15]
-    NbGradIter     = [0,0,0,0,0,0,0]
-    if flagTrWMissingData==2:
-        lrUpdate       = [1e-4,1e-5,1e-6,1e-7]
+    if solver_type=='FP':
+        NbProjection   = [2,4,5,6,7,9,10]
+        NbGradIter     = [0,0,0,0,0,0,0]
     else:
-        lrUpdate       = [1e-3,1e-4,1e-5,1e-6]
-    IterUpdate     = [0,3,10,15,20,25,30,35,40]
+        NbProjection   = [0,0,0,0,0,0,0]
+        #NbProjection  = [2,3,4,5,7,9,10]
+        NbGradIter     = [2,3,4,5,7,9,10]
+        #NbGradIter    = [0,0,0,0,0,0,0]
+    if flagTrWMissingData==2:
+        lrUpdate       = [1e-4,1e-4,1e-5,1e-5,1e-6,1e-6,1e-7]
+    else:
+        lrUpdate       = [1e-3,1e-4,1e-4,1e-5,1e-5,1e-6,1e-6]
+    IterUpdate     = [0,2,3,4,6,8,10]
     val_split      = 0.1
-    iterInit       = 0
     comptUpdate    = 0  
     ## modify/check data format
     input_train     = np.moveaxis(input_train, -1, 1)
@@ -143,7 +147,11 @@ def learning_OSSE(dict_global_Params,genFilename,\
         
     print("..... Start learning AE model %d FP/Grad %d"%(flagAEType,flagOptimMethod))
     best_loss      = 1e10
-    for iter in range(iterInit,Niter):
+    iter = 0
+    while iter<Niter:
+        print('######################')
+        print('ITERATION %d, LR %e'%(iter,lrCurrent))
+        print('######################')
         ## update number of FP projections, number of GB iterations, learning rate and the corresponding model
         if iter == IterUpdate[comptUpdate]:
             NBProjCurrent = NbProjection[comptUpdate]
@@ -173,6 +181,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
                                  batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True), }
 
         ## run NbEpoc training epochs
+        best_loss_epoch      = 1e10
         for epoch in range(NbEpoc):
             print('Epoc %d/%d'%(epoch,NbEpoc))
             # Each epoch has a training and validation phase
@@ -212,23 +221,32 @@ def learning_OSSE(dict_global_Params,genFilename,\
                             outputs,hidden_new,cell_new,normgrad = model(inputs_init,masks,None,None)
                         else:
                             outputs,normgrad = model(inputs_init,masks)
+
+                        ## Losses
+                        # full DAW
+                        idT1 = np.arange(0,inputs_init.shape[1],N_cov+1)
+                        idT2 = np.arange(0,targets.shape[1],1)
+                        # on center image of the DAW
+                        idT1 = int(np.floor(inputs_init.shape[1]/2))
+                        idT2 = int(np.floor(targets.shape[1]/2))
+
                         # compute losses
-                        loss_R      = torch.sum((outputs - targets)**2 * masks_inputs )
-                        loss_R      = torch.mul(1.0 / torch.sum(masks_inputs),loss_R)
-                        loss_I      = torch.sum((outputs - targets)**2 * (1. - masks_inputs) )
-                        loss_I      = torch.mul(1.0 / torch.sum(1.-masks_inputs),loss_I)
-                        loss_All    = torch.mean((outputs - targets)**2 )
+                        loss_R      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 *masks_inputs [:,idT2,:,:])
+                        loss_R      = torch.mul(1.0 / torch.sum(masks_inputs[:,idT2,:,:]),loss_R)
+                        loss_I      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 * (1. - masks_inputs[:,idT2,:,:]) )
+                        loss_I      = torch.mul(1.0 / torch.sum(1.-masks_inputs[:,idT2,:,:]),loss_I)
+                        loss_All    = torch.mean((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
                         if N_cov>0:
                             outputs_wcov = add_covariates_to_tensor(outputs,inputs_init,N_cov).to(device) 
                             targets_wcov = add_covariates_to_tensor(targets,inputs_init,N_cov).to(device)
                         else:
                             outputs_wcov = outputs
                             targets_wcov = targets
-                        loss_AE     = torch.mean((model.model_AE(outputs_wcov) - outputs)**2 )
-                        loss_AE_GT  = torch.mean((model.model_AE(targets_wcov) - targets)**2 )
+                        loss_AE     = torch.mean((model.model_AE(outputs_wcov)[:,idT2,:,:] - outputs[:,idT2,:,:])**2 )
+                        loss_AE_GT  = torch.mean((model.model_AE(targets_wcov)[:,idT2,:,:] - targets[:,idT2,:,:])**2 )
                         index      = np.arange(0,inputs_init.shape[1],N_cov+1)
-                        loss_Obs    = torch.sum( (outputs - inputs_init[:,index,:,:])**2 * masks_inputs )
-                        loss_Obs    = loss_Obs / torch.sum( masks_inputs )
+                        loss_Obs    = torch.sum( (outputs[:,idT2,:,:] - inputs_init[:,idT1,:,:])**2 * masks_inputs[:,idT2,:,:] )
+                        loss_Obs    = loss_Obs / torch.sum( masks_inputs[:,idT2,:,:] )
                         spatial_gradients_avg = einops.reduce(sobel(outputs), 'b t lat lon -> 1', 'mean')
 
                         if flagTrWMissingData == 2:
@@ -268,12 +286,16 @@ def learning_OSSE(dict_global_Params,genFilename,\
                     if phase == 'val' and epoch_loss < best_loss:
                         best_loss = epoch_loss
                         best_model_wts = copy.deepcopy(model.state_dict())
+
+                    # deep copy the model
+                    if phase == 'val' and epoch_loss < best_loss_epoch:
+                        best_loss_epoch = epoch_loss
                 
                 time_elapsed = time.time() - since
                 print('Training complete in {:.0f}m {:.0f}s'.format(
                   time_elapsed // 60, time_elapsed % 60))
                 print('Best val loss: {:4f}'.format(best_loss))
-
+                print('Best val loss epoch: {:4f}'.format(best_loss_epoch))
 
         # ********************************** #
         # Prediction on training & test data #
@@ -391,3 +413,17 @@ def learning_OSSE(dict_global_Params,genFilename,\
                     target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],\
                     target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,\
                     iter)
+
+        '''# if nothing happened during this iteration
+        if best_loss_epoch > best_loss:
+            # copy model parameters from best model
+            model.load_state_dict(best_model_wts)
+            # update comptUpdate
+            comptUpdate -= 1
+            lrCurrent   /=10
+            iter        -=1
+            lrUpdate    = [lr/10. for lr in lrUpdate]
+        else:
+            iter        +=1'''
+        iter+=1
+

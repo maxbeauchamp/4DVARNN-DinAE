@@ -43,6 +43,7 @@ class Compute_Grad(torch.nn.Module):
           loss1 = torch.mean( (xpred - x)**2 )
           loss2 = torch.sum( (xobs - x)**2 * mask )  / torch.sum( mask )
           loss  = self.alphaAE**2 * loss1 + self.alphaObs**2 * loss2
+          #loss  = 0.2*loss1 + 100*loss2
           grad = torch.autograd.grad(loss,x,create_graph=True)[0]
         ## true gradient using autograd for prior||x-g(x)||^2 + |x-g(x)|
         elif self.GradType == 2: 

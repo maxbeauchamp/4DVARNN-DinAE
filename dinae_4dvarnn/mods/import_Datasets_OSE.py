@@ -42,8 +42,8 @@ def import_Data_OSE(dict_global_Params):
     ## Load datasets
     print(".... Load SSH dataset (training data): "+fileObs)
     nc_data_obs = Dataset(fileObs,'r')  
-    #inputs      = np.copy(nc_data_obs['ssh'][:,indLat,indLon])
-    inputs      = np.copy(nc_data_obs['ssh_filtered_N5'][:,indLat,indLon])
+    inputs      = np.copy(nc_data_obs['ssh'][:,indLat,indLon])
+    #inputs      = np.copy(nc_data_obs['ssh_filtered_N5'][:,indLat,indLon])
     lags        = np.copy(nc_data_obs['lag'][:,indLat,indLon])
     targets = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon)))
     nc_data_obs.close()
@@ -67,6 +67,11 @@ def import_Data_OSE(dict_global_Params):
               (anomaly>=np.quantile(anomaly_masked,.99)) )
         inputs[index] = np.nan
     nc_data_OI.close()
+
+    # load BFN data
+    nc_data_BFN   = Dataset(fileBFN,'r')
+    x_BFN = Imputing_NaN_3d(np.copy(nc_data_BFN['SSH'][:,:,:]))
+    nc_data_BFN.close()
 
     # load NATL60 data
     print(".... Load NATL60 SSH dataset (training data): "+fileMod)
@@ -103,6 +108,9 @@ def import_Data_OSE(dict_global_Params):
     index = np.where( (~np.isnan(targets)) & (np.abs(lags)>0.5) )
     targets[index] = np.nan
 
+    # test with BFN as targets
+    # targets = x_BFN
+
     ## Load covariates
     if include_covariates==True:
         cov=[]
@@ -118,14 +126,14 @@ def import_Data_OSE(dict_global_Params):
             cov_mod.append(Imputing_NaN_3d(np.copy(nc_data_cov_mod[lname_cov_mod[icov]][:,indLat,indLon])))
             nc_data_cov_mod.close()
 
-
     ## Apply reduction parameter
     if dwscale!=1:
         inputs    = einops.reduce(inputs,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
-        targets   = einops.reduce(targets,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
+        targets   = einops.reduce(targets,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=int(dwscale/1), w1=int(dwscale/1), reduction=np.nanmean)
         x_OI      = einops.reduce(x_OI,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
         x_mod     = einops.reduce(x_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
         x_OI_mod  = einops.reduce(x_OI_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
+        x_BFN     = einops.reduce(x_BFN,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=int(dwscale/2), w1=int(dwscale/2), reduction=np.nanmean)
         for icov in range(N_cov):
             cov[icov]     = einops.reduce(cov[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
             cov_mod[icov] = einops.reduce(cov_mod[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmean)
@@ -142,7 +150,6 @@ def import_Data_OSE(dict_global_Params):
     mask_targets = np.copy(targets)
     mask_targets = np.asarray(~np.isnan(mask_targets))
 
-
     # upsample original datasets
     print(np.nanstd(inputs.flatten()-x_OI.flatten()))
     '''index_nan = np.where(~np.isnan(inputs))
@@ -153,19 +160,16 @@ def import_Data_OSE(dict_global_Params):
 
     ## Build time series for training (Ntime * Nchannel * Nlat * Nlon)
     inputs_train       = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
-    mask_inputs_train  = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
-    targets_train       = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw)) 
-    mask_targets_train = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
-    target_mod         = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
-    inputs_train_OI   = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
+    targets_train      = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw)) 
+    targets_mod         = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
+    targets_BFN         = np.zeros((len(indN_Tt),len(indLat),len(indLon),size_tw))
+    inputs_train_OI    = ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw))
     if include_covariates==True:
         cov_train      = []
         cov_train_mod  = []
-        mask_cov_train = []
         for icov in range(N_cov):
             cov_train.append(ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw)))
             cov_train_mod.append(ndarray_NaN((len(indN_Tt),len(indLat),len(indLon),size_tw)))
-            mask_cov_train.append(np.ones((len(indN_Tt),len(indLat),len(indLon),size_tw)))
     for k in range(len(indN_Tt)):
         idt = np.arange(indN_Tt[k]-np.floor(size_tw/2.),indN_Tt[k]+np.floor(size_tw/2.)+1,1)
         idt2= (np.where((idt>=0) & (idt<inputs.shape[0]))[0]).astype(int)
@@ -174,32 +178,38 @@ def import_Data_OSE(dict_global_Params):
         if flagloadOIData == 1: 
             inputs_train[k,:,:,idt2]         = inputs[idt,:,:] - x_OI[idt,:,:]
             targets_train[k,:,:,idt2]        = targets[idt,:,:] - x_OI[idt,:,:]
-            target_mod[k,:,:,idt2]           = x_mod[idt,:,:] - x_OI_mod[idt,:,:] 
+            targets_mod[k,:,:,idt2]           = x_mod[idt,:,:] - x_OI_mod[idt,:,:] 
+            targets_BFN[k,:,:,idt2]           = x_BFN[idt,:,:] - x_OI[idt,:,:]
         else:
             inputs_train[k,:,:,idt2]     = inputs[idt,:,:]
             targets_train[k,:,:,idt2]    = targets[idt,:,:]
-            target_mod[k,:,:,idt2]       = x_mod[idt,:,:]
+            targets_mod[k,:,:,idt2]       = x_mod[idt,:,:]
+            targets_BFN[k,:,:,idt2]       = x_BFN[idt,:,:]
 
         # import covariates
         if include_covariates==True:
             for icov in range(N_cov):
+                print(icov)
                 cov_train[icov][k,:,:,idt2] = cov[icov][idt,:,:]
                 cov_train_mod[icov][k,:,:,idt2] = cov_mod[icov][idt,:,:]
-        mask_inputs_train[k,:,:,idt2] = mask_inputs[idt,:,:]
-        mask_targets_train[k,:,:,idt2] = mask_targets[idt,:,:]
-
+    
     ## Add covariates (merge inputs_train and mask_train with covariates)
     if include_covariates==True:
         cov_train.insert(0,inputs_train)
-        cov_train_mod.insert(0,target_mod)
-        mask_cov_train.insert(0,mask_inputs_train)
+        cov_train_mod.insert(0,targets_mod)
         inputs_train      = np.concatenate(cov_train,axis=3)
-        target_mod        = np.concatenate(cov_train_mod,axis=3)
-        mask_inputs_train = np.concatenate(mask_cov_train,axis=3)
-        order     = np.stack([np.arange(i*size_tw,(i+1)*size_tw) for i in range(0,N_cov+1)]).T.flatten()
-        inputs_train    = inputs_train[:,:,:,order]
-        target_mod      = target_mod[:,:,:,order]
-        mask_inputs_train = mask_inputs_train[:,:,:,order]
+        targets_mod        = np.concatenate(cov_train_mod,axis=3)
+        order             = np.stack([np.arange(i*size_tw,(i+1)*size_tw) for i in range(0,N_cov+1)]).T.flatten()
+        inputs_train      = inputs_train[:,:,:,order]
+        targets_mod        = targets_mod[:,:,:,order]
+
+    ## mask generation
+    # mask inputs
+    mask_inputs_train   = np.asarray(~np.isnan(inputs_train))
+    # mask targets
+    mask_targets_train  = np.asarray(~np.isnan(targets_train))
+    # mask NATL60
+    mask_targets_mod     = np.asarray(~np.isnan(targets_mod))
 
     ## Build gappy (and potentially noisy) data test
     genFilename = 'modelNATL60_SSH_'+str('%03d'%inputs_train.shape[0])+str('_%03d'%inputs_train.shape[1])+str('_%03d'%inputs_train.shape[2])
@@ -210,21 +220,23 @@ def import_Data_OSE(dict_global_Params):
         stdTt                = np.sqrt( np.nanvar(inputs_train) )
         inputs_train         = (inputs_train  - meanTt)/stdTt
         targets_train        = (targets_train - meanTt)/stdTt
+        targets_BFN           = (targets_BFN - meanTt)/stdTt
 
-        meanTt_mod            = np.nanmean( target_mod )
-        stdTt_mod             = np.sqrt( np.nanvar(target_mod) )
-        target_mod            = (target_mod - meanTt)/stdTt
+        meanTt_mod            = np.nanmean( targets_mod )
+        stdTt_mod             = np.sqrt( np.nanvar(targets_mod) )
+        targets_mod            = (targets_mod - meanTt_mod)/stdTt_mod
+
     else:
         index = np.asarray([np.arange(i,(N_cov+1)*size_tw,(N_cov+1)) for i in range(N_cov+1)])
         meanTt               = [np.nanmean(inputs_train[:,:,:,index[i,:]]) for i in range(N_cov+1)]
         stdTt                = [np.sqrt(np.nanvar(inputs_train[:,:,:,index[i,:]])) for i in range(N_cov+1)]
-        meanTt_mod           = [np.nanmean(target_mod[:,:,:,index[i,:]]) for i in range(N_cov+1)]
-        stdTt_mod            = [np.sqrt(np.nanvar(target_mod[:,:,:,index[i,:]])) for i in range(N_cov+1)]
+        meanTt_mod           = [np.nanmean(targets_mod[:,:,:,index[i,:]]) for i in range(N_cov+1)]
+        stdTt_mod            = [np.sqrt(np.nanvar(targets_mod[:,:,:,index[i,:]])) for i in range(N_cov+1)]
         for i in range(N_cov+1):
             inputs_train[:,:,:,index[i]]          = (inputs_train[:,:,:,index[i]] - meanTt[i])/stdTt[i]
-            target_mod[:,:,:,index[i]]            = (target_mod[:,:,:,index[i]] - meanTt_mod[i])/stdTt_mod[i]
+            targets_mod[:,:,:,index[i]]            = (targets_mod[:,:,:,index[i]] - meanTt_mod[i])/stdTt_mod[i]
         targets_train  = (targets_train - meanTt[0])/stdTt[0]
-
+        targets_BFN  = (targets_BFN - meanTt[0])/stdTt[0]
 
     ## Export datatest as NetCDF
     export_NetCDF=False
@@ -241,13 +253,13 @@ def import_Data_OSE(dict_global_Params):
                                    'mask_inputs'  : (('time','nc','lat','lon'),mask_inputs_train[:,:,:,index[0]].transpose(0,3,1,2)),\
                                    'target'   : (('time','nc','lat','lon'),targets_train.transpose(0,3,1,2)),\
                                    'mask_targets' : (('time','nc','lat','lon'),mask_targets_train.transpose(0,3,1,2)),\
-                                   'NATL60'   : (('time','nc','lat','lon'),target_mod[:,:,:,index[0]].transpose(0,3,1,2))},\
+                                   'NATL60'   : (('time','nc','lat','lon'),targets_mod[:,:,:,index[0]].transpose(0,3,1,2))},\
                         coords={'lon': indLon,\
                                 'lat': indLat,\
                                 'time': range(0,len(time_u))})
         data.to_netcdf(dirSAVE+"data_train.nc")
 
     return genFilename, meanTt, stdTt, inputs_train, mask_inputs_train, targets_train, mask_targets_train,\
-           lday_train, inputs_train_OI, target_mod
+           lday_train, inputs_train_OI, targets_mod, mask_targets_mod, targets_BFN
 
 

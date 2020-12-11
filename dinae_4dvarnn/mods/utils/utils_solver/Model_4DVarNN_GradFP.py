@@ -15,6 +15,7 @@ from model_GradUpdate0    import model_GradUpdate0
 from model_GradUpdate1    import model_GradUpdate1
 from model_GradUpdate2    import model_GradUpdate2
 from model_GradUpdate3    import model_GradUpdate3
+from median_pool          import MedianPool2d
 
 def replace_tup_at_idx(tup, idx, val):
     lst = list(tup)
@@ -37,6 +38,8 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             self.InterpFlag  = InterpFlag
             self.periodicBnd = periodicBnd
             self.shape       = ShapeData
+            # init median pooling
+            self.median_pooling = MedianPool2d()
         # Define Solver type according to OptimType
         ## Gradient-based minimization using a fixed-step descent
         if OptimType == 0:
@@ -116,7 +119,11 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                     target_x = torch.add(torch.mul(target_x,target_mask), torch.mul(xnew,target_mask_))
                 else:
                     # optimization update
-                    target_x = torch.add(target_x,torch.mul(grad,-1.0))
+                    #target_x = torch.add(target_x,torch.mul(grad,-1.0))
+                    target_x = torch.add(target_x,torch.mul(grad,-1.0/self.NGrad))
+
+            # apply median pooling
+            # target_x = self.median_pooling(target_x)
 
             if self.OptimType == 1:
                 return target_x,grad_old,_normgrad
@@ -125,6 +132,9 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             else:
                 return target_x,_normgrad
         else:
+
+            # apply median pooling
+            # target_x = self.median_pooling(target_x)
 
             _normgrad = 1.
             if self.OptimType == 1:

@@ -29,17 +29,32 @@ def GENN(dict_global_Params,genFilename,shapeData):
             self.conv1Tr = torch.nn.ConvTranspose2d(int(shapeData[0]/(N_cov+1)),int(shapeData[0]/(N_cov+1)),\
                                                    (int(4/dwscale),int(4/dwscale)),stride=(int(4/dwscale),int(4/dwscale)),bias=False)
             self.conv4   = torch.nn.Conv2d(int(shapeData[0]/(N_cov+1)),2*DimAE,(3,3),padding=int(3/2),bias=False)
+
+            # layers for small scale
+            self.conv1b   = ConstrainedConv2d(shapeData[0],NbFilter,(WFilter,WFilter),padding=int(WFilter/2),bias=False)
+            self.conv2b   = torch.nn.Conv2d(NbFilter,DimAE,(1,1),padding=0,bias=False)
+            self.resnet1b = ResNetConv2d(NbResUnit,DimAE,5,1,0)
+            self.conv3b   = torch.nn.Conv2d(DimAE,2*DimAE,(1,1),padding=0,bias=False)
+
+            # final layer
             self.convF   = torch.nn.Conv2d(2*DimAE,int(shapeData[0]/(N_cov+1)),(3,3),padding=int(3/2),bias=False)
                 
         def forward(self, x):
-            x = self.pool1( x )
-            x = self.conv1( x )
-            x = self.conv2( F.relu(x) )
-            x = self.resnet1( x )
-            x = self.conv3( x )
-            x = self.conv1Tr( x )
-            x = self.conv4( F.relu(x) )
-            x = self.convF( x )
+            # large scale
+            xbar = self.pool1( x )
+            xbar = self.conv1( xbar )
+            xbar = self.conv2( F.relu(xbar) )
+            xbar = self.resnet1( xbar )
+            xbar = self.conv3( xbar )
+            xbar = self.conv1Tr( xbar )
+            xbar = self.conv4( F.relu(xbar) )
+
+            dx = self.conv1b( x )
+            dx = self.conv2b( F.relu(dx) )
+            dx = self.resnet1b( dx ) 
+            dx = self.conv3b( dx )
+            # large sclae + small scale
+            x = self.convF( xbar + dx)
             return x
             
     class Decoder(torch.nn.Module):

@@ -13,7 +13,7 @@ def save_Models(dict_global_Params,genFilename,alpha_4DVar,\
     else:
         genSuffixModel = genSuffixModel+'_AETRwoTrueData'
                    
-    genSuffixModel = genSuffixModel+str('%02d'%(flagAEType))+'D'+str('%02d'%(DimAE))+'N'+str('%02d'%(Nsquare))+'W'+str('%02d'%(Wsquare))
+    genSuffixModel = genSuffixModel+str('%02d'%(flagAEType))+'D'+str('%02d'%(DimAE))
     genSuffixModel = genSuffixModel+'_Nproj'+str('%02d'%(NBProjCurrent))
     genSuffixModel = genSuffixModel+'_Grad_'+str('%02d'%(flagGradModel))+'_'+str('%02d'%(flagOptimMethod))+'_'+str('%02d'%(NBGradCurrent))
       

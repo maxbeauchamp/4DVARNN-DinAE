@@ -189,7 +189,9 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
 
     # import BFN results
     BFN_10=xr.open_dataset("/users/local/DATA/OSE/GULFSTREAM/OSE_GULFSTREAM_BFN_daily.nc")
-    BFN_10=BFN_10.SSH
+    ## Apply reduction parameter
+    if dwscale!=1:
+        BFN_10 = einops.reduce(BFN_10.SSH.values,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=int(dwscale/2), w1=int(dwscale/2), reduction=np.nanmean)
 
     ## keep only the information on the target variable (remove covariates)
     if include_covariates == True:
@@ -278,7 +280,7 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
         OI   = Gradient(x_train_OI[ifig,:,:,idT].squeeze(),2)
         PRED = Gradient(x_train_pred[ifig,:,:,idT].squeeze(),2)
         REC  = Gradient(rec_AE_Tr[ifig,:,:,idT].squeeze(),2)
-        #BFN  = Gradient(BFN,2)
+        BFN  = Gradient(BFN,2)
         ANOM = Gradient(x_train_OI[ifig,:,:,idT].squeeze()-x_train_pred[ifig,:,:,idT].squeeze(),2)
         plot(ax,0,0,lon,lat,GT,r"$\nabla_{GT}$",\
              extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
@@ -286,10 +288,10 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
              extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
         plot(ax,1,0,lon,lat,PRED,r"$\nabla_{Pred}$",\
              extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
-        plot(ax,1,1,lon,lat,REC,r"$\nabla_{Rec}$",\
-             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
-        #plot(ax,1,1,lon,lat,BFN,r"$\nabla_{BFN}$",\
+        #plot(ax,1,1,lon,lat,REC,r"$\nabla_{Rec}$",\
         #     extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
+        plot(ax,1,1,lon,lat,BFN,r"$\nabla_{BFN}$",\
+             extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
         plot(ax,2,0,lon,lat,OI,r"$\nabla_{OI}$",\
              extent=extent_,cmap=cmap,vmin=vmin,vmax=vmax)
         plot(ax,2,1,lon,lat,ANOM,r"$\nabla_{Anomaly}$",\

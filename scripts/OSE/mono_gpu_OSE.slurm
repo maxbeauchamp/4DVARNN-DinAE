@@ -23,18 +23,24 @@ export PYTHONPATH=${HOME}/4DVARNN-DinAE:${PYTHONPATH}
 # echo des commandes lancées
 set -x
 
+# parameters
+# 1: lag (0/5)
+# 2: domain (GULFSTREAM/OSMOSIS)
+# 3: Load Model (0/1)
+# 4: solver type (FP/GB)
+
 # copie vers le WORK pour execution
 JobID=$RANDOM
 rsync -avrz --exclude=figs ${HOME}/4DVARNN-DinAE/ ${WORK}/4DVARNN-DinAE_${JobID}
 # modify the yaml file according to parameters 
-sed -i -e 's|_LAG_|'"${1}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config.yml
-sed -i -e 's|_DOMAIN_|'"${2}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config.yml
-sed -i -e 's|_LMOD_|'"${3}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config.yml
-sed -i -e 's|_WREGUL_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config.yml
-sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/launch_OSE.py
+sed -i -e 's|_LAG_|'"${1}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config_zay.yml
+sed -i -e 's|_DOMAIN_|'"${2}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config_zay.yml
+sed -i -e 's|_LMOD_|'"${3}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config_zay.yml
+sed -i -e 's|_SOLVER_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/config_zay.yml
+sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/launch_OSE_zay.py
 
 # exécution du code
-python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/launch_OSE.py
+python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSE/launch_OSE_zay.py
 
 # remove copy
 rm -rf ${WORK}/4DVARNN-DinAE_${JobID}

@@ -23,18 +23,30 @@ export PYTHONPATH=${HOME}/4DVARNN-DinAE:${PYTHONPATH}
 # echo des commandes lancées
 set -x
 
+# parameters
+# 1: opt (nadir/nadirswot)
+# 2: lag (0/5)
+# 3: type_obs (obs/mod)
+# 4: domain (GULFSTREAM/OSMOSIS)
+# 5: wMis (0/1/2)
+# 6: wCov (True/False)
+# 7: solver type (FP/GB)
+
 # copie vers le WORK pour execution
 JobID=$RANDOM
 rsync -avrz --exclude=figs ${HOME}/4DVARNN-DinAE/ ${WORK}/4DVARNN-DinAE_${JobID}
-# modify the yaml file according to parameters 
-sed -i -e 's|_LAG_|'"${2}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config.yml
-sed -i -e 's|_DOMAIN_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config.yml
-sed -i -e 's|_WMIS_|'"${5}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config.yml
-sed -i -e 's|_WCOV_|'"${6}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config.yml
-sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py
+# modify the yaml file according to parameters
+sed -i -e 's|_OPT_|'"${1}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_LAG_|'"${2}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_TYPE_OBS_|'"${3}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_DOMAIN_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_WMIS_|'"${5}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_WCOV_|'"${6}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_SOLVER_|'"${7}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE_zay.py
 
 # exécution du code
-python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE.py ${1} ${2} ${3} ${4} ${5} ${6}
+python -u ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE_zay.py
 
 # remove copy
 rm -rf ${WORK}/4DVARNN-DinAE_${JobID}
