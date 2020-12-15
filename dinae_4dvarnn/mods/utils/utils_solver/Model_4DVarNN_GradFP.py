@@ -40,6 +40,8 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             self.shape       = ShapeData
             # init median pooling
             self.median_pooling = MedianPool2d()
+        with torch.set_grad_enabled(True):
+            self.alphaGrad   = torch.nn.Parameter(torch.Tensor([1.]))
         # Define Solver type according to OptimType
         ## Gradient-based minimization using a fixed-step descent
         if OptimType == 0:
@@ -90,6 +92,7 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
             x = torch.Tensor.index_add(x,1,torch_index,target_x)
             xpred = self.model_AE(x)
             grad  = self.model_Grad.compute_Grad(target_x, xpred, target_obs, target_mask)
+
             if normgrad == 0. :
                 _normgrad = torch.sqrt( torch.mean( grad**2 ) )
             else:
@@ -119,8 +122,12 @@ class Model_4DVarNN_GradFP(torch.nn.Module):
                     target_x = torch.add(torch.mul(target_x,target_mask), torch.mul(xnew,target_mask_))
                 else:
                     # optimization update
+                    target_x = torch.add(target_x,torch.mul(grad,-1.0*self.alphaGrad))
+                    #print(self.model_Grad.compute_Grad.alphaAE)
+                    #print(self.model_Grad.compute_Grad.alphaObs)
+                    #print(self.alphaGrad)
                     #target_x = torch.add(target_x,torch.mul(grad,-1.0))
-                    target_x = torch.add(target_x,torch.mul(grad,-1.0/self.NGrad))
+                    #target_x = torch.add(target_x,torch.mul(grad,-1.0/self.NGrad))
 
             # apply median pooling
             # target_x = self.median_pooling(target_x)

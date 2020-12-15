@@ -56,20 +56,25 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
     ## model parameters
     if solver_type=='FP':
-        NbProjection   = [2,4,5,6,7,9,10]
+        #NbProjection   = [2,4,5,6,7,9,10]
+        NbProjection   = [5,5,5,5,5,5,5]
         NbGradIter     = [0,0,0,0,0,0,0]
     else:
-        NbProjection   = [0,0,0,0,0,0,0]
-        #NbProjection  = [2,3,4,5,7,9,10]
-        NbGradIter     = [2,3,4,5,7,9,10]
+        #NbProjection   = [0,0,0,0,0,0,0]
+        NbProjection  = [5,5,5,5,5,5,5]
+        #NbGradIter     = [2,3,4,5,7,9,10]
+        NbGradIter     = [5,5,5,5,5,5,5]
         #NbGradIter    = [0,0,0,0,0,0,0]
     if flagTrWMissingData==2:
         lrUpdate       = [1e-4,1e-4,1e-5,1e-5,1e-6,1e-6,1e-7]
+        lrUpdate       = [1e-2,1e-3,1e-4,1e-5,1e-5,1e-6,1e-6]
     else:
         lrUpdate       = [1e-3,1e-4,1e-4,1e-5,1e-5,1e-6,1e-6]
+        #lrUpdate       = [1e-2,1e-3,1e-4,1e-5,1e-5,1e-6,1e-6]
     IterUpdate     = [0,2,3,4,6,8,10]
     val_split      = 0.1
     comptUpdate    = 0  
+
     ## modify/check data format
     input_train     = np.moveaxis(input_train, -1, 1)
     mask_train      = np.moveaxis(mask_train, -1, 1)
@@ -118,7 +123,11 @@ def learning_OSSE(dict_global_Params,genFilename,\
     ## create an optimizer object (Adam with lr 1e-3)
     lrCurrent        = lrUpdate[0]
     lambda_LRAE = 0.5
-    optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},\
+    #optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},\
+    #                          {'params': model.model_AE.encoder.parameters(),\
+    #                           'lr': lambda_LRAE*lrCurrent}
+    #                          ], lr=lrCurrent)
+    optimizer   = optim.RMSprop([{'params': model.model_Grad.parameters()},\
                               {'params': model.model_AE.encoder.parameters(),\
                                'lr': lambda_LRAE*lrCurrent}
                               ], lr=lrCurrent)
@@ -165,7 +174,10 @@ def learning_OSSE(dict_global_Params,genFilename,\
                       flagGradModel,flagOptimMethod,N_cov=N_cov)
             model =  model_to_MultiGPU(model)
             # update optimizer
-            optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
+            #optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
+            #                        {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
+            #                        ], lr=lrCurrent)
+            optimizer   = optim.RMSprop([{'params': model.model_Grad.parameters()},
                                     {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
                                     ], lr=lrCurrent)
 
@@ -224,11 +236,13 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
                         ## Losses
                         # full DAW
-                        idT1 = np.arange(0,inputs_init.shape[1],N_cov+1)
-                        idT2 = np.arange(0,targets.shape[1],1)
+                        if flagTrWMissingData==2:
+                            idT1 = np.arange(0,inputs_init.shape[1],N_cov+1)
+                            idT2 = np.arange(0,targets.shape[1],1)
                         # on center image of the DAW
-                        idT1 = int(np.floor(inputs_init.shape[1]/2))
-                        idT2 = int(np.floor(targets.shape[1]/2))
+                        else:
+                            idT1 = int(np.floor(inputs_init.shape[1]/2))
+                            idT2 = int(np.floor(targets.shape[1]/2))
 
                         # compute losses
                         loss_R      = torch.sum((outputs[:,idT2,:,:] - targets[:,idT2,:,:])**2 *masks_inputs [:,idT2,:,:])
@@ -247,13 +261,13 @@ def learning_OSSE(dict_global_Params,genFilename,\
                         index      = np.arange(0,inputs_init.shape[1],N_cov+1)
                         loss_Obs    = torch.sum( (outputs[:,idT2,:,:] - inputs_init[:,idT1,:,:])**2 * masks_inputs[:,idT2,:,:] )
                         loss_Obs    = loss_Obs / torch.sum( masks_inputs[:,idT2,:,:] )
-                        spatial_gradients_avg = einops.reduce(sobel(outputs), 'b t lat lon -> 1', 'mean')
-
                         if flagTrWMissingData == 2:
+                            spatial_gradients_avg = einops.reduce(sobel(outputs), 'b t lat lon -> 1', 'mean')
                             loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE + spatial_gradients_avg
                         else:
+                            spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
                             loss        = loss_All + spatial_gradients_avg
-
+                         
                         # backward + optimize only if in training phase
                         if phase == 'train':
                             loss.backward()

@@ -45,7 +45,7 @@ NN_options:
 #   Dimension of the latent space
     DimAE: 40
 #   model type, 1: ConvAE or 2: GENN 3: PINN
-    flagAEType: 2
+    flagAEType: _PHI_
 
 # loss function weighting
 loss_weighting:

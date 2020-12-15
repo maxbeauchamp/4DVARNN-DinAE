@@ -56,6 +56,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
         x_obs= x_mod
     else:
         x_obs = np.copy(nc_data_obs['ssh_'+type_obs][:,indLat,indLon])
+        err = np.copy(nc_data_obs['ssh_obs'][:,indLat,indLon]) - np.copy(nc_data_obs['ssh_mod'][:,indLat,indLon])
         mask = np.asarray(~np.isnan(x_obs))
     if flagTrWMissingData==0:
         mask[indN_Tr,:,:]  = 1
@@ -82,6 +83,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
         x_mod    = einops.reduce(x_mod,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
         x_obs    = einops.reduce(x_obs,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
         x_OI     = einops.reduce(x_OI,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
+        err      = einops.reduce(err,  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
         for icov in range(N_cov):
             cov[icov]     = einops.reduce(cov[icov],  '(t t1) (h h1) (w w1) -> t h w', t1=1, h1=dwscale, w1=dwscale, reduction=np.nanmedian)
         if domain=="OSMOSIS":
@@ -118,6 +120,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
             x_train_OI[k,:,:,idt2]   = x_OI[idt,:,:]
             target_train[k,:,:,idt2] = x_mod[idt,:,:] - x_OI[idt,:,:]
             input_train[k,:,:,idt2]  = x_obs[idt,:,:] - x_OI[idt,:,:]
+            #input_train[k,:,:,idt2]  = (x_mod[idt,:,:] + err[idt,:,:]) - x_OI[idt,:,:]
         else:
             target_train[k,:,:,idt2] = x_mod[idt,:,:]
             input_train[k,:,:,idt2]  = x_obs[idt,:,:]
@@ -174,6 +177,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
             x_test_OI[k,:,:,idt2]   = x_OI[idt,:,:]
             target_test[k,:,:,idt2] = x_mod[idt,:,:] - x_OI[idt,:,:]
             input_test[k,:,:,idt2]  = x_obs[idt,:,:] - x_OI[idt,:,:]
+            #input_test[k,:,:,idt2]  = (x_mod[idt,:,:] + err[idt,:,:]) - x_OI[idt,:,:]
         else:
             target_test[k,:,:,idt2] = x_mod[idt,:,:]
             input_test[k,:,:,idt2]  = x_obs[idt,:,:]

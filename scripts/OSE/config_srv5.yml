@@ -15,9 +15,9 @@ data_options:
     lag: 0
     domain: GULFSTREAM
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
-    flagloadOIData: 0
+    flagloadOIData: 1
 #   use additional covariates in initial layer
-    include_covariates: False
+    include_covariates: True
     lfile_cov:
     - "/training/ssh_alg_h2g_j2g_j2n_j3_s3a_duacs.nc"
     lname_cov:

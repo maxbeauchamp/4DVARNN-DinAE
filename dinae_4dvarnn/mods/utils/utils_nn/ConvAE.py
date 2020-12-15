@@ -11,17 +11,17 @@ def ConvAE(dict_global_Params,genFilename,shapeData):
     class Encoder(torch.nn.Module):
         def __init__(self):
             super(Encoder, self).__init__()
-            self.conv1 = torch.nn.Conv2d(shapeData[0],DimAE,(3,3),padding=1)
+            self.conv1 = torch.nn.Conv2d(shapeData[0],DimAE,(3,3),padding=int(3/2))
             self.pool1 = torch.nn.AvgPool2d((2,2))
-            self.conv2 = torch.nn.Conv2d(DimAE,2*DimAE,(3,3),padding=1)
+            self.conv2 = torch.nn.Conv2d(DimAE,2*DimAE,(3,3),padding=int(3/2))
             self.pool2 = torch.nn.AvgPool2d((2,2))
-            self.conv3 = torch.nn.Conv2d(2*DimAE,2*DimAE,(3,3),padding=1)
+            self.conv3 = torch.nn.Conv2d(2*DimAE,4*DimAE,(3,3),padding=int(3/2))
             self.pool3 = torch.nn.AvgPool2d((2,2))
-            self.conv4 = torch.nn.Conv2d(2*DimAE,2*DimAE,(3,3),padding=1)
-            self.pool4 = torch.nn.AvgPool2d((2,2))
-            self.conv5 = torch.nn.Conv2d(2*DimAE,2*DimAE,(3,3),padding=1)
-            self.pool5 = torch.nn.AvgPool2d((2,2))
-            self.conv6 = torch.nn.Conv2d(2*DimAE,DimAE,(1,1),padding=0)
+            self.conv4 = torch.nn.Conv2d(4*DimAE,8*DimAE,(3,3),padding=int(3/2))
+            #self.pool4 = torch.nn.AvgPool2d((2,2))
+            #self.conv5 = torch.nn.Conv2d(2*DimAE,2*DimAE,(3,3),padding=1)
+            self.pool5 = torch.nn.AvgPool2d((5,5))
+            self.conv6 = torch.nn.Conv2d(8*DimAE,DimAE,(1,1),padding=int(1/2))
             
         def forward(self, x):
             x = self.conv1( x )
@@ -31,8 +31,8 @@ def ConvAE(dict_global_Params,genFilename,shapeData):
             x = self.conv3( F.relu(x) )
             x = self.pool3(x)
             x = self.conv4( F.relu(x) )
-            x = self.pool4(x)
-            x = self.conv5( F.relu(x) )
+            #x = self.pool4(x)
+            #x = self.conv5( F.relu(x) )
             x = self.pool5(x)
             x = self.conv6( x )
             return x
@@ -40,19 +40,11 @@ def ConvAE(dict_global_Params,genFilename,shapeData):
     class Decoder(torch.nn.Module):
         def __init__(self):
             super(Decoder, self).__init__()
-            self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,256,(16,16),stride=(16,16),bias=False)
-            self.conv2Tr = torch.nn.ConvTranspose2d(256,64,(2,2),stride=(2,2),bias=False)
-            self.conv3   = torch.nn.Conv2d(64,32,(1,1),padding=0)
-            self.resnet  = ResNetConv2d(2,32,2,3,1)
-            self.convF  = torch.nn.Conv2d(32,shapeData[0],(1,1),padding=0)
-            
-        def _make_ResNet(self,Nblocks,dim,K,kernel_size, padding):
-            layers = []
-            for kk in range(0,Nblocks):
-                layers.append(torch.nn.Conv2d(dim,K*dim,kernel_size,padding=padding,bias=False))
-                layers.append(torch.nn.ReLU())
-                layers.append(torch.nn.Conv2d(K*dim,dim,kernel_size,padding=padding,bias=False))            
-            return torch.nn.Sequential(*layers)
+            self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,DimAE,(20,20),stride=(20,20),bias=False,padding=int(20/2))
+            self.conv2Tr = torch.nn.ConvTranspose2d(40,40,(3,3),stride=(2,2),bias=False,padding=int(3/2))
+            self.conv3   = torch.nn.Conv2d(40,40,(3,3),stride=(2,2),padding=int(3/2))
+            self.resnet  = ResNetConv2d(2,40,2,3,int(3/2))
+            self.convF  = torch.nn.Conv2d(40,shapeData[0],(1,1),padding=int(1/2))
             
         def forward(self, x):
             x = self.conv1Tr( x )

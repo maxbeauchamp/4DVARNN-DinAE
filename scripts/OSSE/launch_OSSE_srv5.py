@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     # create the output directory
     if flagAEType==1:
-        suf1="ConvAE",
+        suf1="ConvAE"
     elif flagAEType==2:
         suf1="GENN"
     else:

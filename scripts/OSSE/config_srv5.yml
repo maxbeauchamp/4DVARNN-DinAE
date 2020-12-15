@@ -9,15 +9,15 @@ path_files:
     - /oi/ssh_NATL60_swot_4nadir.nc
 #   Obs file (list of 3 files: nadir, swot, nadir+swot)
     fileObs:
-    - /data/gridded_data_swot_wocorr/dataset_nadir_2d.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_0d.nc
     - /data/gridded_data_swot_wocorr/dataset_swot.nc
-    - /data/gridded_data_swot_wocorr/dataset_nadir_2d_swot.nc
+    - /data/gridded_data_swot_wocorr/dataset_nadir_0d_swot.nc
 
 # data options
 data_options:
     domain: GULFSTREAM
     opt: nadirswot
-    lag: 2
+    lag: 0
     type_obs: mod
     flagTrWMissingData: 1
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
@@ -54,13 +54,13 @@ loss_weighting:
       - - 1.
         - 0.1
     alpha4DVar: !1darray
-      - - 1.
+      - - 1
         - 0.1
 
 # solver parameters
 solver_options: 
 #   FP or Grad
-    solver_type: GB
+    solver_type: FP
 #   Gradient computation 
 #   0: subgradient
 #   1: true gradient/autograd
@@ -69,7 +69,7 @@ solver_options:
 #   0: fixed-step gradient descent
 #   1: ConvNet_step gradient descent
 #   2: LSTM-based descent
-    flagOptimMethod: 1     
+    flagOptimMethod: 2     
 
 # training parameters
 training_params:

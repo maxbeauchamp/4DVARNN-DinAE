@@ -30,7 +30,8 @@ set -x
 # 4: domain (GULFSTREAM/OSMOSIS)
 # 5: wMis (0/1/2)
 # 6: wCov (True/False)
-# 7: solver type (FP/GB)
+# 7: NN-type (1:ConvaE/2:GENN)
+# 8: solver type (FP/GB)
 
 # copie vers le WORK pour execution
 JobID=$RANDOM
@@ -42,7 +43,8 @@ sed -i -e 's|_TYPE_OBS_|'"${3}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/
 sed -i -e 's|_DOMAIN_|'"${4}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
 sed -i -e 's|_WMIS_|'"${5}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
 sed -i -e 's|_WCOV_|'"${6}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
-sed -i -e 's|_SOLVER_|'"${7}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_PHI_|'"${7}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
+sed -i -e 's|_SOLVER_|'"${8}"'|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/config_zay.yml
 sed -i -e 's|_PATH_|'"${WORK}"'/4DVARNN-DinAE_'"${JobID}"'/scripts/OSSE|g' ${WORK}/4DVARNN-DinAE_${JobID}/scripts/OSSE/launch_OSSE_zay.py
 
 # exécution du code
