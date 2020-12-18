@@ -46,7 +46,7 @@ if __name__ == '__main__':
     flagTrWMissingData  	= conf['data_options']['flagTrWMissingData'] 
     flagloadOIData 		= conf['data_options']['flagloadOIData']
     include_covariates  	= conf['data_options']['include_covariates']
-    lfile_cov                   = [ datapath+'DATA/domain='+domain+x for x in conf['data_options']['lfile_cov'] ]
+    lfile_cov                   = [ datapath+'DATA/'+domain+x for x in conf['data_options']['lfile_cov'] ]
     lname_cov                   = conf['data_options']['lname_cov']
     lid_cov                     = conf['data_options']['lid_cov'] 
     N_cov               	= ifelse(include_covariates==True,len(lid_cov),0)

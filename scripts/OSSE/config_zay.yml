@@ -33,6 +33,8 @@ data_options:
     - OI
 #   Length of the 4th dimension 
     size_tw: 11
+#   Dowscaling parameter
+    dwscale: 1
 #   Index evaluation dates
     start_eval_index: 52
     end_eval_index: 94
@@ -78,5 +80,3 @@ training_params:
     batch_size: 4
     NbEpoc: 20
     Niter: 20
-
-~                      

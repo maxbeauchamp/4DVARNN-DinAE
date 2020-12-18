@@ -25,31 +25,31 @@ def ConvAE(dict_global_Params,genFilename,shapeData):
             
         def forward(self, x):
             x = self.conv1( x )
-            x = self.pool1(x)
+            x = self.pool1( F.dropout(x) )
             x = self.conv2( F.relu(x) )
-            x = self.pool2(x)
+            x = self.pool2( F.dropout(x) )
             x = self.conv3( F.relu(x) )
-            x = self.pool3(x)
+            x = self.pool3( F.dropout(x) )
             x = self.conv4( F.relu(x) )
             #x = self.pool4(x)
             #x = self.conv5( F.relu(x) )
-            x = self.pool5(x)
+            x = self.pool5( F.dropout(x) )
             x = self.conv6( x )
             return x
 
     class Decoder(torch.nn.Module):
         def __init__(self):
             super(Decoder, self).__init__()
-            self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,DimAE,(20,20),stride=(20,20),bias=False,padding=int(20/2))
-            self.conv2Tr = torch.nn.ConvTranspose2d(40,40,(3,3),stride=(2,2),bias=False,padding=int(3/2))
-            self.conv3   = torch.nn.Conv2d(40,40,(3,3),stride=(2,2),padding=int(3/2))
+            self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,256,(20,20),stride=(25,25),bias=False,padding=int(20/2))
+            self.conv2Tr = torch.nn.ConvTranspose2d(256,80,(2,2),stride=(2,2),bias=False,padding=(0,0))
+            self.conv3   = torch.nn.Conv2d(80,40,(3,3),stride=(1,1),padding=int(3/2))
             self.resnet  = ResNetConv2d(2,40,2,3,int(3/2))
-            self.convF  = torch.nn.Conv2d(40,shapeData[0],(1,1),padding=int(1/2))
+            self.convF  = torch.nn.Conv2d(40,int(shapeData[0]/(N_cov+1)),(1,1),padding=int(1/2))
             
         def forward(self, x):
             x = self.conv1Tr( x )
-            x = self.conv2Tr( F.relu(x) )
-            x = self.conv3( F.relu(x) )
+            x = self.conv2Tr( F.dropout(x) )
+            x = self.conv3( F.dropout(x) )
             x = self.resnet(x)
             x = self.convF(x)
             return x

@@ -58,19 +58,19 @@ def learning_OSSE(dict_global_Params,genFilename,\
     if solver_type=='FP':
         #NbProjection   = [2,4,5,6,7,9,10]
         NbProjection   = [5,5,5,5,5,5,5]
+        NbProjection   = [1,1,2,3,4,5,5]
         NbGradIter     = [0,0,0,0,0,0,0]
     else:
         #NbProjection   = [0,0,0,0,0,0,0]
-        NbProjection  = [5,5,5,5,5,5,5]
+        NbProjection  = [2,2,2,5,5,5,5]
         #NbGradIter     = [2,3,4,5,7,9,10]
-        NbGradIter     = [5,5,5,5,5,5,5]
+        NbGradIter     = [2,2,2,5,5,5,5]
         #NbGradIter    = [0,0,0,0,0,0,0]
     if flagTrWMissingData==2:
-        lrUpdate       = [1e-4,1e-4,1e-5,1e-5,1e-6,1e-6,1e-7]
+        #lrUpdate       = [1e-4,1e-4,1e-5,1e-5,1e-6,1e-6,1e-7]
         lrUpdate       = [1e-2,1e-3,1e-4,1e-5,1e-5,1e-6,1e-6]
     else:
         lrUpdate       = [1e-3,1e-4,1e-4,1e-5,1e-5,1e-6,1e-6]
-        #lrUpdate       = [1e-2,1e-3,1e-4,1e-5,1e-5,1e-6,1e-6]
     IterUpdate     = [0,2,3,4,6,8,10]
     val_split      = 0.1
     comptUpdate    = 0  
@@ -123,14 +123,15 @@ def learning_OSSE(dict_global_Params,genFilename,\
     ## create an optimizer object (Adam with lr 1e-3)
     lrCurrent        = lrUpdate[0]
     lambda_LRAE = 0.5
-    #optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},\
-    #                          {'params': model.model_AE.encoder.parameters(),\
-    #                           'lr': lambda_LRAE*lrCurrent}
-    #                          ], lr=lrCurrent)
-    optimizer   = optim.RMSprop([{'params': model.model_Grad.parameters()},\
+    optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},\
                               {'params': model.model_AE.encoder.parameters(),\
                                'lr': lambda_LRAE*lrCurrent}
                               ], lr=lrCurrent)
+    '''optimizer   = optim.RMSprop([{'params': model.model_Grad.parameters()},\
+                              {'params': model.model_AE.encoder.parameters(),\
+                               'lr': lambda_LRAE*lrCurrent}
+                              ], lr=lrCurrent)
+    '''
 
     ## adapt loss function parameters if learning only with observations
     if flagTrWMissingData == 2:
@@ -174,13 +175,13 @@ def learning_OSSE(dict_global_Params,genFilename,\
                       flagGradModel,flagOptimMethod,N_cov=N_cov)
             model =  model_to_MultiGPU(model)
             # update optimizer
-            #optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
-            #                        {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
-            #                        ], lr=lrCurrent)
-            optimizer   = optim.RMSprop([{'params': model.model_Grad.parameters()},
+            optimizer   = optim.Adam([{'params': model.model_Grad.parameters()},
                                     {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
                                     ], lr=lrCurrent)
-
+            '''optimizer   = optim.RMSprop([{'params': model.model_Grad.parameters()},
+                                    {'params': model.model_AE.encoder.parameters(), 'lr': lambda_LRAE*lrCurrent}
+                                    ], lr=lrCurrent)
+            '''
             # copy model parameters from current model
             model.load_state_dict(best_model_wts)                            
             # update comptUpdate
@@ -265,8 +266,9 @@ def learning_OSSE(dict_global_Params,genFilename,\
                             spatial_gradients_avg = einops.reduce(sobel(outputs), 'b t lat lon -> 1', 'mean')
                             loss        = alpha4DVar[0] * loss_Obs + alpha4DVar[1] * loss_AE + spatial_gradients_avg
                         else:
-                            spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
-                            loss        = loss_All + spatial_gradients_avg
+                            #spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
+                            loss_Grad   = torch.sqrt(einops.reduce((sobel(torch.unsqueeze(outputs[:,idT2,:,:],1))-sobel(torch.unsqueeze(targets[:,idT2,:,:],1)))**2, 'b t lat lon -> 1', 'mean'))
+                            loss        = loss_All + loss_Grad
                          
                         # backward + optimize only if in training phase
                         if phase == 'train':

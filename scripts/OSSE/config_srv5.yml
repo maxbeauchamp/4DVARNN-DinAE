@@ -19,7 +19,7 @@ data_options:
     opt: nadirswot
     lag: 0
     type_obs: mod
-    flagTrWMissingData: 1
+    flagTrWMissingData: 2
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
@@ -46,7 +46,7 @@ NN_options:
 #   Dimension of the latent space
     DimAE: 40    
 #   model type, 1: ConvAE or 2: GENN 3: PINN
-    flagAEType: 2     
+    flagAEType: 2    
 
 # loss function weighting
 loss_weighting: 
@@ -69,7 +69,7 @@ solver_options:
 #   0: fixed-step gradient descent
 #   1: ConvNet_step gradient descent
 #   2: LSTM-based descent
-    flagOptimMethod: 2     
+    flagOptimMethod: 1     
 
 # training parameters
 training_params:
