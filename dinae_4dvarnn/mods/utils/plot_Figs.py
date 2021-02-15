@@ -30,6 +30,19 @@ def plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
     for key,val in dict_global_Params.items():
         exec("globals()['"+key+"']=val")
 
+    if domain=="OSMOSIS":
+        extent     = [-19.5,-11.5,45.,55.]
+        indLat     = 200
+        indLon     = 160
+    elif domain=='GULFSTREAM':
+        extent     = [-65.,-55.,33.,43.]
+        indLat     = 200
+        indLon     = 200
+    else:
+        extent=[-65.,-55.,30.,40.]
+        indLat     = 200
+        indLon     = 200
+
     ## keep only the information on the target variable (remove covariates)
     if include_covariates == True:
         index = np.arange(0,(N_cov+1)*size_tw,(N_cov+1))
@@ -73,12 +86,12 @@ def plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
         mk_dir_recursive(figpathTt) 
 
     idT = int(np.floor(input_train.shape[3]/2))
-    lon = np.arange(-65,-55,1/(20/dwscale))
-    lat = np.arange(30,40,1/(20/dwscale))
-    indLat     = np.arange(0,int(200/dwscale))
-    indLon     = np.arange(0,int(200/dwscale))
-    lon = lon[indLon]
-    lat = lat[indLat]
+    lon = np.arange(extent[0],extent[1],1/(20/dwscale))
+    lat = np.arange(extent[2],extent[3],1/(20/dwscale))
+    indLat     = int(indLat/dwscale)
+    indLon     = int(indLon/dwscale)
+    lon = lon[:indLon]
+    lat = lat[:indLat]
     extent_=[np.min(lon),np.max(lon),np.min(lat),np.max(lat)]
     lfig=[20,40,60]
 
@@ -187,6 +200,19 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
     for key,val in dict_global_Params.items():
         exec("globals()['"+key+"']=val")
 
+    if domain=="OSMOSIS":
+        extent     = [-19.5,-11.5,45.,55.]
+        indLat     = 200
+        indLon     = 160
+    elif domain=='GULFSTREAM':
+        extent     = [-65.,-55.,33.,43.]
+        indLat     = 200
+        indLon     = 200
+    else:
+        extent=[-65.,-55.,30.,40.]
+        indLat     = 200
+        indLon     = 200
+
     # import BFN results
     BFN_10=xr.open_dataset("/users/local/DATA/OSE/GULFSTREAM/OSE_GULFSTREAM_BFN_daily.nc")
     ## Apply reduction parameter
@@ -222,13 +248,13 @@ def plot_Figs2(dict_global_Params,genFilename,genSuffixModel,\
         shutil.rmtree(figpathTr)
         mk_dir_recursive(figpathTr)
 
-    idT = int(np.floor(x_input.shape[3]/2))
-    lon = np.arange(-65,-55,1/(20/dwscale))
-    lat = np.arange(30,40,1/(20/dwscale))
-    indLat     = np.arange(0,int(200/dwscale))
-    indLon     = np.arange(0,int(200/dwscale))
-    lon = lon[indLon]
-    lat = lat[indLat]
+    idT = int(np.floor(input_train.shape[3]/2))
+    lon = np.arange(extent[0],extent[1],1/(20/dwscale))
+    lat = np.arange(extent[2],extent[3],1/(20/dwscale))
+    indLat     = int(indLat/dwscale)
+    indLon     = int(indLon/dwscale)
+    lon = lon[:indLon]
+    lat = lat[:indLat]
     extent_=[np.min(lon),np.max(lon),np.min(lat),np.max(lat)]
     lfig=[20,40,60]
 

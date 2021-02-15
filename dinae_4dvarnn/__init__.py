@@ -43,14 +43,12 @@ assert sys.version_info >= (3,5), "Need Python>=3.6"
 dirs = {}
 
 # Define paths
-datapath="/users/local/"
-basepath="/users/local/m19beauc/"
-scratchpath=basepath+"4DVARNN-DinAE_xp/"
-'''
+#datapath="/users/local/"
+#basepath="/users/local/m19beauc/"
+#scratchpath=basepath+"4DVARNN-DinAE_xp/"
 datapath="/gpfswork/rech/yrf/uba22to/"
 basepath="/linkhome/rech/genimt01/uba22to/"
 scratchpath="/gpfsscratch/rech/yrf/uba22to/4DVARNN-DinAE_xp/"
-'''
 
 print("Initializing 4DVARNN-DinAE libraries...",flush=True)
 

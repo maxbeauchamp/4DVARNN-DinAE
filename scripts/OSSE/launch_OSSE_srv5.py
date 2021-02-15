@@ -56,6 +56,7 @@ if __name__ == '__main__':
     end_eval_index              = conf['data_options']['end_eval_index']
     start_train_index           = conf['data_options']['start_train_index']
     end_train_index             = conf['data_options']['end_train_index']
+    ixp                         = conf['data_options']['id_xp']
     DimAE       		= conf['NN_options']['DimAE']
     flagAEType  		= conf['NN_options']['flagAEType']
     alpha                       = conf['loss_weighting']['alpha']
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     'solver_type','flagOptimMethod','flagGradModel',\
     'alpha','alpha4DVar',\
     'start_eval_index','end_eval_index',\
-    'start_train_index','end_train_index',\
+    'start_train_index','end_train_index','ixp',\
     'batch_size','NbEpoc','Niter',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   

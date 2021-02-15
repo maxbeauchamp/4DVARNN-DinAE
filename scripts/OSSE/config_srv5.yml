@@ -40,6 +40,8 @@ data_options:
 #   Index trainig dates
     start_train_index: 122
     end_train_index: 365
+#   Index XP
+    id_xp: 1
 
 # NN model options
 NN_options:

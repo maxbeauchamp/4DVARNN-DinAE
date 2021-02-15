@@ -1,0 +1,20 @@
+Loading pytorch-gpu/py3/1.4.0
+  Loading requirement: cuda/10.1.1 nccl/2.4.8-1-cuda cudnn/10.1-v7.5.1.10
+    gcc/8.3.1 openmpi/4.0.2-cuda
++ JobID=3993
++ rsync -avrz --exclude=figs /linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/ /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993
++ sed -i -e 's|_LAG_|0|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/config_zay.yml
++ sed -i -e 's|_DOMAIN_|GULFSTREAM|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/config_zay.yml
++ sed -i -e 's|_LMOD_|False|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/config_zay.yml
++ sed -i -e 's|_SOLVER_|GB|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/config_zay.yml
++ sed -i -e 's|_PATH_|/gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE|g' /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/launch_OSE_zay.py
++ python -u /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/launch_OSE_zay.py
+Traceback (most recent call last):
+  File "/gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993/scripts/OSE/launch_OSE_zay.py", line 108, in <module>
+    lday_train, x_train_OI, x_mod, mask_mod, x_BFN = import_Data_OSE(globParams)
+  File "/linkhome/rech/genimt01/uba22to/4DVARNN-DinAE/dinae_4dvarnn/mods/import_Datasets_OSE.py", line 44, in import_Data_OSE
+    nc_data_obs = Dataset(fileObs,'r')  
+  File "netCDF4/_netCDF4.pyx", line 2321, in netCDF4._netCDF4.Dataset.__init__
+  File "netCDF4/_netCDF4.pyx", line 1885, in netCDF4._netCDF4._ensure_nc_success
+FileNotFoundError: [Errno 2] No such file or directory: b'/gpfswork/rech/yrf/uba22to/DATA/OSE/GULFSTREAM/training/dataset_nadir_0d.nc'
++ rm -rf /gpfswork/rech/yrf/uba22to/4DVARNN-DinAE_3993

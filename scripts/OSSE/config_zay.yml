@@ -41,6 +41,8 @@ data_options:
 #   Index trainig dates
     start_train_index: 122
     end_train_index: 365
+#   Index XP
+    id_xp: 1
 
 # NN model options
 NN_options:
@@ -79,4 +81,4 @@ training_params:
 # batch size for a single GPU  
     batch_size: 4
     NbEpoc: 20
-    Niter: 20
+    Niter: 6

@@ -40,7 +40,10 @@ def ConvAE(dict_global_Params,genFilename,shapeData):
     class Decoder(torch.nn.Module):
         def __init__(self):
             super(Decoder, self).__init__()
-            self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,256,(20,20),stride=(25,25),bias=False,padding=int(20/2))
+            if domain=="OSMOSIS":
+                self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,256,(16,21),stride=(25,25),bias=False,padding=int(16/2))
+            else:
+                self.conv1Tr = torch.nn.ConvTranspose2d(DimAE,256,(20,20),stride=(25,25),bias=False,padding=int(20/2))
             self.conv2Tr = torch.nn.ConvTranspose2d(256,80,(2,2),stride=(2,2),bias=False,padding=(0,0))
             self.conv3   = torch.nn.Conv2d(80,40,(3,3),stride=(1,1),padding=int(3/2))
             self.resnet  = ResNetConv2d(2,40,2,3,int(3/2))

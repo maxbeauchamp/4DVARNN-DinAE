@@ -52,10 +52,7 @@ def import_Data_OSSE(dict_global_Params,type_obs):
     # DAILY NATL60
     x_mod = Imputing_NaN_3d(np.copy(nc_data_mod['ssh'][:,indLat,indLon]))
     # NADIR/SWOT observations
-    if flagTrWMissingData==0:
-        x_obs= x_mod
-    else:
-        x_obs = np.copy(nc_data_obs['ssh_'+type_obs][:,indLat,indLon])
+    x_obs = np.copy(nc_data_obs['ssh_'+type_obs][:,indLat,indLon])
     nc_data_mod.close()
     nc_data_obs.close()
     # load OI data
@@ -168,8 +165,6 @@ def import_Data_OSSE(dict_global_Params,type_obs):
     # Build ground truth data test
     if flagTrWMissingData==2:
         target_test = input_test
-    if flagTrWMissingData==0:
-        input_test  = target_test
     # Add covariates (merge x_test and mask_test with covariates)
     if include_covariates==True:
         cov_test.insert(0,input_test)

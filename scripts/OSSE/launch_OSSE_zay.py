@@ -56,6 +56,7 @@ if __name__ == '__main__':
     end_eval_index              = conf['data_options']['end_eval_index']
     start_train_index           = conf['data_options']['start_train_index']
     end_train_index             = conf['data_options']['end_train_index']
+    ixp                         = conf['data_options']['id_xp']
     DimAE       		= conf['NN_options']['DimAE']
     flagAEType  		= conf['NN_options']['flagAEType']
     alpha                       = conf['loss_weighting']['alpha']
@@ -73,7 +74,7 @@ if __name__ == '__main__':
 
     # create the output directory
     if flagAEType==1:
-        suf1="ConvAE",
+        suf1="ConvAE"
     elif flagAEType==2:
         suf1="GENN"
     else:
@@ -86,9 +87,7 @@ if __name__ == '__main__':
         suf2 = "wwmissing"
     suf3 = ifelse(solver_type=="GB","GB"+str(flagOptimMethod),"FP")
     suf4 = ifelse(include_covariates==True,"w"+'-'.join(lid_cov),"wocov")
-    dirSAVE = ifelse(opt!='swot',\
-              scratchpath+domain+'/OSSE/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/',\
-              scratchpath+domain+'/OSSE/resIA_'+opt+'_'+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/')
+    dirSAVE = scratchpath+domain+'/OSSE/resIA_'+opt+'_nadlag_'+lag+"_"+type_obs+"/"+suf3+'_'+suf1+'_'+suf2+'_'+suf4+'/'
     if not os.path.exists(dirSAVE):
         mk_dir_recursive(dirSAVE)
     #else:
@@ -106,7 +105,7 @@ if __name__ == '__main__':
     'solver_type','flagOptimMethod','flagGradModel',\
     'alpha','alpha4DVar',\
     'start_eval_index','end_eval_index',\
-    'start_train_index','end_train_index',\
+    'start_train_index','end_train_index','ixp',\
     'batch_size','NbEpoc','Niter',\
     'dirSAVE','suf1','suf2','suf3','suf4']
     globParams = createGlobParams(list_globParams)   

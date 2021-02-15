@@ -5,6 +5,7 @@ from eval_Performance      import eval_AEPerformance
 from eval_Performance      import eval_InterpPerformance
 from plot_Figs             import plot_Figs
 from save_Pickle           import save_Pickle
+from save_NetCDF           import save_NetCDF
 from save_Models           import save_Models
 from Model_4DVarNN_FP      import Model_4DVarNN_FP
 from Model_4DVarNN_Grad    import Model_4DVarNN_Grad
@@ -57,14 +58,14 @@ def learning_OSSE(dict_global_Params,genFilename,\
     ## model parameters
     if solver_type=='FP':
         #NbProjection   = [2,4,5,6,7,9,10]
-        NbProjection   = [5,5,5,5,5,5,5]
+        #NbProjection   = [5,5,5,5,5,5,5]
         NbProjection   = [1,1,2,3,4,5,5]
         NbGradIter     = [0,0,0,0,0,0,0]
     else:
         #NbProjection   = [0,0,0,0,0,0,0]
-        NbProjection  = [2,2,2,5,5,5,5]
-        #NbGradIter     = [2,3,4,5,7,9,10]
-        NbGradIter     = [2,2,2,5,5,5,5]
+        NbProjection   = [1,1,2,3,4,5,5]
+        NbGradIter     = [2,3,4,5,7,9,10]
+        #NbGradIter     = [2,2,2,5,5,5,5]
         #NbGradIter    = [0,0,0,0,0,0,0]
     if flagTrWMissingData==2:
         #lrUpdate       = [1e-4,1e-4,1e-5,1e-5,1e-6,1e-6,1e-7]
@@ -189,7 +190,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
                 comptUpdate += 1
         ## daloader for the training phase                
         dataloaders = { 'train': torch.utils.data.DataLoader(training_dataset,\
-                                 batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True),\
+                                 batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True),\
                         'val':   torch.utils.data.DataLoader(test_dataset,\
                                  batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True), }
 
@@ -268,7 +269,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
                         else:
                             #spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
                             loss_Grad   = torch.sqrt(einops.reduce((sobel(torch.unsqueeze(outputs[:,idT2,:,:],1))-sobel(torch.unsqueeze(targets[:,idT2,:,:],1)))**2, 'b t lat lon -> 1', 'mean'))
-                            loss        = loss_All + loss_Grad
+                            loss        = loss_All + loss_Grad + loss_AE_GT
                          
                         # backward + optimize only if in training phase
                         if phase == 'train':
@@ -354,7 +355,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
         for inputs_init,masks,targets in dataloaders['train']:
             inputs_init    = inputs_init.to(device)
             masks          = masks.to(device)
-            targets      = targets.to(device)
+            targets        = targets.to(device)
             if N_cov>0:
                 targets_wcov = add_covariates_to_tensor(targets,\
                                 inputs_init,N_cov).to(device)
@@ -362,13 +363,11 @@ def learning_OSSE(dict_global_Params,genFilename,\
                 targets_wcov = targets
             with torch.set_grad_enabled(True): 
                 outputs_ = model.model_AE(targets_wcov)
-            print(outputs_.shape)
             if len(rec_AE_Tr) == 0:
                 rec_AE_Tr  = torch.mul(1.0,outputs_).cpu().detach()
             else:
                 rec_AE_Tr  = np.concatenate((rec_AE_Tr,\
                                torch.mul(1.0,outputs_).cpu().detach().numpy()),axis=0)
-            print(rec_AE_Tr.shape)
 
         # ouputs for test data
         rec_AE_Tt = []
@@ -415,19 +414,23 @@ def learning_OSSE(dict_global_Params,genFilename,\
         # **************************** #
 
         ## save models
-        genSuffixModel=save_Models(dict_global_Params,genFilename,alpha4DVar,\
+        genSuffixModel=save_Models(dict_global_Params,genFilename,alpha4DVar,
                                    NBProjCurrent,NBGradCurrent,model_AE,model,iter)
 
         ## generate some plots
-        plot_Figs(dict_global_Params,genFilename,genSuffixModel,\
-                  target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],\
-                  target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,\
+        plot_Figs(dict_global_Params,genFilename,genSuffixModel,
+                  target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],
+                  target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,
                   lday_pred,lday_test,iter)
 
         ## save results in a pickle file
-        save_Pickle(dict_global_Params,\
-                    target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],\
-                    target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,\
+        save_Pickle(dict_global_Params,
+                    target_train,input_train,x_train_pred,rec_AE_Tr,input_train_OI,meanTr[0],stdTr[0],
+                    target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,iter)
+
+        ## save results in NetCDF file
+        save_NetCDF(dict_global_Params,meanTr[0],stdTr[0],
+                    x_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,
                     iter)
 
         '''# if nothing happened during this iteration

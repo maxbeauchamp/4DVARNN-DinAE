@@ -4,7 +4,7 @@
 #SBATCH --ntasks=1                  # nombre de tâche (un unique processus ici)
 #SBATCH --gres=gpu:1                # nombre de GPU à réserver (un unique GPU ici)
 #SBATCH --cpus-per-task=40          # nombre de coeurs à réserver (un quart du noeud)
-#SBATCH --partition=gpu_p1          # change de partition (preprost: test; gpu_p1: runs)
+#SBATCH -C v100-32g                 # partition
 # /!\ Attention, la ligne suivante est trompeuse mais dans le vocabulaire
 # de Slurm "multithread" fait bien référence à l'hyperthreading.
 #SBATCH --hint=nomultithread        # on réserve des coeurs physiques et non logiques
