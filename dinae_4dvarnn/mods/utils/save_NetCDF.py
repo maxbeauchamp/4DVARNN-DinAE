@@ -36,8 +36,8 @@ def save_NetCDF(dict_global_Params,\
     mesh_lat = mesh_lat.T
     mesh_lon = mesh_lon.T
 
-    saved_path1 = dirSAVE+'/NATL60_GULFSTREAM_XP'+ixp+'_'+suf3+"_"+suf1+"_%03d.nc"%(iter)
-    saved_path2 = dirSAVE+'/NATL60_GULFSTREAM_XP'+ixp+'_rec_'+suf3+"_"+suf1+"_%03d.nc"%(iter)
+    saved_path1 = dirSAVE+'/NATL60_GULFSTREAM_XP'+str(ixp)+'_'+suf3+"_"+suf1+"_%03d.nc"%(iter)
+    saved_path2 = dirSAVE+'/NATL60_GULFSTREAM_XP'+str(ixp)+'_rec_'+suf3+"_"+suf1+"_%03d.nc"%(iter)
 
     ## keep only the information on the target variable (remove covariates)
     if include_covariates == True:

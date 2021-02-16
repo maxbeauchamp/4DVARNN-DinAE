@@ -62,9 +62,12 @@ def learning_OSSE(dict_global_Params,genFilename,\
         NbProjection   = [1,1,2,3,4,5,5]
         NbGradIter     = [0,0,0,0,0,0,0]
     else:
-        #NbProjection   = [0,0,0,0,0,0,0]
-        NbProjection   = [1,1,2,3,4,5,5]
-        NbGradIter     = [2,3,4,5,7,9,10]
+        NbProjection   = [0,0,0,0,0,0,0]
+        #NbProjection   = [1,2,3,4,4,5,5]
+        #NbProjection   = [2,4,5,6,7,9,10]
+        #NbGradIter     = [1,2,3,4,4,5,5]
+        #NbProjection   = [2,2,2,2,2,2,2]
+        NbGradIter     = [1,2,3,4,4,5,5]
         #NbGradIter     = [2,2,2,5,5,5,5]
         #NbGradIter    = [0,0,0,0,0,0,0]
     if flagTrWMissingData==2:
@@ -72,7 +75,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
         lrUpdate       = [1e-2,1e-3,1e-4,1e-5,1e-5,1e-6,1e-6]
     else:
         lrUpdate       = [1e-3,1e-4,1e-4,1e-5,1e-5,1e-6,1e-6]
-    IterUpdate     = [0,2,3,4,6,8,10]
+    IterUpdate     = [0,1,2,3,4,5,6]
     val_split      = 0.1
     comptUpdate    = 0  
 
@@ -269,7 +272,8 @@ def learning_OSSE(dict_global_Params,genFilename,\
                         else:
                             #spatial_gradients_avg = einops.reduce(sobel(torch.unsqueeze(outputs[:,idT2,:,:],1)), 'b t lat lon -> 1', 'mean')
                             loss_Grad   = torch.sqrt(einops.reduce((sobel(torch.unsqueeze(outputs[:,idT2,:,:],1))-sobel(torch.unsqueeze(targets[:,idT2,:,:],1)))**2, 'b t lat lon -> 1', 'mean'))
-                            loss        = loss_All + loss_Grad + loss_AE_GT
+                            loss        = loss_All + 10*loss_Grad + .1*loss_AE + .1*loss_AE_GT
+                            #loss        = loss_All + loss_Grad
                          
                         # backward + optimize only if in training phase
                         if phase == 'train':
@@ -430,7 +434,7 @@ def learning_OSSE(dict_global_Params,genFilename,\
 
         ## save results in NetCDF file
         save_NetCDF(dict_global_Params,meanTr[0],stdTr[0],
-                    x_test,x_test_missing,x_test_pred,rec_AE_Tt,x_test_OI,
+                    target_test,input_test,x_test_pred,rec_AE_Tt,input_test_OI,
                     iter)
 
         '''# if nothing happened during this iteration

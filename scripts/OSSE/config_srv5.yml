@@ -18,8 +18,8 @@ data_options:
     domain: GULFSTREAM
     opt: nadirswot
     lag: 0
-    type_obs: mod
-    flagTrWMissingData: 2
+    type_obs: obs
+    flagTrWMissingData: 1
 #   load OI: work on SSH or anomaly w.r.t OI (SSH-OI)
     flagloadOIData: 1 
 #   use additional covariates in initial layer
@@ -62,7 +62,7 @@ loss_weighting:
 # solver parameters
 solver_options: 
 #   FP or Grad
-    solver_type: FP
+    solver_type: GB
 #   Gradient computation 
 #   0: subgradient
 #   1: true gradient/autograd
